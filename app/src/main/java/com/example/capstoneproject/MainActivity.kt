@@ -3,9 +3,9 @@ package com.example.capstoneproject
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.*
 import androidx.navigation.compose.rememberNavController
 import com.example.capstoneproject.navigation.AppNavGraph
+import com.example.capstoneproject.ui.theme.CapstoneProjectTheme // ✅ Tambahkan import ini
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -14,7 +14,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val navController = rememberNavController()
-            MaterialTheme {
+            CapstoneProjectTheme { // ✅ Gunakan theme custom-mu
                 AppNavGraph(navController = navController, viewModel = viewModel)
             }
         }
