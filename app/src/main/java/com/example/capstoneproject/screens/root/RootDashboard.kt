@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.capstoneproject.navigation.Screen
@@ -54,5 +55,19 @@ fun RootDashboard(onNavigate: (Screen) -> Unit, onLogout: () -> Unit) {
         Button(onClick = onLogout, colors = ButtonDefaults.buttonColors(containerColor = Color.Red)) {
             Text("Logout", color = Color.White)
         }
+    }
+}
+
+@Preview(
+    showBackground = true,
+    device = "spec:width=1024dp,height=768dp,dpi=240"
+)
+@Composable
+fun RootDashboardTabletPreview() {
+    MaterialTheme {
+        RootDashboard(
+            onNavigate = {},
+            onLogout = {}
+        )
     }
 }

@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.capstoneproject.MainViewModel
@@ -192,4 +193,19 @@ fun LoginPage(viewModel: MainViewModel, onLoginSuccess: (Screen) -> Unit) {
             }
         }
     }
+}
+
+@Preview(
+    showBackground = true,
+    device = "spec:width=1024dp,height=768dp,dpi=240"
+)
+@Composable
+fun AnimatedLoginPagePreview() {
+    // Buat dummy ViewModel & handler karena Preview nggak bisa handle real logic
+    val dummyViewModel = MainViewModel() // Pastikan constructor-nya tidak perlu parameter (atau pakai mock kalau perlu)
+    AnimatedLoginPage(
+        visible = true,
+        viewModel = dummyViewModel,
+        onLoginSuccess = {}
+    )
 }

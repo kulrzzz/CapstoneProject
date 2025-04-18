@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 // Dummy user data class
@@ -46,5 +47,16 @@ fun DaftarUserPage(onBack: () -> Unit) {
                 }
             }
         }
+    }
+}
+
+@Preview(
+    showBackground = true,
+    device = "spec:width=1024dp,height=768dp,dpi=240"
+)
+@Composable
+fun DaftarUserPagePreview() {
+    MaterialTheme {
+        DaftarUserPage(onBack = {})
     }
 }

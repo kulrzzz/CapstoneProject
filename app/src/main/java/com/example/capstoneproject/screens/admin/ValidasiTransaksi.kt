@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -60,5 +61,16 @@ fun ValidasiTransaksiPage(onBack: () -> Unit = {}) {
             false -> Text("❌ Transaksi tidak ditemukan atau tidak valid", color = MaterialTheme.colorScheme.error, fontSize = 18.sp)
             null -> {}
         }
+    }
+}
+
+@Preview(
+    showBackground = true,
+    device = "spec:width=1024dp,height=768dp,dpi=240"
+)
+@Composable
+fun ValidasiTransaksiPagePreview() {
+    MaterialTheme {
+        ValidasiTransaksiPage(onBack = {})
     }
 }
