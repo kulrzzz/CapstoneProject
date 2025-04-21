@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.capstoneproject.R
@@ -227,3 +228,17 @@ val dummyRiwayat = listOf(
     RiwayatItem("Subin Sedhai", "GKM 1.3", "12:00 - 14:00", "863256"),
     RiwayatItem("Worjula Joshi", "GKM 1.3", "12:00 - 20:00", "4598728")
 )
+
+@Preview(
+    showBackground = true,
+    device = "spec:width=1024dp,height=768dp,dpi=240"
+)
+@Composable
+fun AdminDashboardTabletPreview() {
+    MaterialTheme {
+        AdminDashboard(
+            onNavigate = {},
+            onLogout = {}
+        )
+    }
+}
