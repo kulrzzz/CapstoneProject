@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,30 +16,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.capstoneproject.MainViewModel
 import com.example.capstoneproject.R
 import com.example.capstoneproject.navigation.Screen
+import kotlinx.coroutines.launch
 
 @Composable
 fun AnimatedLoginPage(
     visible: Boolean,
-    viewModel: MainViewModel,
+    viewModel: MainViewModel = viewModel(),
     onLoginSuccess: (Screen) -> Unit
 ) {
     AnimatedVisibility(
         visible = visible,
-        enter = scaleIn(
-            initialScale = 0.8f,
-            animationSpec = tween(durationMillis = 600, delayMillis = 200)
-        ) + fadeIn(animationSpec = tween(600, delayMillis = 200)),
-        exit = scaleOut(
-            targetScale = 1.1f,
-            animationSpec = tween(durationMillis = 400)
-        ) + fadeOut(animationSpec = tween(400))
+        enter = scaleIn(initialScale = 0.8f, animationSpec = tween(600, delayMillis = 200)) +
+                fadeIn(animationSpec = tween(600, delayMillis = 200)),
+        exit = scaleOut(targetScale = 1.1f, animationSpec = tween(400)) +
+                fadeOut(animationSpec = tween(400))
     ) {
         LoginPage(viewModel, onLoginSuccess)
     }
@@ -52,14 +46,13 @@ fun AnimatedLoginPage(
 fun LoginPage(viewModel: MainViewModel, onLoginSuccess: (Screen) -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var error by remember { mutableStateOf(false) }
+    var error by remember { mutableStateOf<String?>(null) }
     var passwordVisible by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     val gradient = Brush.verticalGradient(
         listOf(Color(0xFFB3E5FC), Color(0xFFFFF3E0))
     )
-
-    val fontFamily = MaterialTheme.typography.bodyLarge.fontFamily // Ganti dengan FontFamily jika pakai custom font
 
     Box(
         modifier = Modifier
@@ -71,7 +64,6 @@ fun LoginPage(viewModel: MainViewModel, onLoginSuccess: (Screen) -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.align(Alignment.Center)
         ) {
-            // Logo
             Image(
                 painter = painterResource(id = R.drawable.reservin3),
                 contentDescription = "Logo",
@@ -82,43 +74,36 @@ fun LoginPage(viewModel: MainViewModel, onLoginSuccess: (Screen) -> Unit) {
 
             Spacer(modifier = Modifier.height(36.dp))
 
-            // Email Input
             OutlinedTextField(
                 value = email,
                 onValueChange = {
                     email = it
-                    error = false
+                    error = null
                 },
                 singleLine = true,
                 placeholder = { Text("Email", color = Color.Gray) },
-                leadingIcon = {
-                    Icon(Icons.Default.Email, contentDescription = null, tint = Color.Gray)
-                },
+                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = Color.Gray) },
                 modifier = Modifier
-                    .width(500.dp) // atau nilai yang sesuai selera
+                    .width(500.dp)
                     .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(24.dp)),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Transparent,
-                    unfocusedBorderColor = Color.Transparent,
-                    disabledBorderColor = Color.Transparent
+                    unfocusedBorderColor = Color.Transparent
                 ),
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Password Input
             OutlinedTextField(
                 value = password,
                 onValueChange = {
                     password = it
-                    error = false
+                    error = null
                 },
                 singleLine = true,
                 placeholder = { Text("Password", color = Color.Gray) },
-                leadingIcon = {
-                    Icon(Icons.Default.Lock, contentDescription = null, tint = Color.Gray)
-                },
+                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Color.Gray) },
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
@@ -131,38 +116,40 @@ fun LoginPage(viewModel: MainViewModel, onLoginSuccess: (Screen) -> Unit) {
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier
-                    .width(500.dp) // atau nilai yang sesuai selera
+                    .width(500.dp)
                     .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(24.dp)),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Transparent,
-                    unfocusedBorderColor = Color.Transparent,
-                    disabledBorderColor = Color.Transparent
+                    unfocusedBorderColor = Color.Transparent
                 ),
                 textStyle = MaterialTheme.typography.bodyLarge.copy(color = Color.Black)
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Login Button
             Button(
                 onClick = {
-                    val screen = viewModel.login(email, password)
-                    if (screen != null) {
-                        onLoginSuccess(screen)
-                    } else {
-                        error = true
+                    coroutineScope.launch {
+                        if (email.isBlank() || password.isBlank()) {
+                            error = "Email dan password tidak boleh kosong"
+                        } else {
+                            viewModel.login(email, password) { result ->
+                                if (result != null) {
+                                    onLoginSuccess(result)
+                                } else {
+                                    error = viewModel.loginError.value ?: "Email atau Password salah"
+                                }
+                            }
+                        }
                     }
                 },
                 modifier = Modifier
                     .width(300.dp)
                     .height(50.dp),
                 shape = RoundedCornerShape(30.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Transparent
-                ),
-                contentPadding = PaddingValues() // penting agar isi tidak padded default
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                contentPadding = PaddingValues()
             ) {
-                // Isi button dengan Box ber-gradient
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -181,14 +168,9 @@ fun LoginPage(viewModel: MainViewModel, onLoginSuccess: (Screen) -> Unit) {
                 }
             }
 
-            // Error message
-            if (error) {
+            error?.let {
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    "Email atau Password salah",
-                    color = MaterialTheme.colorScheme.error,
-                    fontSize = 12.sp
-                )
+                Text(text = it, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
             }
         }
     }
