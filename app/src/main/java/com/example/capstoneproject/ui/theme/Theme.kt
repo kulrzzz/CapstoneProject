@@ -11,12 +11,6 @@ private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
     tertiary = Pink40,
-    // Optional: Tambahkan jika ingin kustomisasi lebih detail
-    // background = Color.White,
-    // surface = Color.White,
-    // onPrimary = Color.White,
-    // onSecondary = Color.Black,
-    // onTertiary = Color.White,
 )
 
 // 🌙 3. Dark Color Scheme (Optional)
@@ -41,10 +35,11 @@ fun CapstoneProjectTheme(
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
-
     MaterialTheme(
-        colorScheme = LightColorScheme,
-        typography = AppTypography, // Gunakan typography yang pakai Poppins
+        colorScheme = colorScheme,
+        typography = AppTypography,
         content = content
     )
 }
+
+
