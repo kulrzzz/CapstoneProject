@@ -1,4 +1,5 @@
-package com.example.capstoneproject.screens.root
+package com.example.capstoneproject.screens.admin
+
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.example.capstoneproject.R
 
 @Composable
-fun SideBarRoot(
+fun SideBarAdmin(
     logoSpacing: Dp = 25.dp
 ) {
     Column(
@@ -55,11 +56,6 @@ fun SideBarRoot(
             SidebarItem(iconRes = R.drawable.homebefore, text = "Dashboard")
             SidebarItem(iconRes = R.drawable.riwayat, text = "Lihat Riwayat Transaksi")
             SidebarItem(iconRes = R.drawable.daftaruser, text = "Lihat Daftar User")
-
-            Divider(color = Color(0xFFE2E8F0), thickness = 1.dp)
-
-            SidebarItem(iconRes = R.drawable.adminbefore, text = "Manajemen Admin")
-            SidebarItem(iconRes = R.drawable.ruanganbefore, text = "Manajemen Ruangan")
         }
 
         LogoutButton()
@@ -115,6 +111,6 @@ fun LogoutButton() {
 @Composable
 fun SideBarPreview() {
     MaterialTheme {
-        SideBarRoot()
+        SideBarAdmin()
     }
 }
