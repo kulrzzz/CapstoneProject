@@ -21,27 +21,25 @@ fun MainScreen() {
 
         when (selectedMenu) {
             MenuItem.MANAJEMEN_RUANGAN -> ManajemenRuangan(
-                onTambahRuanganClick = { /* navigasi ke TambahRuanganScreen */ }
+                onTambahRuanganClick = { selectedMenu = MenuItem.TAMBAH_RUANGAN }
             )
-
-            MenuItem.MANAJEMEN_RUANGAN -> TambahRuangan()
-            else -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Silahkan pilih menu lain", style = MaterialTheme.typography.headlineSmall)
+            MenuItem.TAMBAH_RUANGAN -> TambahRuangan()
+            MenuItem.DASHBOARD -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Ini Dashboard", style = MaterialTheme.typography.headlineSmall)
+            }
+            MenuItem.RIWAYAT -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Ini Riwayat", style = MaterialTheme.typography.headlineSmall)
+            }
+            MenuItem.DAFTAR_USER -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Ini Daftar User", style = MaterialTheme.typography.headlineSmall)
+            }
+            MenuItem.MANAJEMEN_ADMIN -> Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text("Ini Manajemen Admin", style = MaterialTheme.typography.headlineSmall)
             }
         }
-//        when (selectedMenu) {
-////            MenuItem.DASHBOARD -> DashboardScreen()
-//            MenuItem.MANAJEMEN_RUANGAN -> ManajemenRuangan(
-//                onTambahRuanganClick = { /* navigasi ke TambahRuanganScreen */ }
-//            )
-//            // lainnya
-//            MenuItem.DASHBOARD -> TODO()
-//            MenuItem.RIWAYAT -> TODO()
-//            MenuItem.DAFTAR_USER -> TODO()
-//            MenuItem.MANAJEMEN_ADMIN -> TODO()
-//        }
     }
 }
+
 
 @Preview(showBackground = true, widthDp = 1024, heightDp = 768)
 @Composable

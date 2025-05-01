@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.example.capstoneproject.R
 
 enum class MenuItem {
-    DASHBOARD, RIWAYAT, DAFTAR_USER, MANAJEMEN_ADMIN, MANAJEMEN_RUANGAN
+    DASHBOARD, RIWAYAT, DAFTAR_USER, MANAJEMEN_ADMIN, MANAJEMEN_RUANGAN, TAMBAH_RUANGAN
 }
 
 @Composable
@@ -133,7 +133,7 @@ fun LogoutButton() {
     }
 }
 
-@Preview(showBackground = true, widthDp = 300, heightDp = 768)
+@Preview(showBackground = true, widthDp = 262, heightDp = 768)
 @Composable
 fun SideBarRootPreview() {
     var selectedMenu by remember { mutableStateOf(MenuItem.DASHBOARD) }
