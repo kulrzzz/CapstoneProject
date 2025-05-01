@@ -1,5 +1,5 @@
 // RootDashboard.kt
-package com.example.capstoneproject.screens.root
+package com.example.capstoneproject.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

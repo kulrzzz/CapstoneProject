@@ -1,4 +1,4 @@
-package com.example.capstoneproject.screens.admin
+package com.example.capstoneproject.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,37 +11,39 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-// Dummy user data class
-data class User(val username: String, val email: String)
+// Dummy data class (jika belum global, bisa dipindah ke file terpisah)
+data class Transaksi(val id: String, val user: String, val tanggal: String, val jumlah: Int)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DaftarUserPage(onBack: () -> Unit) {
-    val daftarUser = remember {
+fun RiwayatTransaksiPage(onBack: () -> Unit) {
+    val riwayat = remember {
         listOf(
-            User("user1", "user1@email.com"),
-            User("user2", "user2@email.com"),
-            User("user3", "user3@email.com")
+            Transaksi("TRX001", "user1", "2024-04-10", 50000),
+            Transaksi("TRX002", "user2", "2024-04-11", 75000),
+            Transaksi("TRX003", "user1", "2024-04-12", 100000)
         )
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
         TopAppBar(
-            title = { Text("Daftar User") },
+            title = { Text("Riwayat Transaksi") },
             navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
                 }
             }
         )
 
         Column(modifier = Modifier.padding(16.dp)) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                items(daftarUser) { user ->
+                items(riwayat) { trx ->
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.padding(16.dp)) {
-                            Text("Username: ${user.username}", style = MaterialTheme.typography.bodyLarge)
-                            Text("Email: ${user.email}")
+                            Text("ID: ${trx.id}", style = MaterialTheme.typography.bodyLarge)
+                            Text("User: ${trx.user}")
+                            Text("Tanggal: ${trx.tanggal}")
+                            Text("Jumlah: Rp ${trx.jumlah}")
                         }
                     }
                 }
@@ -55,8 +57,8 @@ fun DaftarUserPage(onBack: () -> Unit) {
     device = "spec:width=1024dp,height=768dp,dpi=240"
 )
 @Composable
-fun DaftarUserPagePreview() {
+fun RiwayatTransaksiPagePreview() {
     MaterialTheme {
-        DaftarUserPage(onBack = {})
+        RiwayatTransaksiPage(onBack = {})
     }
 }

@@ -1,4 +1,4 @@
-package com.example.capstoneproject.screens.admin
+package com.example.capstoneproject.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,7 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.capstoneproject.R
 import com.example.capstoneproject.navigation.Screen
-import com.example.capstoneproject.ui.theme.Poppins
 
 @Composable
 fun AdminDashboard(

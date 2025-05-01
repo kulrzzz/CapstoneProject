@@ -5,9 +5,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.capstoneproject.MainViewModel
-import com.example.capstoneproject.screens.admin.*
+import com.example.capstoneproject.screens.AdminDashboard
+import com.example.capstoneproject.screens.CrudAdminPage
+import com.example.capstoneproject.screens.CrudRuanganPage
+import com.example.capstoneproject.screens.DaftarUserPage
+import com.example.capstoneproject.screens.RiwayatTransaksiPage
+import com.example.capstoneproject.screens.RootDashboard
 import com.example.capstoneproject.screens.login.AnimatedLoginPage
-import com.example.capstoneproject.screens.root.*
 
 @Composable
 fun AppNavGraph(navController: NavHostController, viewModel: MainViewModel) {
