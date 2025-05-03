@@ -5,13 +5,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.capstoneproject.MainViewModel
-import com.example.capstoneproject.screens.AdminDashboard
-import com.example.capstoneproject.screens.CrudAdminPage
-import com.example.capstoneproject.screens.CrudRuanganPage
-import com.example.capstoneproject.screens.DaftarUserPage
-import com.example.capstoneproject.screens.RiwayatTransaksiPage
-import com.example.capstoneproject.screens.RootDashboard
+import com.example.capstoneproject.screens.admin.DaftarUserPage
+import com.example.capstoneproject.screens.admin.RiwayatTransaksiPage
+import com.example.capstoneproject.screens.dashboard.DashboardScreen
 import com.example.capstoneproject.screens.login.AnimatedLoginPage
+import com.example.capstoneproject.screens.root.ManajemenAdminPage
+import com.example.capstoneproject.screens.root.TambahAdminPage
+import com.example.capstoneproject.screens.root.ManajemenRuanganPage
+import com.example.capstoneproject.screens.root.TambahRuanganPage
 
 @Composable
 fun AppNavGraph(navController: NavHostController, viewModel: MainViewModel) {
@@ -19,7 +20,6 @@ fun AppNavGraph(navController: NavHostController, viewModel: MainViewModel) {
         navController = navController,
         startDestination = Screen.Login.route
     ) {
-
         // Login
         composable(Screen.Login.route) {
             AnimatedLoginPage(
@@ -27,27 +27,16 @@ fun AppNavGraph(navController: NavHostController, viewModel: MainViewModel) {
                 viewModel = viewModel,
                 onLoginSuccess = { screen ->
                     navController.navigate(screen.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true } // prevents back to login
+                        popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 }
             )
         }
 
-        // Dashboards
-        composable(Screen.AdminDashboard.route) {
-            AdminDashboard(
-                onNavigate = { navController.navigate(it.route) },
-                onLogout = {
-                    viewModel.logout()
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0) // clear backstack
-                    }
-                }
-            )
-        }
-
-        composable(Screen.RootDashboard.route) {
-            RootDashboard(
+        // Shared Dashboard
+        composable(Screen.Dashboard.route) {
+            DashboardScreen(
+                userRole = viewModel.userRole.value,
                 onNavigate = { navController.navigate(it.route) },
                 onLogout = {
                     viewModel.logout()
@@ -58,7 +47,7 @@ fun AppNavGraph(navController: NavHostController, viewModel: MainViewModel) {
             )
         }
 
-        // Admin Pages
+        // Admin-only Pages
         composable(Screen.RiwayatTransaksi.route) {
             RiwayatTransaksiPage(onBack = { navController.popBackStack() })
         }
@@ -66,12 +55,18 @@ fun AppNavGraph(navController: NavHostController, viewModel: MainViewModel) {
             DaftarUserPage(onBack = { navController.popBackStack() })
         }
 
-        // Root Pages
-        composable(Screen.CrudAdmin.route) {
-            CrudAdminPage(onBack = { navController.popBackStack() })
+        // Root-only Pages
+        composable(Screen.ManajemenAdmin.route) {
+            ManajemenAdminPage(onBack = { navController.popBackStack() })
         }
-        composable(Screen.CrudRuangan.route) {
-            CrudRuanganPage(onBack = { navController.popBackStack() })
+        composable(Screen.TambahAdmin.route) {
+            TambahAdminPage(onBack = { navController.popBackStack() })
+        }
+        composable(Screen.ManajemenRuangan.route) {
+            ManajemenRuanganPage(onBack = { navController.popBackStack() })
+        }
+        composable(Screen.TambahRuangan.route) {
+            TambahRuanganPage(onBack = { navController.popBackStack() })
         }
     }
 }

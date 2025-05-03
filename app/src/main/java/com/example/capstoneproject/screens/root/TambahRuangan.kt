@@ -1,4 +1,4 @@
-package com.example.capstoneproject.screens
+package com.example.capstoneproject.screens.root
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

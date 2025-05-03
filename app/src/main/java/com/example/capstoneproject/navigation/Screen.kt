@@ -2,18 +2,17 @@ package com.example.capstoneproject.navigation
 
 sealed class Screen(val route: String) {
 
-    // General / Auth
+    // General
     object Login : Screen("login")
+    object Dashboard : Screen("dashboard") // digunakan bersama untuk admin & root
 
-    // Dashboard
-    object AdminDashboard : Screen("admin_dashboard")
-    object RootDashboard : Screen("root_dashboard")
-
-    // Admin Screens
+    // Admin-only Screens
     object RiwayatTransaksi : Screen("riwayat_transaksi")
     object DaftarUser : Screen("daftar_user")
 
-    // Root Screens
-    object CrudAdmin : Screen("crud_admin")
-    object CrudRuangan : Screen("crud_ruangan")
+    // Root-only Screens (5 fitur termasuk admin)
+    object ManajemenAdmin : Screen("manajemen_admin")
+    object TambahAdmin : Screen("tambah_admin")
+    object ManajemenRuangan : Screen("manajemen_ruangan")
+    object TambahRuangan : Screen("tambah_ruangan")
 }

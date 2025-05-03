@@ -1,4 +1,4 @@
-package com.example.capstoneproject.screens
+package com.example.capstoneproject.screens.admin
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

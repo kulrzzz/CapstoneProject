@@ -8,7 +8,6 @@ import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.network.ApiClient
 import com.example.capstoneproject.util.Constants
 import kotlinx.coroutines.launch
-import java.util.*
 
 class MainViewModel : ViewModel() {
 
@@ -41,19 +40,15 @@ class MainViewModel : ViewModel() {
                     _isLoggedIn.value = true
                     userName = user.admin_fullname
 
-                    val destination = when (user.admin_who) {
-                        2 -> {
-                            _userRole.value = "root"
-                            Screen.RootDashboard
-                        }
-                        1 -> {
-                            _userRole.value = "admin"
-                            Screen.AdminDashboard
-                        }
+                    // Gunakan 1 screen dashboard saja untuk keduanya
+                    _userRole.value = when (user.admin_who) {
+                        2 -> "root"
+                        1 -> "admin"
                         else -> null
                     }
 
-                    onResult(destination)
+                    onResult(Screen.Dashboard)
+
                 } else {
                     _loginError.value = "Email atau password salah"
                     onResult(null)
