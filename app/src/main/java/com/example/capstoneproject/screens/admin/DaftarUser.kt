@@ -55,7 +55,7 @@ fun DaftarUserPage(onBack: () -> Unit) {
     device = "spec:width=1024dp,height=768dp,dpi=240"
 )
 @Composable
-fun DaftarUserPagePreview() {
+fun DaftarUserPreview() {
     MaterialTheme {
         DaftarUserPage(onBack = {})
     }

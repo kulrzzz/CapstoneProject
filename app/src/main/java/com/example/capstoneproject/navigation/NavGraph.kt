@@ -9,18 +9,18 @@ import com.example.capstoneproject.screens.admin.DaftarUserPage
 import com.example.capstoneproject.screens.admin.RiwayatTransaksiPage
 import com.example.capstoneproject.screens.dashboard.DashboardScreen
 import com.example.capstoneproject.screens.login.AnimatedLoginPage
-import com.example.capstoneproject.screens.root.ManajemenAdminPage
-import com.example.capstoneproject.screens.root.TambahAdminPage
-import com.example.capstoneproject.screens.root.ManajemenRuanganPage
-import com.example.capstoneproject.screens.root.TambahRuanganPage
+import com.example.capstoneproject.screens.root.*
 
 @Composable
-fun AppNavGraph(navController: NavHostController, viewModel: MainViewModel) {
+fun AppNavGraph(
+    navController: NavHostController,
+    viewModel: MainViewModel
+) {
     NavHost(
         navController = navController,
         startDestination = Screen.Login.route
     ) {
-        // Login
+        // Login Page
         composable(Screen.Login.route) {
             AnimatedLoginPage(
                 visible = true,
@@ -28,16 +28,22 @@ fun AppNavGraph(navController: NavHostController, viewModel: MainViewModel) {
                 onLoginSuccess = { screen ->
                     navController.navigate(screen.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
+                        launchSingleTop = true
                     }
                 }
             )
         }
 
-        // Shared Dashboard
+        // Shared Dashboard for Admin & Root
         composable(Screen.Dashboard.route) {
             DashboardScreen(
                 userRole = viewModel.userRole.value,
-                onNavigate = { navController.navigate(it.route) },
+                onNavigate = { target ->
+                    navController.navigate(target.route) {
+                        popUpTo(Screen.Dashboard.route)
+                        launchSingleTop = true
+                    }
+                },
                 onLogout = {
                     viewModel.logout()
                     navController.navigate(Screen.Login.route) {
@@ -47,7 +53,7 @@ fun AppNavGraph(navController: NavHostController, viewModel: MainViewModel) {
             )
         }
 
-        // Admin-only Pages
+        // Admin + Root Pages
         composable(Screen.RiwayatTransaksi.route) {
             RiwayatTransaksiPage(onBack = { navController.popBackStack() })
         }
@@ -57,13 +63,20 @@ fun AppNavGraph(navController: NavHostController, viewModel: MainViewModel) {
 
         // Root-only Pages
         composable(Screen.ManajemenAdmin.route) {
-            ManajemenAdminPage(onBack = { navController.popBackStack() })
+            ManajemenAdminPage(
+                onTambahAdminClick = { navController.navigate(Screen.TambahAdmin.route) },
+                onBack = { navController.popBackStack() }
+            )
         }
         composable(Screen.TambahAdmin.route) {
             TambahAdminPage(onBack = { navController.popBackStack() })
         }
         composable(Screen.ManajemenRuangan.route) {
-            ManajemenRuanganPage(onBack = { navController.popBackStack() })
+            ManajemenRuanganPage(
+                onTambahRuanganClick = {
+                    navController.navigate(Screen.TambahRuangan.route)
+                }
+            )
         }
         composable(Screen.TambahRuangan.route) {
             TambahRuanganPage(onBack = { navController.popBackStack() })

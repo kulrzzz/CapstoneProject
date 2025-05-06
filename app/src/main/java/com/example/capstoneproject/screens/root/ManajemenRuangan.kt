@@ -1,4 +1,4 @@
-package com.example.capstoneproject.screens
+package com.example.capstoneproject.screens.root
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -13,20 +13,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.capstoneproject.R
 import com.example.capstoneproject.ui.theme.TableHeaderCell
 
 @Composable
-fun ManajemenRuangan(onTambahRuanganClick: () -> Unit) {
+fun ManajemenRuanganPage(
+    onTambahRuanganClick: () -> Unit
+) {
     val titleColor = Color(0xFF009DFF)
     val buttonColor = Color(0xFF007BFF)
     val spacingLarge = 24.dp
     val spacingMedium = 16.dp
     val textSizeTitle = 22.sp
     val textSizeNormal = 10.sp
-
     val columnWidthNo = 25.dp
     val verticalSpacing = 0.dp
     val iconSpacing = 4.dp
@@ -102,10 +105,10 @@ fun ManajemenRuangan(onTambahRuanganClick: () -> Unit) {
 @Composable
 fun RoomItem(
     room: Room,
-    textSize: androidx.compose.ui.unit.TextUnit,
-    verticalSpacing: androidx.compose.ui.unit.Dp,
-    columnWidthNo: androidx.compose.ui.unit.Dp,
-    iconSpacing: androidx.compose.ui.unit.Dp
+    textSize: TextUnit,
+    verticalSpacing: Dp,
+    columnWidthNo: Dp,
+    iconSpacing: Dp
 ) {
     Column {
         Row(
@@ -132,10 +135,10 @@ fun RoomItem(
                 modifier = Modifier.wrapContentWidth(),
                 horizontalArrangement = Arrangement.spacedBy(iconSpacing)
             ) {
-                IconButton(onClick = { /* Edit */ }) {
+                IconButton(onClick = { /* Edit logic */ }) {
                     Icon(painter = painterResource(id = R.drawable.edit), contentDescription = "Edit", tint = Color(0xFF007BFF))
                 }
-                IconButton(onClick = { /* Delete */ }) {
+                IconButton(onClick = { /* Delete logic */ }) {
                     Icon(painter = painterResource(id = R.drawable.trash), contentDescription = "Delete", tint = Color.Red)
                 }
             }
@@ -145,6 +148,7 @@ fun RoomItem(
     }
 }
 
+// Dummy Data
 data class Room(
     val no: Int,
     val nama: String,
@@ -170,5 +174,5 @@ val dummyRooms = List(15) {
 @Preview(showBackground = true, widthDp = 762, heightDp = 768)
 @Composable
 fun ManajemenRuanganPreview() {
-    ManajemenRuangan(onTambahRuanganClick = {})
+    ManajemenRuanganPage(onTambahRuanganClick = {})
 }

@@ -1,4 +1,4 @@
-package com.example.capstoneproject.screens
+package com.example.capstoneproject.screens.admin
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -10,7 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,28 +20,35 @@ import androidx.compose.ui.unit.sp
 import com.example.capstoneproject.ui.theme.TableHeaderCell
 
 @Composable
-fun RiwayatTransaksiScreen() {
+fun RiwayatTransaksiPage(
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val titleColor = Color(0xFF009DFF)
     val headerBg = Color(0xFFF5F7FF)
-    val textSizeTitle = 22.sp
-    val textSizeNormal = 12.sp
-    val spacingLarge = 24.dp
-    val spacingMedium = 16.dp
+    val textSize = 12.sp
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .width(762.dp)
             .height(768.dp)
-            .padding(spacingMedium)
+            .padding(16.dp)
     ) {
+        // Tombol kembali (opsional)
+        Button(onClick = onBack) {
+            Text("← Kembali")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = "Lihat Riwayat Transaksi",
-            fontSize = textSizeTitle,
+            fontSize = 22.sp,
             color = titleColor,
             fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(spacingLarge))
+        Spacer(modifier = Modifier.height(24.dp))
 
         Surface(
             shape = RoundedCornerShape(16.dp),
@@ -50,25 +56,10 @@ fun RiwayatTransaksiScreen() {
             shadowElevation = 8.dp
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                // Table Header
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(headerBg)
-                        .padding(vertical = spacingMedium),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TableHeaderCell("Kode Booking", 100.dp, textSizeNormal)
-                    TableHeaderCell("Nama Peminjam", 100.dp, textSizeNormal)
-                    TableHeaderCell("Nama Gedung", 120.dp, textSizeNormal)
-                    TableHeaderCell("Nominal Pembayaran", 130.dp, textSizeNormal)
-                    TableHeaderCell("Status Pembayaran", 120.dp, textSizeNormal)
-                    Spacer(modifier = Modifier.weight(1f))
-                }
-
+                TransaksiHeaderRow(headerBg, textSize)
                 LazyColumn {
                     items(dummyTransactions) { transaksi ->
-                        TransactionRow(transaksi, textSizeNormal)
+                        TransaksiRow(transaksi, textSize)
                     }
                 }
             }
@@ -77,10 +68,25 @@ fun RiwayatTransaksiScreen() {
 }
 
 @Composable
-fun TransactionRow(
-    transaksi: Transaksi,
-    textSize: TextUnit
-) {
+fun TransaksiHeaderRow(bgColor: Color, fontSize: TextUnit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(bgColor)
+            .padding(vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        TableHeaderCell("Kode Booking", 100.dp, fontSize)
+        TableHeaderCell("Nama Peminjam", 100.dp, fontSize)
+        TableHeaderCell("Nama Gedung", 120.dp, fontSize)
+        TableHeaderCell("Nominal Pembayaran", 130.dp, fontSize)
+        TableHeaderCell("Status Pembayaran", 120.dp, fontSize)
+        Spacer(modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+fun TransaksiRow(transaksi: Transaksi, fontSize: TextUnit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -88,51 +94,30 @@ fun TransactionRow(
             .padding(vertical = 10.dp, horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Kode Booking (underline, biru)
         Text(
             text = transaksi.kodeBooking,
             color = Color(0xFF007BFF),
-            fontSize = textSize,
+            fontSize = fontSize,
             textDecoration = TextDecoration.Underline,
             modifier = Modifier.width(100.dp)
         )
-
-        Text(
-            text = transaksi.namaPeminjam,
-            fontSize = textSize,
-            modifier = Modifier.width(100.dp)
-        )
-
-        Text(
-            text = transaksi.namaGedung,
-            fontSize = textSize,
-            modifier = Modifier.width(120.dp)
-        )
-
-        Text(
-            text = transaksi.nominal,
-            fontSize = textSize,
-            modifier = Modifier.width(130.dp)
-        )
-
-        StatusBadge(
-            status = transaksi.status,
-            fontSize = textSize,
-            modifier = Modifier.width(120.dp)
-        )
+        Text(transaksi.namaPeminjam, fontSize = fontSize, modifier = Modifier.width(100.dp))
+        Text(transaksi.namaGedung, fontSize = fontSize, modifier = Modifier.width(120.dp))
+        Text(transaksi.nominal, fontSize = fontSize, modifier = Modifier.width(130.dp))
+        StatusBadge(transaksi.status, fontSize, Modifier.width(120.dp))
     }
 }
 
 @Composable
 fun StatusBadge(status: String, fontSize: TextUnit, modifier: Modifier = Modifier) {
-    val isLunas = status.lowercase() == "lunas"
-    val backgroundColor = if (isLunas) Color(0xFFE3FCEF) else Color(0xFFFFE6E6)
+    val isLunas = status.equals("lunas", ignoreCase = true)
+    val bgColor = if (isLunas) Color(0xFFE3FCEF) else Color(0xFFFFE6E6)
     val textColor = if (isLunas) Color(0xFF2ECC71) else Color(0xFFEA4335)
 
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier
-            .background(backgroundColor, shape = RoundedCornerShape(16.dp))
+            .background(bgColor, shape = RoundedCornerShape(16.dp))
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Text(
@@ -144,7 +129,7 @@ fun StatusBadge(status: String, fontSize: TextUnit, modifier: Modifier = Modifie
     }
 }
 
-// Dummy Data Class
+// Dummy model & data
 data class Transaksi(
     val kodeBooking: String,
     val namaPeminjam: String,
@@ -153,22 +138,15 @@ data class Transaksi(
     val status: String
 )
 
-// Dummy Data List
 val dummyTransactions = listOf(
     Transaksi("12358G", "Jesicca", "GKM Lantai 2", "Rp 50.000", "Belum lunas"),
     Transaksi("12358G", "Jesicca", "GKM Lantai 1", "Rp 70.000", "Lunas"),
     Transaksi("12358G", "Jesicca", "GKM Lantai 1", "Rp 70.000", "Lunas"),
-    Transaksi("12358G", "Jesicca", "GKM Lantai 1", "Rp 70.000", "Lunas"),
-    Transaksi("12358G", "Jesicca", "GKM Lantai 1", "Rp 70.000", "Lunas"),
-    Transaksi("12358G", "Jesicca", "GKM Lantai 1", "Rp 70.000", "Lunas"),
-    Transaksi("12358G", "Jesicca", "GKM Lantai 3", "Rp 50.000", "Belum lunas"),
-    Transaksi("12358G", "Jesicca", "GKM Lantai 3", "Rp 50.000", "Belum lunas"),
-    Transaksi("12358G", "Jesicca", "GKM Lantai 3", "Rp 50.000", "Belum lunas"),
-    Transaksi("12358G", "Jesicca", "GKM Lantai 1", "Rp 70.000", "Lunas"),
+    Transaksi("12358G", "Jesicca", "GKM Lantai 3", "Rp 50.000", "Belum lunas")
 )
 
 @Preview(showBackground = true, widthDp = 762, heightDp = 768)
 @Composable
-fun RiwayatTransaksiScreenPreview() {
-    RiwayatTransaksiScreen()
+fun RiwayatTransaksiPreview() {
+    RiwayatTransaksiPage(onBack = {})
 }

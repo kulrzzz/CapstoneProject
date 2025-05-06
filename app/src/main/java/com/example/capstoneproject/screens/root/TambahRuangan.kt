@@ -2,7 +2,9 @@ package com.example.capstoneproject.screens.root
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -11,6 +13,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -21,33 +24,29 @@ import com.example.capstoneproject.R
 @Composable
 fun CustomTextField(
     label: String,
-    value: String = "",
-    onValueChange: (String) -> Unit = {},
+    value: String,
+    onValueChange: (String) -> Unit,
     singleLine: Boolean = true,
     minHeight: Dp = 64.dp
 ) {
     Column {
-        Text(
-            text = label,
-            color = Color.Gray,
-            fontSize = 14.sp // Label font size
-        )
+        Text(text = label, color = Color.Gray, fontSize = 14.sp)
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier
-                .height(50.dp)
                 .fillMaxWidth()
                 .heightIn(min = minHeight)
                 .shadow(4.dp, RoundedCornerShape(16.dp)),
             shape = RoundedCornerShape(16.dp),
-            textStyle = TextStyle(fontSize = 16.sp), // Isi font size
+            textStyle = TextStyle(fontSize = 16.sp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color(0xFF0284C7),
                 unfocusedBorderColor = Color.Gray,
                 containerColor = Color.White
             ),
-            singleLine = singleLine
+            singleLine = singleLine,
+            visualTransformation = VisualTransformation.None
         )
     }
 }
@@ -63,11 +62,7 @@ fun CustomDropdownField(
     var expanded by remember { mutableStateOf(false) }
 
     Column {
-        Text(
-            text = label,
-            color = Color.Gray,
-            fontSize = 14.sp
-        )
+        Text(text = label, color = Color.Gray, fontSize = 14.sp)
 
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -97,13 +92,11 @@ fun CustomDropdownField(
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .exposedDropdownSize()
+                modifier = Modifier.fillMaxWidth()
             ) {
                 items.forEach { item ->
                     DropdownMenuItem(
-                        text = { Text(text = item, fontSize = 16.sp) },
+                        text = { Text(item, fontSize = 16.sp) },
                         onClick = {
                             onValueSelected(item)
                             expanded = false
@@ -115,9 +108,10 @@ fun CustomDropdownField(
     }
 }
 
-
 @Composable
-fun TambahRuangan() {
+fun TambahRuanganPage(
+    onBack: () -> Unit = {}
+) {
     val backgroundColor = colorResource(id = R.color.soft_indigo)
 
     var namaRuangan by remember { mutableStateOf("") }
@@ -132,31 +126,57 @@ fun TambahRuangan() {
 
     Column(
         modifier = Modifier
-            .width(762.dp)
-            .height(768.dp)
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .background(backgroundColor)
             .padding(24.dp)
     ) {
         Text(
             text = "Tambah Ruangan",
             color = Color(0xFF0284C7),
-            fontSize = 24.sp // Judul font size
+            fontSize = 24.sp
         )
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            CustomTextField(label = "Nama Ruangan", value = namaRuangan, onValueChange = { namaRuangan = it })
+            CustomTextField(
+                label = "Nama Ruangan",
+                value = namaRuangan,
+                onValueChange = { namaRuangan = it }
+            )
+
             CustomDropdownField(
                 label = "Kategori Ruangan",
                 selectedValue = kategoriRuangan,
                 onValueSelected = { kategoriRuangan = it },
-                items = categories,
+                items = categories
             )
-            CustomTextField(label = "Kapasitas", value = kapasitas, onValueChange = { kapasitas = it })
-            CustomTextField(label = "Fasilitas", value = fasilitas, onValueChange = { fasilitas = it })
-            CustomTextField(label = "Harga Sewa", value = hargaSewa, onValueChange = { hargaSewa = it })
-            CustomTextField(label = "Ukuran Ruangan", value = ukuranRuangan, onValueChange = { ukuranRuangan = it })
+
+            CustomTextField(
+                label = "Kapasitas",
+                value = kapasitas,
+                onValueChange = { kapasitas = it }
+            )
+
+            CustomTextField(
+                label = "Fasilitas",
+                value = fasilitas,
+                onValueChange = { fasilitas = it }
+            )
+
+            CustomTextField(
+                label = "Harga Sewa",
+                value = hargaSewa,
+                onValueChange = { hargaSewa = it }
+            )
+
+            CustomTextField(
+                label = "Ukuran Ruangan",
+                value = ukuranRuangan,
+                onValueChange = { ukuranRuangan = it }
+            )
+
             CustomTextField(
                 label = "Deskripsi Ruangan",
                 value = deskripsiRuangan,
@@ -168,7 +188,7 @@ fun TambahRuangan() {
             Text(
                 text = "Upload Foto Ruangan",
                 color = Color.Gray,
-                fontSize = 14.sp // Label font size
+                fontSize = 14.sp
             )
 
             Box(
@@ -182,7 +202,9 @@ fun TambahRuangan() {
             }
 
             Button(
-                onClick = { /* TODO: Action */ },
+                onClick = {
+                    // TODO: Submit ke ViewModel atau API
+                },
                 modifier = Modifier.align(Alignment.End)
             ) {
                 Text("➕ Tambahkan", fontSize = 16.sp)
@@ -194,5 +216,5 @@ fun TambahRuangan() {
 @Preview(showBackground = true, widthDp = 762, heightDp = 768)
 @Composable
 fun TambahRuanganPreview() {
-    TambahRuangan()
+    TambahRuanganPage()
 }
