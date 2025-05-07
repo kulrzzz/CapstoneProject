@@ -20,7 +20,7 @@ fun AppNavGraph(
         navController = navController,
         startDestination = Screen.Login.route
     ) {
-        // Login Page
+        // 🔐 Login Page
         composable(Screen.Login.route) {
             AnimatedLoginPage(
                 visible = true,
@@ -34,7 +34,7 @@ fun AppNavGraph(
             )
         }
 
-        // Shared Dashboard for Admin & Root
+        // 🧭 Shared Dashboard Page (Admin + Root)
         composable(Screen.Dashboard.route) {
             DashboardScreen(
                 userRole = viewModel.userRole.value,
@@ -53,7 +53,7 @@ fun AppNavGraph(
             )
         }
 
-        // Admin + Root Pages
+        // 🧾 Admin + Root Pages
         composable(Screen.RiwayatTransaksi.route) {
             RiwayatTransaksiPage(onBack = { navController.popBackStack() })
         }
@@ -61,16 +61,20 @@ fun AppNavGraph(
             DaftarUserPage(onBack = { navController.popBackStack() })
         }
 
-        // Root-only Pages
+        // 🛠️ Root-only Pages
         composable(Screen.ManajemenAdmin.route) {
             ManajemenAdminPage(
-                onTambahAdminClick = { navController.navigate(Screen.TambahAdmin.route) },
+                onTambahAdminClick = {
+                    navController.navigate(Screen.TambahAdmin.route)
+                },
                 onBack = { navController.popBackStack() }
             )
         }
+
         composable(Screen.TambahAdmin.route) {
             TambahAdminPage(onBack = { navController.popBackStack() })
         }
+
         composable(Screen.ManajemenRuangan.route) {
             ManajemenRuanganPage(
                 onTambahRuanganClick = {
@@ -78,6 +82,7 @@ fun AppNavGraph(
                 }
             )
         }
+
         composable(Screen.TambahRuangan.route) {
             TambahRuanganPage(onBack = { navController.popBackStack() })
         }

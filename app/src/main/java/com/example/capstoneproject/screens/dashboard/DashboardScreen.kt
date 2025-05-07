@@ -22,14 +22,15 @@ fun DashboardScreen(
     onLogout: () -> Unit
 ) {
     Row(modifier = Modifier.fillMaxSize()) {
-        // Sidebar (shared)
+
+        // ✅ Sidebar dinamis untuk admin dan root
         SideBar(
+            userRole = userRole,
             onNavigate = onNavigate,
-            onLogout = onLogout,
-            userRole = userRole
+            onLogout = onLogout
         )
 
-        // Dashboard Content
+        // ✅ Konten dashboard utama
         Surface(
             modifier = Modifier
                 .weight(1f)
@@ -43,11 +44,9 @@ fun DashboardScreen(
             ) {
                 Text(
                     text = "Main Dashboard",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        fontSize = 26.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF0D47A1)
-                    )
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF0D47A1)
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -63,8 +62,9 @@ fun DashboardScreen(
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Text(
-                    text = "Riwayat peminjaman",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    text = "Riwayat Peminjaman",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
 

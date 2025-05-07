@@ -23,31 +23,35 @@ class MainViewModel : ViewModel() {
     var userName by mutableStateOf("")
         private set
 
-    /**
-     * Melakukan proses login berdasarkan data dari endpoint GET /api/admin/all
-     */
     fun login(email: String, password: String, onResult: (Screen?) -> Unit) {
         viewModelScope.launch {
             try {
+                val trimmedEmail = email.trim()
+                val trimmedPassword = password.trim()
+
                 val admins: List<Admin> = ApiClient.apiService.getAllAdmins(Constants.ACCESS_TOKEN)
 
                 val user = admins.find {
-                    it.admin_email.equals(email.trim(), ignoreCase = true) &&
-                            it.admin_pass == password
+                    it.admin_email?.trim()?.equals(trimmedEmail, ignoreCase = true) == true &&
+                            it.admin_pass?.trim() == trimmedPassword
                 }
 
                 if (user != null) {
                     _isLoggedIn.value = true
-                    userName = user.admin_fullname
+                    userName = user.admin_fullname ?: "User"
 
-                    // Gunakan 1 screen dashboard saja untuk keduanya
                     _userRole.value = when (user.admin_who) {
                         2 -> "root"
                         1 -> "admin"
                         else -> null
                     }
 
-                    onResult(Screen.Dashboard)
+                    if (_userRole.value != null) {
+                        onResult(Screen.Dashboard)
+                    } else {
+                        _loginError.value = "Role pengguna tidak dikenali."
+                        onResult(null)
+                    }
 
                 } else {
                     _loginError.value = "Email atau password salah"
