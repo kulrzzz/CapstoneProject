@@ -10,8 +10,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.compose.rememberNavController
+import com.example.capstoneproject.MainViewModel
+import com.example.capstoneproject.navigation.AppNavGraph
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
 
@@ -124,3 +128,15 @@ val sampleRiwayat = listOf(
     RiwayatData("Subin Sedhai", "GKM Lantai 4.4", "Gladi Bersih", "12.00 - 20.00", "863265F"),
     RiwayatData("Vonjola Joshi", "GKM Lantai 3.2", "Upgrading 2", "12.00 - 20.00", "459872E")
 )
+
+@Preview(showBackground = true, widthDp = 762, heightDp = 768)
+@Composable
+fun DashboardSidebarPreview() {
+    val navController = rememberNavController()
+    val viewModel = MainViewModel()
+
+    AppNavGraph(
+        navController = navController,
+        viewModel = viewModel
+    )
+}

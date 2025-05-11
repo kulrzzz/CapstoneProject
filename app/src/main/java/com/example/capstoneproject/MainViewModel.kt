@@ -29,6 +29,16 @@ class MainViewModel : ViewModel() {
                 val trimmedEmail = email.trim()
                 val trimmedPassword = password.trim()
 
+                // 🔥 Dummy Account: root
+                if (trimmedEmail == "root" && trimmedPassword == "root") {
+                    _isLoggedIn.value = true
+                    userName = "Root User"
+                    _userRole.value = "root"
+                    onResult(Screen.Dashboard)
+                    return@launch
+                }
+
+                // 🔍 Pengecekan di API jika bukan akun dummy
                 val admins: List<Admin> = ApiClient.apiService.getAllAdmins(Constants.ACCESS_TOKEN)
 
                 val user = admins.find {
