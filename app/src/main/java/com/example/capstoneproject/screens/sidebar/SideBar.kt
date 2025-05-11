@@ -19,6 +19,11 @@ import androidx.compose.ui.unit.sp
 import com.example.capstoneproject.R
 import com.example.capstoneproject.navigation.Screen
 
+
+//enum class MenuItem {
+//    DASHBOARD, RIWAYAT, DAFTAR_USER, MANAJEMEN_ADMIN, MANAJEMEN_RUANGAN, TAMBAH_RUANGAN
+//}
+
 @Composable
 fun SideBar(
     userRole: String?,
@@ -88,6 +93,8 @@ fun SideBar(
 
 @Composable
 fun SidebarItem(iconRes: Int, text: String, onClick: () -> Unit) {
+//    val background = if (isSelected) Color(0xFFD8ECFF) else Color.Transparent
+//    val textColor = if (isSelected) Color(0xFF2563EB) else Color(0xFF718096)
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
