@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -123,5 +124,24 @@ fun EditAdminPage(
                 Text(if (isLoading) "Menyimpan..." else "Simpan")
             }
         }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 762, heightDp = 768)
+@Composable
+fun EditAdminPagePreview() {
+    MaterialTheme {
+        EditAdminPage(
+            admin = Admin(
+                admin_id = "1",
+                admin_fullname = "John Doe",
+                admin_email = "johndoe@example.com",
+                admin_pass = "password123",
+                admin_who = 1,
+                created_at = "2025-05-15",
+                updated_at = "2025-05-15"
+            ),
+            onBack = {}
+        )
     }
 }

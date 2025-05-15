@@ -51,6 +51,7 @@ fun ManajemenAdminPage(
                 .weight(1f)
                 .fillMaxHeight()
                 .padding(spacing)
+                .background(Color(0xFFF5CCC))
         ) {
             Text(
                 text = "Manajemen Admin",
@@ -74,7 +75,7 @@ fun ManajemenAdminPage(
             Card(
                 modifier = Modifier.fillMaxSize(),
                 shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
                 Column {
                     Row(
@@ -173,7 +174,11 @@ fun AdminRow(
 fun PreviewManajemenAdminPage() {
     ManajemenAdminPage(
         adminRequestList = listOf(
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01")
+            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
+            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
+            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
+            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
+            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
         ),
         onTambahAdminClick = {},
         onEditAdmin = {},
