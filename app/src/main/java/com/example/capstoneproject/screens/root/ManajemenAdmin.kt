@@ -13,12 +13,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.capstoneproject.R
 import com.example.capstoneproject.model.Admin
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
@@ -35,7 +37,7 @@ fun ManajemenAdminPage(
 ) {
     val spacing = 24.dp
     val textSize = 14.sp
-    val titleSize = 24.sp
+    val titleSize = 27.sp
     val headerColor = Color(0xFFF0F4FF)
     val headerTextColor = Color(0xFF1A237E)
 
@@ -56,22 +58,32 @@ fun ManajemenAdminPage(
                 .padding(spacing)
 
         ) {
+            Spacer(modifier = Modifier.height(25.dp))
+
             Text(
                 text = "Manajemen Admin",
                 fontSize = titleSize,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = Color(0xFF04A5D4)
             )
 
             Spacer(modifier = Modifier.height(spacing))
 
             Button(
                 onClick = onTambahAdminClick,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                shape = RoundedCornerShape(12.dp)
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1570EF)),
+                shape = RoundedCornerShape(12.dp),
             ) {
-                Text("Tambah Admin", fontSize = textSize, color = Color.White)
+                Icon(
+                    painter = painterResource(id = R.drawable.tambahadmin),
+                    contentDescription = "Tambah Admin",
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Tambah Admin", fontSize = 14.sp, color = Color.White)
             }
+
 
             Spacer(modifier = Modifier.height(spacing))
 
@@ -163,10 +175,20 @@ fun AdminRow(
                 .padding(start = 26.dp)
         ) {
             IconButton(onClick = onEdit) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
+                Icon(
+                    painter = painterResource(id = R.drawable.edit),
+                    contentDescription = "Edit",
+                    tint = Color (0xFF1570EF),
+                    modifier = Modifier.size(20.dp) // Atur ukuran ikonnya
+                )
             }
             IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                Icon(
+                    painter = painterResource(id = R.drawable.trash),
+                    contentDescription = "Delete",
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(20.dp)
+                )
             }
         }
     }

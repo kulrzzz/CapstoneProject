@@ -8,5 +8,11 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="soft_indigo">#F5F7FF</color>
+    <color name="blue_bird">#04A5D4</color>
+    <color name="blue_bluk">#1570EF</color>
+    <color name="edit_icon">#80B3E7</color>
+
+
+
 
 </resources>
