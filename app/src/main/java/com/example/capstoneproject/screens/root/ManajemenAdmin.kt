@@ -39,7 +39,10 @@ fun ManajemenAdminPage(
     val headerColor = Color(0xFFF0F4FF)
     val headerTextColor = Color(0xFF1A237E)
 
-    Row(modifier = Modifier.fillMaxSize()) {
+    Row(modifier = Modifier
+        .fillMaxSize()
+        .background(Color(0xFFF5F7FF))
+    ) {
         SideBar(
             userRole = "root",
             onNavigate = onNavigate,
@@ -51,7 +54,7 @@ fun ManajemenAdminPage(
                 .weight(1f)
                 .fillMaxHeight()
                 .padding(spacing)
-                .background(Color(0xFFF5CCC))
+
         ) {
             Text(
                 text = "Manajemen Admin",
