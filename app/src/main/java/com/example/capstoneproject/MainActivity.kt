@@ -3,19 +3,37 @@ package com.example.capstoneproject
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.capstoneproject.navigation.AppNavGraph
-import com.example.capstoneproject.ui.theme.CapstoneProjectTheme // ✅ Tambahkan import ini
+import com.example.capstoneproject.ui.theme.CapstoneProjectTheme
+import com.example.capstoneproject.viewmodel.AdminViewModel
+import com.example.capstoneproject.viewmodel.LoginViewModel
+import com.example.capstoneproject.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val viewModel = MainViewModel()
+
+        // Android ViewModel scoped to Activity lifecycle (recommended over manual instantiation)
+        val mainViewModel: MainViewModel by viewModels()
 
         setContent {
             val navController = rememberNavController()
-            CapstoneProjectTheme { // ✅ Gunakan theme custom-mu
-                AppNavGraph(navController = navController, viewModel = viewModel)
+
+            // Compose-aware ViewModel instantiation
+            val loginViewModel: LoginViewModel = viewModel()
+            val adminViewModel: AdminViewModel = viewModel()
+
+            CapstoneProjectTheme {
+                AppNavGraph(
+                    navController = navController,
+                    mainViewModel = mainViewModel,
+                    loginViewModel = loginViewModel,
+                    adminViewModel = adminViewModel
+                )
             }
         }
     }

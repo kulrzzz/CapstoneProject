@@ -1,10 +1,15 @@
 package com.example.capstoneproject.navigation
 
+import android.widget.Toast
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.capstoneproject.MainViewModel
+import com.example.capstoneproject.viewmodel.AdminViewModel
+import com.example.capstoneproject.viewmodel.LoginViewModel
+import com.example.capstoneproject.viewmodel.MainViewModel
 import com.example.capstoneproject.screens.admin.DaftarUserPage
 import com.example.capstoneproject.screens.admin.RiwayatTransaksiPage
 import com.example.capstoneproject.screens.dashboard.DashboardScreen
@@ -14,18 +19,21 @@ import com.example.capstoneproject.screens.root.*
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    viewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    loginViewModel: LoginViewModel,
+    adminViewModel: AdminViewModel
 ) {
     NavHost(
         navController = navController,
         startDestination = Screen.Login.route
     ) {
-        // 🔐 Login Page
+        // 🔐 Login
         composable(Screen.Login.route) {
             AnimatedLoginPage(
                 visible = true,
-                viewModel = viewModel,
+                loginViewModel = loginViewModel,
                 onLoginSuccess = { screen ->
+                    mainViewModel.setLoggedIn(true)
                     navController.navigate(screen.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                         launchSingleTop = true
@@ -34,10 +42,10 @@ fun AppNavGraph(
             )
         }
 
-        // 🧭 Shared Dashboard Page (Admin + Root)
+        // 🧭 Dashboard
         composable(Screen.Dashboard.route) {
             DashboardScreen(
-                userRole = viewModel.userRole.value,
+                userRole = loginViewModel.userRole,
                 onNavigate = { target ->
                     navController.navigate(target.route) {
                         popUpTo(Screen.Dashboard.route)
@@ -45,7 +53,8 @@ fun AppNavGraph(
                     }
                 },
                 onLogout = {
-                    viewModel.logout()
+                    loginViewModel.clearLoginState()
+                    mainViewModel.logout()
                     navController.navigate(Screen.Login.route) {
                         popUpTo(0)
                     }
@@ -53,28 +62,75 @@ fun AppNavGraph(
             )
         }
 
-        // 🧾 Admin + Root Pages
+        // 🧾 Riwayat dan Daftar User
         composable(Screen.RiwayatTransaksi.route) {
             RiwayatTransaksiPage(onBack = { navController.popBackStack() })
         }
+
         composable(Screen.DaftarUser.route) {
             DaftarUserPage(onBack = { navController.popBackStack() })
         }
 
-        // 🛠️ Root-only Pages
+        // 🛠️ Manajemen Admin
         composable(Screen.ManajemenAdmin.route) {
+            val context = LocalContext.current
+
+            LaunchedEffect(Unit) {
+                adminViewModel.fetchAdmins()
+            }
+
             ManajemenAdminPage(
+                adminRequestList = adminViewModel.adminList.filter { it.admin_who == 1 },
                 onTambahAdminClick = {
                     navController.navigate(Screen.TambahAdmin.route)
                 },
-                onBack = { navController.popBackStack() }
+                onEditAdmin = { admin ->
+                    navController.navigate("edit_admin/${admin.admin_id}")
+                },
+                onDeleteAdmin = { admin ->
+                    adminViewModel.deleteAdmin(admin.admin_id ?: "") { success ->
+                        Toast.makeText(
+                            context,
+                            if (success) "Admin berhasil dihapus" else "Gagal menghapus admin",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                },
+                onNavigate = { screen ->
+                    navController.navigate(screen.route) {
+                        launchSingleTop = true
+                    }
+                },
+                onLogout = {
+                    loginViewModel.clearLoginState()
+                    mainViewModel.logout()
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(0)
+                    }
+                }
             )
         }
 
+        // ➕ Tambah Admin
         composable(Screen.TambahAdmin.route) {
             TambahAdminPage(onBack = { navController.popBackStack() })
         }
 
+        // ✏️ Edit Admin
+        composable("edit_admin/{adminId}") { backStackEntry ->
+            val adminId = backStackEntry.arguments?.getString("adminId")
+            val admin = adminViewModel.adminList.find { it.admin_id == adminId }
+
+            if (admin != null) {
+                EditAdminPage(
+                    admin = admin,
+                    onBack = { navController.popBackStack() },
+                    adminViewModel = adminViewModel
+                )
+            }
+        }
+
+        // 🏢 Manajemen Ruangan
         composable(Screen.ManajemenRuangan.route) {
             ManajemenRuanganPage(
                 onTambahRuanganClick = {

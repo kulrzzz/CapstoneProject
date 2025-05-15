@@ -17,19 +17,18 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.*
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.capstoneproject.MainViewModel
 import com.example.capstoneproject.R
 import com.example.capstoneproject.navigation.Screen
+import com.example.capstoneproject.viewmodel.LoginViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun AnimatedLoginPage(
     visible: Boolean,
-    viewModel: MainViewModel = viewModel(),
+    loginViewModel: LoginViewModel = viewModel(),
     onLoginSuccess: (Screen) -> Unit
 ) {
     AnimatedVisibility(
@@ -39,21 +38,31 @@ fun AnimatedLoginPage(
         exit = scaleOut(targetScale = 1.1f, animationSpec = tween(400)) +
                 fadeOut(animationSpec = tween(400))
     ) {
-        LoginPage(viewModel, onLoginSuccess)
+        LoginPage(loginViewModel, onLoginSuccess)
     }
 }
 
 @Composable
-fun LoginPage(viewModel: MainViewModel, onLoginSuccess: (Screen) -> Unit) {
+fun LoginPage(
+    loginViewModel: LoginViewModel,
+    onLoginSuccess: (Screen) -> Unit
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var error by remember { mutableStateOf<String?>(null) }
     var passwordVisible by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
     val gradient = Brush.verticalGradient(
         listOf(Color(0xFFB3E5FC), Color(0xFFFFF3E0))
     )
+
+    val loginError by loginViewModel.loginError
+    val isAuthenticating by loginViewModel.isAuthenticating
+
+    // Clear error otomatis saat user mengetik ulang
+    LaunchedEffect(email, password) {
+        loginViewModel.clearLoginState()
+    }
 
     Box(
         modifier = Modifier
@@ -77,10 +86,7 @@ fun LoginPage(viewModel: MainViewModel, onLoginSuccess: (Screen) -> Unit) {
 
             OutlinedTextField(
                 value = email,
-                onValueChange = {
-                    email = it
-                    error = null
-                },
+                onValueChange = { email = it },
                 singleLine = true,
                 placeholder = { Text("Email", color = Color.Gray) },
                 leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = Color.Gray) },
@@ -98,10 +104,7 @@ fun LoginPage(viewModel: MainViewModel, onLoginSuccess: (Screen) -> Unit) {
 
             OutlinedTextField(
                 value = password,
-                onValueChange = {
-                    password = it
-                    error = null
-                },
+                onValueChange = { password = it },
                 singleLine = true,
                 placeholder = { Text("Password", color = Color.Gray) },
                 leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Color.Gray) },
@@ -132,13 +135,11 @@ fun LoginPage(viewModel: MainViewModel, onLoginSuccess: (Screen) -> Unit) {
                 onClick = {
                     coroutineScope.launch {
                         if (email.isBlank() || password.isBlank()) {
-                            error = "Email dan password tidak boleh kosong"
+                            loginViewModel.clearLoginState()
                         } else {
-                            viewModel.login(email, password) { result ->
+                            loginViewModel.login(email, password) { result ->
                                 if (result != null) {
                                     onLoginSuccess(result)
-                                } else {
-                                    error = viewModel.loginError.value ?: "Email atau Password salah"
                                 }
                             }
                         }
@@ -162,32 +163,25 @@ fun LoginPage(viewModel: MainViewModel, onLoginSuccess: (Screen) -> Unit) {
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "Login",
-                        style = MaterialTheme.typography.titleLarge.copy(color = Color.White)
-                    )
+                    if (isAuthenticating) {
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            strokeWidth = 2.dp,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    } else {
+                        Text(
+                            text = "Login",
+                            style = MaterialTheme.typography.titleLarge.copy(color = Color.White)
+                        )
+                    }
                 }
             }
 
-            error?.let {
+            loginError?.let {
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(text = it, color = MaterialTheme.colorScheme.error, fontSize = 12.sp)
             }
         }
     }
-}
-
-@Preview(
-    showBackground = true,
-    device = "spec:width=1024dp,height=768dp,dpi=240"
-)
-@Composable
-fun AnimatedLoginPagePreview() {
-    // Buat dummy ViewModel & handler karena Preview nggak bisa handle real logic
-    val dummyViewModel = MainViewModel() // Pastikan constructor-nya tidak perlu parameter (atau pakai mock kalau perlu)
-    AnimatedLoginPage(
-        visible = true,
-        viewModel = dummyViewModel,
-        onLoginSuccess = {}
-    )
 }

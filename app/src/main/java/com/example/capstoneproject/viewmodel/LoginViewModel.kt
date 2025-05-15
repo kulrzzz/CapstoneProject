@@ -1,4 +1,4 @@
-package com.example.capstoneproject
+package com.example.capstoneproject.viewmodel
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
@@ -9,76 +9,66 @@ import com.example.capstoneproject.network.ApiClient
 import com.example.capstoneproject.util.Constants
 import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
-
-    private val _isLoggedIn = mutableStateOf(false)
-    val isLoggedIn: State<Boolean> = _isLoggedIn
-
-    private val _userRole = mutableStateOf<String?>(null)
-    val userRole: State<String?> = _userRole
+class LoginViewModel : ViewModel() {
 
     private val _loginError = mutableStateOf<String?>(null)
     val loginError: State<String?> = _loginError
 
+    private val _isAuthenticating = mutableStateOf(false)
+    val isAuthenticating: State<Boolean> = _isAuthenticating
+
     var userName by mutableStateOf("")
+        private set
+
+    var userRole by mutableStateOf<String?>(null)
         private set
 
     fun login(email: String, password: String, onResult: (Screen?) -> Unit) {
         viewModelScope.launch {
+            _isAuthenticating.value = true
+            _loginError.value = null
+
             try {
                 val trimmedEmail = email.trim()
                 val trimmedPassword = password.trim()
 
-                // 🔥 Dummy Account: root
-                if (trimmedEmail == "root" && trimmedPassword == "root") {
-                    _isLoggedIn.value = true
-                    userName = "Root User"
-                    _userRole.value = "root"
-                    onResult(Screen.Dashboard)
-                    return@launch
-                }
-
-                // 🔍 Pengecekan di API jika bukan akun dummy
-                val admins: List<Admin> = ApiClient.apiService.getAllAdmins(Constants.ACCESS_TOKEN)
-
-                val user = admins.find {
+                val adminList = ApiClient.apiService.getAllAdmins(Constants.ACCESS_TOKEN)
+                val user = adminList.find {
                     it.admin_email?.trim()?.equals(trimmedEmail, ignoreCase = true) == true &&
                             it.admin_pass?.trim() == trimmedPassword
                 }
 
                 if (user != null) {
-                    _isLoggedIn.value = true
                     userName = user.admin_fullname ?: "User"
-
-                    _userRole.value = when (user.admin_who) {
+                    userRole = when (user.admin_who) {
                         2 -> "root"
                         1 -> "admin"
                         else -> null
                     }
 
-                    if (_userRole.value != null) {
+                    if (userRole != null) {
                         onResult(Screen.Dashboard)
                     } else {
                         _loginError.value = "Role pengguna tidak dikenali."
                         onResult(null)
                     }
-
                 } else {
                     _loginError.value = "Email atau password salah"
                     onResult(null)
                 }
 
             } catch (e: Exception) {
-                e.printStackTrace()
-                _loginError.value = "Terjadi kesalahan saat login. Coba lagi nanti."
+                _loginError.value = "Terjadi kesalahan saat login: ${e.message}"
                 onResult(null)
+            } finally {
+                _isAuthenticating.value = false
             }
         }
     }
 
-    fun logout() {
-        _isLoggedIn.value = false
-        _userRole.value = null
+    fun clearLoginState() {
+        _loginError.value = null
+        userRole = null
         userName = ""
     }
 }

@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -14,10 +13,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
-import com.example.capstoneproject.MainViewModel
 import com.example.capstoneproject.navigation.AppNavGraph
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
+import com.example.capstoneproject.viewmodel.AdminViewModel
+import com.example.capstoneproject.viewmodel.LoginViewModel
+import com.example.capstoneproject.viewmodel.MainViewModel
 
 @Composable
 fun DashboardScreen(
@@ -27,14 +28,14 @@ fun DashboardScreen(
 ) {
     Row(modifier = Modifier.fillMaxSize()) {
 
-        // ✅ Sidebar dinamis untuk admin dan root
+        // Sidebar dinamis
         SideBar(
             userRole = userRole,
             onNavigate = onNavigate,
             onLogout = onLogout
         )
 
-        // ✅ Konten dashboard utama
+        // Konten dashboard utama
         Surface(
             modifier = Modifier
                 .weight(1f)
@@ -133,10 +134,14 @@ val sampleRiwayat = listOf(
 @Composable
 fun DashboardSidebarPreview() {
     val navController = rememberNavController()
-    val viewModel = MainViewModel()
+    val mainViewModel = MainViewModel()
+    val loginViewModel = LoginViewModel()
+    val adminViewModel = AdminViewModel()
 
     AppNavGraph(
         navController = navController,
-        viewModel = viewModel
+        mainViewModel = mainViewModel,
+        loginViewModel = loginViewModel,
+        adminViewModel = adminViewModel
     )
 }

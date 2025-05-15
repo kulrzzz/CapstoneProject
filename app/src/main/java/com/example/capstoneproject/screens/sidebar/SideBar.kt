@@ -19,17 +19,15 @@ import androidx.compose.ui.unit.sp
 import com.example.capstoneproject.R
 import com.example.capstoneproject.navigation.Screen
 
-
-//enum class MenuItem {
-//    DASHBOARD, RIWAYAT, DAFTAR_USER, MANAJEMEN_ADMIN, MANAJEMEN_RUANGAN, TAMBAH_RUANGAN
-//}
-
 @Composable
 fun SideBar(
     userRole: String?,
     onNavigate: (Screen) -> Unit,
     onLogout: () -> Unit
 ) {
+    // 🧠 Sidebar state to highlight selected
+    var selectedScreen by remember { mutableStateOf<Screen?>(null) }
+
     val menuItems = remember(userRole) {
         buildList {
             add(SidebarItemModel("Dashboard", R.drawable.homebefore, Screen.Dashboard))
@@ -37,7 +35,7 @@ fun SideBar(
             add(SidebarItemModel("Lihat Daftar User", R.drawable.daftaruser, Screen.DaftarUser))
 
             if (userRole == "root") {
-                add(SidebarItemModel("DIVIDER", -1, Screen.Dashboard)) // Marker for Divider
+                add(SidebarItemModel("DIVIDER", -1, Screen.Dashboard)) // Divider marker
                 add(SidebarItemModel("Manajemen Admin", R.drawable.adminbefore, Screen.ManajemenAdmin))
                 add(SidebarItemModel("Manajemen Ruangan", R.drawable.ruanganbefore, Screen.ManajemenRuangan))
             }
@@ -75,13 +73,19 @@ fun SideBar(
 
             Divider(color = Color(0xFFE2E8F0), thickness = 1.dp)
 
-            // Render Menu Items
             menuItems.forEach { item ->
                 if (item.icon == -1) {
                     Divider(color = Color(0xFFE2E8F0), thickness = 1.dp)
                 } else {
-                    SidebarItem(iconRes = item.icon, text = item.title) {
-                        onNavigate(item.screen)
+                    SidebarItem(
+                        iconRes = item.icon,
+                        text = item.title,
+                        isSelected = selectedScreen == item.screen
+                    ) {
+                        if (selectedScreen != item.screen) {
+                            selectedScreen = item.screen
+                            onNavigate(item.screen)
+                        }
                     }
                 }
             }
@@ -92,19 +96,19 @@ fun SideBar(
 }
 
 @Composable
-fun SidebarItem(iconRes: Int, text: String, onClick: () -> Unit) {
-//    val background = if (isSelected) Color(0xFFD8ECFF) else Color.Transparent
-//    val textColor = if (isSelected) Color(0xFF2563EB) else Color(0xFF718096)
+fun SidebarItem(iconRes: Int, text: String, isSelected: Boolean, onClick: () -> Unit) {
+    val background = if (isSelected) Color(0xFFD8ECFF) else Color.Transparent
+    val textColor = if (isSelected) Color(0xFF2563EB) else Color(0xFF1F2937)
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.Transparent, RoundedCornerShape(8.dp))
-            .padding(12.dp)
+            .background(background, RoundedCornerShape(8.dp))
             .clickable { onClick() }
+            .padding(vertical = 12.dp, horizontal = 12.dp)
     ) {
-
         Image(
             painter = painterResource(id = iconRes),
             contentDescription = text,
@@ -113,7 +117,7 @@ fun SidebarItem(iconRes: Int, text: String, onClick: () -> Unit) {
         Text(
             text = text,
             fontSize = 14.sp,
-            color = Color.Black
+            color = textColor
         )
     }
 }
@@ -141,7 +145,6 @@ fun LogoutButton(onLogout: () -> Unit) {
     }
 }
 
-// Data class untuk menu item
 data class SidebarItemModel(
     val title: String,
     val icon: Int,
