@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,7 +42,16 @@ fun TambahAdminPage(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    Row(modifier = Modifier.fillMaxSize()) {
+    val spacing = 24.dp
+    val textSize = 14.sp
+    val titleSize = 30.sp
+    val headerColor = Color(0xFFF0F4FF)
+    val headerTextColor = Color(0xFF1A237E)
+
+    Row(modifier = Modifier
+        .fillMaxSize()
+        .background(Color(0xFFF5F7FF))
+    ) {
 
         SideBar(
             userRole = "root",
@@ -56,20 +66,19 @@ fun TambahAdminPage(
                 .padding(24.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+            Spacer(modifier = Modifier.height(20.dp))
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                }
 
                 Text(
                     text = "Tambah Admin",
-                    fontSize = 24.sp,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = MaterialTheme.typography.titleLarge.fontWeight
+                    fontSize = titleSize,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF04A5D4)
                 )
             }
 
@@ -79,7 +88,7 @@ fun TambahAdminPage(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
                 Column(modifier = Modifier.padding(24.dp)) {
                     AdminInputField(label = "Nama Lengkap", value = fullName, onValueChange = { fullName = it })

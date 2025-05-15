@@ -31,8 +31,8 @@ fun SideBar(
     val menuItems = remember(userRole) {
         buildList {
             add(SidebarItemModel("Dashboard", R.drawable.homebefore, Screen.Dashboard))
-            add(SidebarItemModel("Lihat Riwayat Transaksi", R.drawable.riwayat, Screen.RiwayatTransaksi))
-            add(SidebarItemModel("Lihat Daftar User", R.drawable.daftaruser, Screen.DaftarUser))
+            add(SidebarItemModel("Riwayat Transaksi", R.drawable.riwayat, Screen.RiwayatTransaksi))
+            add(SidebarItemModel("Daftar User", R.drawable.daftaruser, Screen.DaftarUser))
 
             if (userRole == "root") {
                 add(SidebarItemModel("DIVIDER", -1, Screen.Dashboard)) // Divider marker
@@ -116,7 +116,7 @@ fun SidebarItem(iconRes: Int, text: String, isSelected: Boolean, onClick: () -> 
         )
         Text(
             text = text,
-            fontSize = 14.sp,
+            fontSize = 16.sp,
             color = textColor
         )
     }
