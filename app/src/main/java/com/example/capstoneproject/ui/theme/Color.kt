@@ -12,3 +12,5 @@ val Pink40 = Color(0xFF7D5260)
 
 val Header = Color (0xFF04A5D4)
 val ButtonHeader = Color (0xFF1570EF)
+
+val Background = Color (0xFFF5F7FF)

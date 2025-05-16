@@ -36,7 +36,8 @@ fun EditAdminPage(
     var confirmPassword by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
 
-    Row(modifier = Modifier.fillMaxSize()) {
+    Row(modifier = Modifier.fillMaxSize()
+        .background(color = Color(0xFFF5F7FF))) {
         SideBar(
             userRole = "root",
             onNavigate = onNavigate,
@@ -49,7 +50,9 @@ fun EditAdminPage(
                 .fillMaxHeight()
                 .padding(24.dp)
         ) {
-            Text("Edit Admin", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text("Edit Admin", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Color(0xFF04A5D4))
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -136,4 +139,25 @@ fun EditAdminPage(
             }
         }
     }
+}
+
+@Preview(showBackground = true, widthDp = 1024, heightDp = 768)
+@Composable
+fun PreviewEditAdminPage() {
+    val sampleAdmin = Admin(
+        admin_id = "1",
+        admin_fullname = "Muhammad Raffi Ghifari",
+        admin_email = "rafi@gmail.com",
+        admin_pass = "1234",
+        admin_who = 1,
+        created_at = "2024-01-01",
+        updated_at = "2024-01-01"
+    )
+
+    EditAdminPage(
+        admin = sampleAdmin,
+        onBack = { /* No action on preview */ },
+        onNavigate = { /* No navigation on preview */ },
+        onLogout = { /* No logout on preview */ }
+    )
 }

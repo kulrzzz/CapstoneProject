@@ -42,8 +42,7 @@ fun TambahAdminPage(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    val spacing = 24.dp
-    val textSize = 14.sp
+
     val titleSize = 30.sp
     val headerColor = Color(0xFFF0F4FF)
     val headerTextColor = Color(0xFF1A237E)
@@ -68,19 +67,12 @@ fun TambahAdminPage(
         ) {
             Spacer(modifier = Modifier.height(20.dp))
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-
-                Text(
-                    text = "Tambah Admin",
-                    fontSize = titleSize,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF04A5D4)
-                )
-            }
+            Text(
+                text = "Tambah Admin",
+                fontSize = titleSize,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF04A5D4)
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -102,44 +94,65 @@ fun TambahAdminPage(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    Button(
-                        onClick = {
-                            if (fullName.isBlank() || email.isBlank() || password.isBlank()) {
-                                Toast.makeText(context, "Semua field wajib diisi", Toast.LENGTH_SHORT).show()
-                                return@Button
-                            }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Button(
+                            onClick = onBack,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(50.dp)
+                        ) {
+                            Text("Kembali")
+                        }
 
-                            val newAdmin = Admin(
-                                admin_fullname = fullName,
-                                admin_email = email,
-                                admin_pass = password
-                            )
+                        Spacer(modifier = Modifier.width(350.dp))
 
-                            CoroutineScope(Dispatchers.IO).launch {
-                                try {
-                                    val response = ApiClient.apiService.createAdmin(
-                                        admin = newAdmin,
-                                        token = Constants.ACCESS_TOKEN
-                                    )
-                                    launch(Dispatchers.Main) {
-                                        if (response.isSuccessful) {
-                                            Toast.makeText(context, "Admin berhasil ditambahkan", Toast.LENGTH_SHORT).show()
-                                            onBack()
-                                        } else {
-                                            Toast.makeText(context, "Gagal menambahkan admin", Toast.LENGTH_SHORT).show()
+                        Button(
+                            onClick = {
+                                if (fullName.isBlank() || email.isBlank() || password.isBlank()) {
+                                    Toast.makeText(context, "Semua field wajib diisi", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
+
+                                val newAdmin = Admin(
+                                    admin_fullname = fullName,
+                                    admin_email = email,
+                                    admin_pass = password
+                                )
+
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    try {
+                                        val response = ApiClient.apiService.createAdmin(
+                                            admin = newAdmin,
+                                            token = Constants.ACCESS_TOKEN
+                                        )
+                                        launch(Dispatchers.Main) {
+                                            if (response.isSuccessful) {
+                                                Toast.makeText(context, "Admin berhasil ditambahkan", Toast.LENGTH_SHORT).show()
+                                                onBack()
+                                            } else {
+                                                Toast.makeText(context, "Gagal menambahkan admin", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                    } catch (e: Exception) {
+                                        launch(Dispatchers.Main) {
+                                            Toast.makeText(context, "Terjadi kesalahan: ${e.message}", Toast.LENGTH_SHORT).show()
                                         }
                                     }
-                                } catch (e: Exception) {
-                                    launch(Dispatchers.Main) {
-                                        Toast.makeText(context, "Terjadi kesalahan: ${e.message}", Toast.LENGTH_SHORT).show()
-                                    }
                                 }
-                            }
-                        },
-                        modifier = Modifier.align(Alignment.End),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Text("Tambah Admin", fontSize = 16.sp)
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6A1B9A)), // Warna ungu
+                            modifier = Modifier
+                                .weight(1f) // 🔥 Ukuran proporsional
+                                .height(50.dp)
+                        ) {
+                            Text("Tambah Admin", fontSize = 16.sp)
+                        }
                     }
                 }
             }
