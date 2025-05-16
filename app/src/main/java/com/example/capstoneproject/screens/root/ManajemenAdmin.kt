@@ -5,9 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -156,7 +153,7 @@ fun AdminRow(
             fontSize = textSize,
             textAlign = TextAlign.Start,
             modifier = Modifier
-                .width(240.dp) // 👉 Ubah di sini jika ingin memperluas kolom nama
+                .width(240.dp)
                 .padding(start = 48.dp)
         )
 
@@ -165,7 +162,7 @@ fun AdminRow(
             fontSize = textSize,
             textAlign = TextAlign.Start,
             modifier = Modifier
-                .width(240.dp) // 👉 Ubah di sini jika ingin memperluas kolom email
+                .width(240.dp)
                 .padding(start = 48.dp)
         )
 
@@ -179,7 +176,7 @@ fun AdminRow(
                     painter = painterResource(id = R.drawable.edit),
                     contentDescription = "Edit",
                     tint = Color (0xFF1570EF),
-                    modifier = Modifier.size(20.dp) // Atur ukuran ikonnya
+                    modifier = Modifier.size(20.dp)
                 )
             }
             IconButton(onClick = onDelete) {
@@ -199,10 +196,6 @@ fun AdminRow(
 fun PreviewManajemenAdminPage() {
     ManajemenAdminPage(
         adminRequestList = listOf(
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
             Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
         ),
         onTambahAdminClick = {},

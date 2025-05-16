@@ -3,98 +3,103 @@ package com.example.capstoneproject.screens.root
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.capstoneproject.R
+import com.example.capstoneproject.model.Room
+import com.example.capstoneproject.navigation.Screen
+import com.example.capstoneproject.screens.sidebar.SideBar
 import com.example.capstoneproject.ui.theme.TableHeaderCell
 
 @Composable
 fun ManajemenRuanganPage(
-    onTambahRuanganClick: () -> Unit
+    roomList: List<Room>,
+    onTambahRuanganClick: () -> Unit,
+    onEditRoom: (Room) -> Unit,
+    onDeleteRoom: (Room) -> Unit,
+    onNavigate: (Screen) -> Unit = {},
+    onLogout: () -> Unit = {}
 ) {
-    val titleColor = Color(0xFF009DFF)
-    val buttonColor = Color(0xFF007BFF)
-    val spacingLarge = 24.dp
-    val spacingMedium = 16.dp
-    val textSizeTitle = 22.sp
-    val textSizeNormal = 10.sp
-    val columnWidthNo = 25.dp
-    val verticalSpacing = 0.dp
-    val iconSpacing = 4.dp
+    val spacing = 24.dp
+    val textSize = 14.sp
+    val headerColor = Color(0xFFF0F4FF)
+    val headerTextColor = Color(0xFF1A237E)
 
-    Column(
-        modifier = Modifier
-            .width(762.dp)
-            .height(768.dp)
-            .padding(spacingMedium)
-    ) {
-        Text(
-            text = "Manajemen Ruangan",
-            fontSize = textSizeTitle,
-            color = titleColor,
-            fontWeight = FontWeight.Bold
+    Row(modifier = Modifier.fillMaxSize()) {
+        SideBar(
+            userRole = "root",
+            onNavigate = onNavigate,
+            onLogout = onLogout
         )
 
-        Spacer(modifier = Modifier.height(spacingLarge))
-
-        Button(
-            onClick = onTambahRuanganClick,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = buttonColor,
-                contentColor = Color.White
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .padding(spacing)
+        ) {
+            Text(
+                text = "Manajemen Ruangan",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
             )
-        ) {
-            Text(text = "Tambah Ruangan", fontSize = textSizeNormal)
-        }
 
-        Spacer(modifier = Modifier.height(spacingMedium))
+            Spacer(modifier = Modifier.height(spacing))
 
-        Surface(
-            shape = RoundedCornerShape(16.dp),
-            tonalElevation = 4.dp,
-            shadowElevation = 8.dp
-        ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(0xFFF5F7FF))
-                        .padding(vertical = spacingMedium),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TableHeaderCell("No", columnWidthNo, textSizeNormal)
-                    TableHeaderCell("Nama Ruangan", 90.dp, textSizeNormal)
-                    TableHeaderCell("Kategori Ruangan", 110.dp, textSizeNormal)
-                    TableHeaderCell("Kapasitas", 75.dp, textSizeNormal)
-                    TableHeaderCell("Fasilitas", 75.dp, textSizeNormal)
-                    TableHeaderCell("Harga Sewa", 87.dp, textSizeNormal)
-                    TableHeaderCell("Ukuran", 90.dp, textSizeNormal)
-                    TableHeaderCell("Foto", 95.dp, textSizeNormal)
-                    TableHeaderCell("Actions", 80.dp, textSizeNormal)
-                    Spacer(modifier = Modifier.weight(1f))
-                }
+            Button(
+                onClick = onTambahRuanganClick,
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("➕ Tambah Ruangan", fontSize = textSize, color = Color.White)
+            }
 
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(dummyRooms) { room ->
-                        RoomItem(
-                            room = room,
-                            textSize = textSizeNormal,
-                            verticalSpacing = verticalSpacing,
-                            columnWidthNo = columnWidthNo,
-                            iconSpacing = iconSpacing
-                        )
+            Spacer(modifier = Modifier.height(spacing))
+
+            Card(
+                modifier = Modifier.fillMaxSize(),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+            ) {
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(headerColor)
+                            .padding(vertical = 12.dp, horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TableHeaderCell("No", 75.dp, textSize, headerTextColor)
+                        TableHeaderCell("Nama Ruangan", 240.dp, textSize, headerTextColor)
+                        TableHeaderCell("Kategori", 240.dp, textSize, headerTextColor)
+                        TableHeaderCell("Actions", 120.dp, textSize, headerTextColor)
+                    }
+
+                    Divider(color = Color.LightGray)
+
+                    LazyColumn {
+                        itemsIndexed(roomList) { index, room ->
+                            RoomRow(
+                                no = index + 1,
+                                room = room,
+                                textSize = textSize,
+                                onEdit = { onEditRoom(room) },
+                                onDelete = { onDeleteRoom(room) }
+                            )
+                        }
                     }
                 }
             }
@@ -103,76 +108,58 @@ fun ManajemenRuanganPage(
 }
 
 @Composable
-fun RoomItem(
+fun RoomRow(
+    no: Int,
     room: Room,
     textSize: TextUnit,
-    verticalSpacing: Dp,
-    columnWidthNo: Dp,
-    iconSpacing: Dp
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
 ) {
-    Column {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(if (no % 2 == 0) Color(0xFFF8FAFF) else Color.White)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = no.toString(),
+            fontSize = textSize,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .width(36.dp)
+                .wrapContentWidth(Alignment.CenterHorizontally)
+        )
+
+        Text(
+            text = room.room_name,
+            fontSize = textSize,
+            textAlign = TextAlign.Start,
+            modifier = Modifier
+                .width(240.dp)
+                .padding(start = 48.dp)
+        )
+
+        Text(
+            text = room.room_kategori.orEmpty(),
+            fontSize = textSize,
+            textAlign = TextAlign.Start,
+            modifier = Modifier
+                .width(240.dp)
+                .padding(start = 48.dp)
+        )
+
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .background(Color.White)
-                .padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .width(120.dp)
+                .padding(start = 26.dp)
         ) {
-            Text(text = room.no.toString(), fontSize = textSize, modifier = Modifier.width(columnWidthNo))
-            Text(text = room.nama, fontSize = textSize, modifier = Modifier.width(95.dp))
-            Text(text = room.kategori, fontSize = textSize, modifier = Modifier.width(103.dp))
-            Text(text = room.kapasitas, fontSize = textSize, modifier = Modifier.width(75.dp))
-            Text(text = room.fasilitas, fontSize = textSize, modifier = Modifier.width(80.dp))
-            Text(text = room.harga, fontSize = textSize, modifier = Modifier.width(80.dp))
-            Text(text = room.ukuran, fontSize = textSize, modifier = Modifier.width(80.dp))
-            Text(
-                text = "Lihat Disini",
-                color = Color(0xFF007BFF),
-                fontSize = textSize,
-                modifier = Modifier.width(80.dp)
-            )
-            Row(
-                modifier = Modifier.wrapContentWidth(),
-                horizontalArrangement = Arrangement.spacedBy(iconSpacing)
-            ) {
-                IconButton(onClick = { /* Edit logic */ }) {
-                    Icon(painter = painterResource(id = R.drawable.edit), contentDescription = "Edit", tint = Color(0xFF007BFF))
-                }
-                IconButton(onClick = { /* Delete logic */ }) {
-                    Icon(painter = painterResource(id = R.drawable.trash), contentDescription = "Delete", tint = Color.Red)
-                }
+            IconButton(onClick = onEdit) {
+                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
+            }
+            IconButton(onClick = onDelete) {
+                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
             }
         }
-
-        Spacer(modifier = Modifier.height(verticalSpacing))
     }
-}
-
-// Dummy Data
-data class Room(
-    val no: Int,
-    val nama: String,
-    val kategori: String,
-    val kapasitas: String,
-    val fasilitas: String,
-    val harga: String,
-    val ukuran: String
-)
-
-val dummyRooms = List(15) {
-    Room(
-        no = it + 1,
-        nama = "Jesica",
-        kategori = "GKM Lantai 2",
-        kapasitas = "50 Orang",
-        fasilitas = "10 Kursi",
-        harga = "Rp 50.000",
-        ukuran = "4m x 2m"
-    )
-}
-
-@Preview(showBackground = true, widthDp = 762, heightDp = 768)
-@Composable
-fun ManajemenRuanganPreview() {
-    ManajemenRuanganPage(onTambahRuanganClick = {})
 }

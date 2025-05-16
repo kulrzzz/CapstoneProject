@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import com.example.capstoneproject.viewmodel.AdminViewModel
 import com.example.capstoneproject.viewmodel.LoginViewModel
 import com.example.capstoneproject.viewmodel.MainViewModel
+import com.example.capstoneproject.viewmodel.RuanganViewModel
 import com.example.capstoneproject.screens.admin.DaftarUserPage
 import com.example.capstoneproject.screens.admin.RiwayatTransaksiPage
 import com.example.capstoneproject.screens.dashboard.DashboardScreen
@@ -21,7 +22,8 @@ fun AppNavGraph(
     navController: NavHostController,
     mainViewModel: MainViewModel,
     loginViewModel: LoginViewModel,
-    adminViewModel: AdminViewModel
+    adminViewModel: AdminViewModel,
+    ruanganViewModel: RuanganViewModel
 ) {
     NavHost(
         navController = navController,
@@ -132,9 +134,36 @@ fun AppNavGraph(
 
         // 🏢 Manajemen Ruangan
         composable(Screen.ManajemenRuangan.route) {
+            val context = LocalContext.current
+
+            LaunchedEffect(Unit) {
+                ruanganViewModel.fetchRooms()
+            }
+
             ManajemenRuanganPage(
                 onTambahRuanganClick = {
                     navController.navigate(Screen.TambahRuangan.route)
+                },
+                onNavigate = { screen ->
+                    navController.navigate(screen.route) { launchSingleTop = true }
+                },
+                onLogout = {
+                    loginViewModel.clearLoginState()
+                    mainViewModel.logout()
+                    navController.navigate(Screen.Login.route) { popUpTo(0) }
+                },
+                roomList = ruanganViewModel.roomList,
+                onEditRoom = { room ->
+                    // Navigasi ke edit_room bisa ditambahkan di sini nanti
+                },
+                onDeleteRoom = { room ->
+                    ruanganViewModel.deleteRoomById(room.room_id) { success ->
+                        Toast.makeText(
+                            context,
+                            if (success) "Ruangan berhasil dihapus" else "Gagal menghapus ruangan",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
             )
         }

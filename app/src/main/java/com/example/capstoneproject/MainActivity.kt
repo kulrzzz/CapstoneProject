@@ -12,6 +12,7 @@ import com.example.capstoneproject.ui.theme.CapstoneProjectTheme
 import com.example.capstoneproject.viewmodel.AdminViewModel
 import com.example.capstoneproject.viewmodel.LoginViewModel
 import com.example.capstoneproject.viewmodel.MainViewModel
+import com.example.capstoneproject.viewmodel.RuanganViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,13 +27,15 @@ class MainActivity : ComponentActivity() {
             // Compose-aware ViewModel instantiation
             val loginViewModel: LoginViewModel = viewModel()
             val adminViewModel: AdminViewModel = viewModel()
+            val ruanganViewModel: RuanganViewModel = viewModel()
 
             CapstoneProjectTheme {
                 AppNavGraph(
                     navController = navController,
                     mainViewModel = mainViewModel,
                     loginViewModel = loginViewModel,
-                    adminViewModel = adminViewModel
+                    adminViewModel = adminViewModel,
+                    ruanganViewModel = ruanganViewModel
                 )
             }
         }
