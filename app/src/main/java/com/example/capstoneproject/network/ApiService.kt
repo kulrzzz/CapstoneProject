@@ -1,6 +1,8 @@
 package com.example.capstoneproject.network
 
 import com.example.capstoneproject.model.*
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
@@ -13,9 +15,11 @@ interface ApiService {
         @Query("access_token") token: String
     ): RoomResponse
 
+    @Multipart
     @POST("api/room/add")
-    suspend fun addRoom(
-        @Body room: Room,
+    suspend fun addRoomMultipart(
+        @PartMap parts: Map<String, @JvmSuppressWildcards RequestBody>,
+        @Part image: MultipartBody.Part,
         @Query("access_token") token: String
     ): Response<ResponseBody>
 
@@ -32,9 +36,11 @@ interface ApiService {
     ): Response<ResponseBody>
 
     // ---------------- ROOM IMAGE ----------------
+    @Multipart
     @POST("api/room/image/add")
-    suspend fun addRoomImage(
-        @Body roomImage: RoomImage,
+    suspend fun addRoomImageMultipart(
+        @Part image: MultipartBody.Part,
+        @Part("room_id") roomId: RequestBody,
         @Query("access_token") token: String
     ): Response<ResponseBody>
 
