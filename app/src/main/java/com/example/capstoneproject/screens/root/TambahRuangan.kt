@@ -10,6 +10,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -149,7 +150,7 @@ fun TambahRuanganPage(
                 .weight(1f)
                 .fillMaxHeight()
                 .padding(spacing)
-                .verticalScroll(rememberScrollState())
+
         ) {
             Spacer(modifier = Modifier.height(25.dp))
 
@@ -163,12 +164,18 @@ fun TambahRuanganPage(
             Spacer(modifier = Modifier.height(24.dp))
 
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(32.dp)),
                 shape = RoundedCornerShape(32.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
-                Column(modifier = Modifier.padding(24.dp)) {
+                Column(
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
                     CustomTextField(
                         label = "Nama Ruangan",
                         value = namaRuangan,

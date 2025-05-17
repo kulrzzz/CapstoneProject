@@ -101,7 +101,7 @@ fun TambahAdminPage(
                     ) {
                         Button(
                             onClick = onBack,
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1570EF)),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
                             modifier = Modifier
                                 .weight(1f)
                                 .height(50.dp)

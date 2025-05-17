@@ -132,7 +132,7 @@ fun EditAdminPage(
                         }
                     },
                     enabled = !isLoading,
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color (0xFF1570EF))
                 ) {
                     Text(if (isLoading) "Menyimpan..." else "Simpan", color = Color.White)
                 }

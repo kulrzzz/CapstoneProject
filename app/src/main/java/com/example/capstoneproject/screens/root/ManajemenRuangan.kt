@@ -70,6 +70,13 @@ fun ManajemenRuanganPage(
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1570EF)),
                 shape = RoundedCornerShape(12.dp)
             ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.tambahruangan),
+                    contentDescription = "Tambah Ruangan",
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
                 Text("Tambah Ruangan", fontSize = textSize, color = Color.White)
             }
 
