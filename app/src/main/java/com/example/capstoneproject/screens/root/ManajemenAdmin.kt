@@ -34,7 +34,7 @@ fun ManajemenAdminPage(
 ) {
     val spacing = 24.dp
     val textSize = 14.sp
-    val titleSize = 27.sp
+    val titleSize = 30.sp
     val headerColor = Color(0xFFF0F4FF)
     val headerTextColor = Color(0xFF1A237E)
 
@@ -196,6 +196,17 @@ fun AdminRow(
 fun PreviewManajemenAdminPage() {
     ManajemenAdminPage(
         adminRequestList = listOf(
+            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
+            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
+            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
+            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
+            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
+            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
+            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
+            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
+            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
+            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
+            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
             Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
         ),
         onTambahAdminClick = {},

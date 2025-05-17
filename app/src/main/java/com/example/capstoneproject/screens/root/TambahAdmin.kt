@@ -65,7 +65,7 @@ fun TambahAdminPage(
                 .padding(24.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(25.dp))
 
             Text(
                 text = "Tambah Admin",
@@ -78,7 +78,7 @@ fun TambahAdminPage(
 
             Card(
                 modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(32.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
@@ -91,7 +91,6 @@ fun TambahAdminPage(
 
                     AdminInputField(label = "Password", value = password, onValueChange = { password = it }, isPassword = true)
 
-
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Row(
@@ -102,14 +101,13 @@ fun TambahAdminPage(
                     ) {
                         Button(
                             onClick = onBack,
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1570EF)),
                             modifier = Modifier
                                 .weight(1f)
                                 .height(50.dp)
                         ) {
-                            Text("Kembali")
+                            Text("Kembali", fontSize = 16.sp)
                         }
-
                         Spacer(modifier = Modifier.width(350.dp))
 
                         Button(
@@ -146,7 +144,7 @@ fun TambahAdminPage(
                                     }
                                 }
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6A1B9A)), // Warna ungu
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1570EF)),
                             modifier = Modifier
                                 .weight(1f) // 🔥 Ukuran proporsional
                                 .height(50.dp)
@@ -173,7 +171,7 @@ fun AdminInputField(
         onValueChange = onValueChange,
         modifier = Modifier.fillMaxWidth(),
         label = { Text(label) },
-        shape = RoundedCornerShape(12.dp),
+        shape = RoundedCornerShape(24.dp),
         textStyle = MaterialTheme.typography.bodyLarge,
         singleLine = true,
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,

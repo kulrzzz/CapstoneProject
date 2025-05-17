@@ -5,19 +5,19 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.capstoneproject.R
 import com.example.capstoneproject.model.Room
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
@@ -34,10 +34,14 @@ fun ManajemenRuanganPage(
 ) {
     val spacing = 24.dp
     val textSize = 14.sp
+    val titleSize = 30.sp
     val headerColor = Color(0xFFF0F4FF)
     val headerTextColor = Color(0xFF1A237E)
 
-    Row(modifier = Modifier.fillMaxSize()) {
+    Row(modifier = Modifier
+        .fillMaxSize()
+        .background(Color(0xFFF5F7FF))
+    ) {
         SideBar(
             userRole = "root",
             onNavigate = onNavigate,
@@ -50,21 +54,23 @@ fun ManajemenRuanganPage(
                 .fillMaxHeight()
                 .padding(spacing)
         ) {
+            Spacer(modifier = Modifier.height(25.dp))
+
             Text(
                 text = "Manajemen Ruangan",
-                fontSize = 24.sp,
+                fontSize = titleSize,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = Color(0xFF04A5D4)
             )
 
             Spacer(modifier = Modifier.height(spacing))
 
             Button(
                 onClick = onTambahRuanganClick,
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1570EF)),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("➕ Tambah Ruangan", fontSize = textSize, color = Color.White)
+                Text("Tambah Ruangan", fontSize = textSize, color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(spacing))
@@ -155,11 +161,50 @@ fun RoomRow(
                 .padding(start = 26.dp)
         ) {
             IconButton(onClick = onEdit) {
-                Icon(Icons.Default.Edit, contentDescription = "Edit", tint = MaterialTheme.colorScheme.primary)
+                Icon(
+                    painter = painterResource(id = R.drawable.edit),
+                    contentDescription = "Edit",
+                    tint = Color (0xFF1570EF),
+                    modifier = Modifier.size(20.dp)
+                )
             }
             IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                Icon(
+                    painter = painterResource(id = R.drawable.trash),
+                    contentDescription = "Delete",
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(20.dp)
+                )
             }
         }
     }
+}
+
+@Preview(showBackground = true, widthDp = 1024, heightDp = 768)
+@Composable
+fun ManajemenRuanganPreview() {
+    val dummyRooms = List(5) {
+        com.example.capstoneproject.model.Room(
+            room_id = "$it",
+            room_name = "Ruang Meeting ${'A' + it}",
+            room_desc = "Deskripsi ruang meeting",
+            room_kategori = "Gedung GKM Lt. ${1 + (it % 3)}",
+            room_capacity = 20 + it,
+            room_price = 50000L,
+            room_available = 1,
+            room_start = "08:00",
+            room_end = "17:00",
+            created_at = "2024-01-01",
+            updated_at = "2024-01-02"
+        )
+    }
+
+    ManajemenRuanganPage(
+        roomList = dummyRooms,
+        onTambahRuanganClick = {},
+        onEditRoom = {},
+        onDeleteRoom = {},
+        onNavigate = {},
+        onLogout = {}
+    )
 }
