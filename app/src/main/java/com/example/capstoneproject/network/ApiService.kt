@@ -21,7 +21,7 @@ interface ApiService {
         @PartMap parts: Map<String, @JvmSuppressWildcards RequestBody>,
         @Part image: MultipartBody.Part,
         @Query("access_token") token: String
-    ): Response<ResponseBody>
+    ): Response<RoomAddResponse>
 
     @PUT("api/room/update")
     suspend fun updateRoom(

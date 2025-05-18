@@ -10,13 +10,12 @@ import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import okhttp3.ResponseBody
 import retrofit2.Response
 import java.io.File
+import java.util.*
 
 class RuanganViewModel : ViewModel() {
 
-    // -------------------- STATE --------------------
     private val _roomList = mutableStateListOf<Room>()
     val roomList: List<Room> get() = _roomList
 
@@ -37,7 +36,6 @@ class RuanganViewModel : ViewModel() {
     private val textPlain = "text/plain".toMediaTypeOrNull()
     private val imageMediaType = "image/*".toMediaTypeOrNull()
 
-    // -------------------- FETCH --------------------
     fun fetchRooms() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -54,8 +52,12 @@ class RuanganViewModel : ViewModel() {
         }
     }
 
-    // -------------------- ADD ROOM --------------------
-    fun addRoomMultipart(room: Room, imageFile: File, onResult: (Boolean) -> Unit) {
+    fun addFullRoom(
+        room: Room,
+        imageFile: File,
+        fasilitasList: List<String>,
+        onComplete: (Boolean) -> Unit
+    ) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
@@ -65,7 +67,7 @@ class RuanganViewModel : ViewModel() {
                     "room_kategori" to (room.room_kategori ?: "").toRequestBody(textPlain),
                     "room_capacity" to room.room_capacity.toRequestBody(textPlain),
                     "room_price" to room.room_price.toRequestBody(textPlain),
-                    "room_available" to room.room_available.toRequestBody(textPlain),
+                    "room_available" to 1.toRequestBody(textPlain),
                     "room_start" to (room.room_start ?: "").toRequestBody(textPlain),
                     "room_end" to (room.room_end ?: "").toRequestBody(textPlain)
                 )
@@ -74,72 +76,64 @@ class RuanganViewModel : ViewModel() {
                 val multipartImage = MultipartBody.Part.createFormData("image", imageFile.name, imageRequest)
 
                 val response = ApiClient.apiService.addRoomMultipart(parts, multipartImage, Constants.ACCESS_TOKEN)
-                if (response.isSuccessful) {
-                    _successMessage.value = "Ruangan berhasil ditambahkan."
+                if (response.isSuccessful && response.body() != null) {
+                    val roomId = response.body()!!.data.room_id
+
+                    uploadRoomImage(roomId, imageFile) {}
+
+                    fasilitasList.forEach { fasilitasName ->
+                        val facility = Facility(
+                            facility_id = UUID.randomUUID().toString(),
+                            room_id = roomId,
+                            facility_name = fasilitasName,
+                            created_at = null,
+                            updated_at = null
+                        )
+                        addFacility(facility) {}
+                    }
+
+                    _successMessage.value = "Ruangan dan fasilitas berhasil ditambahkan."
                     fetchRooms()
-                    onResult(true)
+                    onComplete(true)
                 } else {
                     _errorMessage.value = "Gagal menambahkan ruangan: ${response.code()} ${response.message()}"
-                    onResult(false)
+                    onComplete(false)
                 }
             } catch (e: Exception) {
                 _errorMessage.value = "Terjadi kesalahan saat menambahkan ruangan: ${e.message}"
-                onResult(false)
+                onComplete(false)
             } finally {
                 _isLoading.value = false
             }
         }
     }
 
-    // -------------------- UPLOAD IMAGE --------------------
     fun uploadRoomImage(roomId: String, imageFile: File, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
-            _isLoading.value = true
             try {
                 val imageBody = RequestBody.create(imageMediaType, imageFile)
                 val multipartImage = MultipartBody.Part.createFormData("ri_image", imageFile.name, imageBody)
                 val roomIdBody = roomId.toRequestBody(textPlain)
 
                 val response = ApiClient.apiService.addRoomImageMultipart(multipartImage, roomIdBody, Constants.ACCESS_TOKEN)
-                if (response.isSuccessful) {
-                    _successMessage.value = "Gambar berhasil diunggah."
-                    onResult(true)
-                } else {
-                    _errorMessage.value = "Gagal upload gambar: ${response.code()} ${response.message()}"
-                    onResult(false)
-                }
+                onResult(response.isSuccessful)
             } catch (e: Exception) {
-                _errorMessage.value = "Kesalahan upload gambar: ${e.message}"
                 onResult(false)
-            } finally {
-                _isLoading.value = false
             }
         }
     }
 
-    // -------------------- ADD FACILITY --------------------
     fun addFacility(facility: Facility, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
-            _isLoading.value = true
             try {
                 val response = ApiClient.apiService.addFacility(facility, Constants.ACCESS_TOKEN)
-                if (response.isSuccessful) {
-                    _successMessage.value = "Fasilitas berhasil ditambahkan."
-                    onResult(true)
-                } else {
-                    _errorMessage.value = "Gagal menambahkan fasilitas: ${response.message()}"
-                    onResult(false)
-                }
+                onResult(response.isSuccessful)
             } catch (e: Exception) {
-                _errorMessage.value = "Kesalahan saat menambahkan fasilitas: ${e.message}"
                 onResult(false)
-            } finally {
-                _isLoading.value = false
             }
         }
     }
 
-    // -------------------- UPDATE ROOM --------------------
     fun updateRoom(roomId: String, updatedFields: Map<String, String>, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -161,7 +155,6 @@ class RuanganViewModel : ViewModel() {
         }
     }
 
-    // -------------------- DELETE ROOM --------------------
     fun deleteRoomById(roomId: String, onResult: (Boolean) -> Unit) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -184,7 +177,6 @@ class RuanganViewModel : ViewModel() {
         }
     }
 
-    // -------------------- UTIL EXTENSION --------------------
     private fun String.toRequestBody(mediaType: okhttp3.MediaType?) =
         RequestBody.create(mediaType, this)
 
