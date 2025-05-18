@@ -15,17 +15,17 @@ interface ApiService {
         @Query("access_token") token: String
     ): RoomResponse
 
-    @Multipart
+    @FormUrlEncoded
     @POST("api/room/add")
-    suspend fun addRoomMultipart(
-        @PartMap parts: Map<String, @JvmSuppressWildcards RequestBody>,
-        @Part image: MultipartBody.Part,
+    suspend fun addRoomForm(
+        @FieldMap roomFields: Map<String, String>,
         @Query("access_token") token: String
     ): Response<RoomAddResponse>
 
+    @FormUrlEncoded
     @PUT("api/room/update")
     suspend fun updateRoom(
-        @Body updatedFields: Map<String, String>,
+        @FieldMap updatedFields: Map<String, String>,
         @Query("access_token") token: String
     ): Response<ResponseBody>
 
@@ -37,11 +37,11 @@ interface ApiService {
 
     // ---------------- ROOM IMAGE ----------------
     @Multipart
-    @POST("api/room/image/add")
+    @POST("api/room-image/add")
     suspend fun addRoomImageMultipart(
+        @Header("Authorization") token: String,
         @Part image: MultipartBody.Part,
-        @Part("room_id") roomId: RequestBody,
-        @Query("access_token") token: String
+        @Part("room_id") roomId: RequestBody
     ): Response<ResponseBody>
 
     @HTTP(method = "DELETE", path = "api/room/image/delete", hasBody = true)
@@ -51,13 +51,15 @@ interface ApiService {
     ): Response<ResponseBody>
 
     // ---------------- FACILITY ----------------
-    @POST("api/facility/add")
+    @FormUrlEncoded
+    @POST("api/room-facility/add")
     suspend fun addFacility(
-        @Body facility: Facility,
+        @Field("facility_name") facilityName: String,
+        @Field("room_id") roomId: String,
         @Query("access_token") token: String
     ): Response<ResponseBody>
 
-    @HTTP(method = "DELETE", path = "api/facility/delete", hasBody = true)
+    @HTTP(method = "DELETE", path = "api/room/facility/delete", hasBody = true)
     suspend fun deleteFacility(
         @Body payload: Map<String, String>,
         @Query("access_token") token: String

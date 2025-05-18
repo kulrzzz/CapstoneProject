@@ -21,13 +21,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.example.capstoneproject.model.Facility
 import com.example.capstoneproject.model.Room
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
@@ -49,9 +46,7 @@ fun CustomTextField(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = minHeight),
+            modifier = Modifier.fillMaxWidth().heightIn(min = minHeight),
             shape = RoundedCornerShape(24.dp),
             textStyle = TextStyle(fontSize = 16.sp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
@@ -59,8 +54,7 @@ fun CustomTextField(
                 unfocusedBorderColor = Color.Gray,
                 containerColor = Color.White
             ),
-            singleLine = singleLine,
-            visualTransformation = VisualTransformation.None
+            singleLine = singleLine
         )
     }
 }
@@ -77,7 +71,6 @@ fun CustomDropdownField(
 
     Column {
         Text(text = label, color = Color.Gray, fontSize = 14.sp)
-
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded }
@@ -85,9 +78,7 @@ fun CustomDropdownField(
             OutlinedTextField(
                 value = selectedValue,
                 onValueChange = {},
-                modifier = Modifier
-                    .menuAnchor()
-                    .fillMaxWidth(),
+                modifier = Modifier.menuAnchor().fillMaxWidth(),
                 shape = RoundedCornerShape(24.dp),
                 trailingIcon = {
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded)
@@ -101,7 +92,6 @@ fun CustomDropdownField(
                 ),
                 singleLine = true
             )
-
             ExposedDropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
@@ -161,12 +151,17 @@ fun TambahRuanganPage(
         calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true
     )
 
-    Row(modifier = Modifier.fillMaxSize().background(Color(0xFFF5F7FF))) {
+    Row(Modifier.fillMaxSize().background(Color(0xFFF5F7FF))) {
         SideBar(userRole = "root", onNavigate = onNavigate, onLogout = onLogout)
 
-        Column(modifier = Modifier.weight(1f).fillMaxHeight().padding(24.dp)) {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .padding(24.dp)
+        ) {
             Text("Tambah Ruangan", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Color(0xFF04A5D4))
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(Modifier.height(24.dp))
 
             Card(
                 modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(32.dp)),
@@ -175,55 +170,32 @@ fun TambahRuanganPage(
                 elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
                 Column(modifier = Modifier.padding(24.dp).verticalScroll(scrollState)) {
-                    CustomTextField(
-                        label = "Nama Ruangan",
-                        value = namaRuangan,
-                        onValueChange = { namaRuangan = it }
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CustomTextField(
-                        label = "Deskripsi Ruangan",
-                        value = deskripsiRuangan,
-                        onValueChange = { deskripsiRuangan = it },
-                        singleLine = false,
-                        minHeight = 100.dp
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CustomDropdownField(
-                        label = "Kategori Ruangan",
-                        selectedValue = kategoriRuangan,
-                        onValueSelected = { kategoriRuangan = it },
-                        items = categories
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CustomTextField(
-                        label = "Kapasitas",
-                        value = kapasitas,
-                        onValueChange = { kapasitas = it }
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    CustomTextField("Nama Ruangan", namaRuangan, { namaRuangan = it })
+                    Spacer(Modifier.height(16.dp))
+                    CustomTextField("Deskripsi Ruangan", deskripsiRuangan, { deskripsiRuangan = it }, false, 100.dp)
+                    Spacer(Modifier.height(16.dp))
+                    CustomDropdownField("Kategori Ruangan", kategoriRuangan, { kategoriRuangan = it }, categories)
+                    Spacer(Modifier.height(16.dp))
+                    CustomTextField("Kapasitas", kapasitas, { kapasitas = it })
+                    Spacer(Modifier.height(16.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Jam Mulai: ${if (startTime.isNotEmpty()) startTime else "Belum dipilih"}")
-                        Spacer(modifier = Modifier.width(16.dp))
+                        Text("Jam Mulai: ${startTime.ifEmpty { "Belum dipilih" }}")
+                        Spacer(Modifier.width(16.dp))
                         Button(onClick = { timePickerDialogStart.show() }) { Text("Pilih Jam Mulai") }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(Modifier.height(16.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Jam Selesai: ${if (endTime.isNotEmpty()) endTime else "Belum dipilih"}")
-                        Spacer(modifier = Modifier.width(16.dp))
+                        Text("Jam Selesai: ${endTime.ifEmpty { "Belum dipilih" }}")
+                        Spacer(Modifier.width(16.dp))
                         Button(onClick = { timePickerDialogEnd.show() }) { Text("Pilih Jam Selesai") }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    CustomTextField(
-                        label = "Harga Sewa",
-                        value = hargaSewa,
-                        onValueChange = { hargaSewa = it }
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(Modifier.height(16.dp))
+                    CustomTextField("Harga Sewa", hargaSewa, { hargaSewa = it })
+                    Spacer(Modifier.height(24.dp))
                     Text("Upload Gambar", fontSize = 14.sp, color = Color.Gray)
                     Button(onClick = { launcher.launch("image/*") }) { Text("Pilih Gambar") }
                     imageUri.value?.let { uri ->
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(Modifier.height(8.dp))
                         Image(
                             painter = rememberAsyncImagePainter(uri),
                             contentDescription = null,
@@ -231,9 +203,9 @@ fun TambahRuanganPage(
                             contentScale = ContentScale.Crop
                         )
                     }
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(Modifier.height(24.dp))
                     Text("Fasilitas", fontSize = 14.sp, color = Color.Gray)
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(Modifier.height(4.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         OutlinedTextField(
                             value = fasilitasInput,
@@ -242,7 +214,7 @@ fun TambahRuanganPage(
                             label = { Text("Masukkan Fasilitas") },
                             singleLine = true
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(Modifier.width(8.dp))
                         Button(onClick = {
                             if (fasilitasInput.isNotBlank()) {
                                 fasilitasList.add(fasilitasInput)
@@ -250,21 +222,44 @@ fun TambahRuanganPage(
                             }
                         }) { Text("Tambahkan") }
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
-                    fasilitasList.forEach { fasilitas -> Text("- $fasilitas", fontSize = 14.sp, color = Color.DarkGray) }
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(Modifier.height(8.dp))
+                    fasilitasList.forEach { Text("- $it", fontSize = 14.sp, color = Color.DarkGray) }
 
+                    Spacer(Modifier.height(16.dp))
+                    viewModel.errorMessage.value?.let {
+                        Text(it, color = Color.Red, fontSize = 14.sp)
+                    }
+                    viewModel.successMessage.value?.let {
+                        Text(it, color = Color(0xFF16A34A), fontSize = 14.sp)
+                    }
+                    if (viewModel.isLoading.value) {
+                        Spacer(Modifier.height(8.dp))
+                        CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
+                    }
+
+                    Spacer(Modifier.height(24.dp))
                     Button(
                         onClick = {
-                            val uri = imageUri.value
-                            if (uri == null) {
+                            if (namaRuangan.isBlank() || deskripsiRuangan.isBlank() || kategoriRuangan.isBlank() ||
+                                kapasitas.isBlank() || hargaSewa.isBlank() || startTime.isBlank() || endTime.isBlank()) {
+                                Toast.makeText(context, "Harap lengkapi semua kolom", Toast.LENGTH_SHORT).show()
+                                return@Button
+                            }
+                            if (imageUri.value == null) {
                                 Toast.makeText(context, "Harap pilih gambar", Toast.LENGTH_SHORT).show()
                                 return@Button
                             }
-                            val inputStream = context.contentResolver.openInputStream(uri)
+                            if (fasilitasList.isEmpty()) {
+                                Toast.makeText(context, "Tambahkan setidaknya 1 fasilitas", Toast.LENGTH_SHORT).show()
+                                return@Button
+                            }
+                            val inputStream = context.contentResolver.openInputStream(imageUri.value!!)
+                            if (inputStream == null) {
+                                Toast.makeText(context, "Gagal membaca gambar", Toast.LENGTH_SHORT).show()
+                                return@Button
+                            }
                             val tempFile = File.createTempFile("upload", ".jpg", context.cacheDir)
-                            tempFile.outputStream().use { output -> inputStream?.copyTo(output) }
-
+                            tempFile.outputStream().use { output -> inputStream.copyTo(output) }
                             val room = Room(
                                 room_id = "",
                                 room_name = namaRuangan,
@@ -278,10 +273,20 @@ fun TambahRuanganPage(
                                 created_at = null,
                                 updated_at = null
                             )
-
                             viewModel.addFullRoom(room, tempFile, fasilitasList) { success ->
                                 if (success) {
                                     Toast.makeText(context, "Ruangan berhasil ditambahkan", Toast.LENGTH_SHORT).show()
+                                    viewModel.clearMessages()
+                                    namaRuangan = ""
+                                    deskripsiRuangan = ""
+                                    kategoriRuangan = ""
+                                    kapasitas = ""
+                                    hargaSewa = ""
+                                    startTime = ""
+                                    endTime = ""
+                                    fasilitasList.clear()
+                                    fasilitasInput = ""
+                                    imageUri.value = null
                                 } else {
                                     Toast.makeText(context, "Gagal menambahkan ruangan", Toast.LENGTH_SHORT).show()
                                 }
@@ -289,7 +294,8 @@ fun TambahRuanganPage(
                         },
                         modifier = Modifier.align(Alignment.End),
                         shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1570EF))
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1570EF)),
+                        enabled = !viewModel.isLoading.value
                     ) {
                         Text("Tambah Ruangan", fontSize = 16.sp)
                     }
@@ -297,10 +303,4 @@ fun TambahRuanganPage(
             }
         }
     }
-}
-
-@Preview(showBackground = true, widthDp = 1024, heightDp = 768)
-@Composable
-fun TambahRuanganPreview() {
-    TambahRuanganPage()
 }
