@@ -73,7 +73,7 @@ fun RiwayatTransaksiPage(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(headerColor)
-                            .padding(vertical = 12.dp, horizontal = 16.dp),
+                            .padding(vertical = 12.dp, horizontal = 0.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         TableHeaderCell("No", 40.dp, textSize, headerTextColor)
@@ -117,7 +117,7 @@ fun TransaksiRow(
         Text(
             text = no.toString(),
             fontSize = fontSize,
-            textAlign = TextAlign.Center,
+//            textAlign = TextAlign.Center,
             modifier = Modifier.width(36.dp)
         )
 
