@@ -69,9 +69,9 @@ fun AppNavGraph(
 //            RiwayatTransaksiPage(onBack = { navController.popBackStack() })
 //        }
 
-        composable(Screen.DaftarUser.route) {
-            DaftarUserPage(onBack = { navController.popBackStack() })
-        }
+//        composable(Screen.DaftarUser.route) {
+//            DaftarUserPage(onBack = { navController.popBackStack() })
+//        }
 
         // 🛠️ Manajemen Admin
         composable(Screen.ManajemenAdmin.route) {
