@@ -65,9 +65,9 @@ fun AppNavGraph(
         }
 
         // 🧾 Riwayat dan Daftar User
-        composable(Screen.RiwayatTransaksi.route) {
-            RiwayatTransaksiPage(onBack = { navController.popBackStack() })
-        }
+//        composable(Screen.RiwayatTransaksi.route) {
+//            RiwayatTransaksiPage(onBack = { navController.popBackStack() })
+//        }
 
         composable(Screen.DaftarUser.route) {
             DaftarUserPage(onBack = { navController.popBackStack() })

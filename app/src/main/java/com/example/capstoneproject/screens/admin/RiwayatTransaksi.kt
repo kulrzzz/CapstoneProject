@@ -3,63 +3,97 @@ package com.example.capstoneproject.screens.admin
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.capstoneproject.model.Booking
+import com.example.capstoneproject.navigation.Screen
+import com.example.capstoneproject.screens.sidebar.SideBar
 import com.example.capstoneproject.ui.theme.TableHeaderCell
 
 @Composable
 fun RiwayatTransaksiPage(
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier
+    transaksiList: List<Booking>,
+    onNavigate: (Screen) -> Unit = {},
+    onLogout: () -> Unit = {}
 ) {
-    val titleColor = Color(0xFF009DFF)
-    val headerBg = Color(0xFFF5F7FF)
-    val textSize = 12.sp
+    val spacing = 24.dp
+    val textSize = 14.sp
+    val titleSize = 30.sp
+    val headerColor = Color(0xFFF0F4FF)
+    val headerTextColor = Color(0xFF1A237E)
 
-    Column(
-        modifier = modifier
-            .width(762.dp)
-            .height(768.dp)
-            .padding(16.dp)
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F7FF))
     ) {
-        // Tombol kembali (opsional)
-        Button(onClick = onBack) {
-            Text("← Kembali")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "Lihat Riwayat Transaksi",
-            fontSize = 22.sp,
-            color = titleColor,
-            fontWeight = FontWeight.Bold
+        SideBar(
+            userRole = "root",
+            onNavigate = onNavigate,
+            onLogout = onLogout
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Surface(
-            shape = RoundedCornerShape(16.dp),
-            tonalElevation = 4.dp,
-            shadowElevation = 8.dp
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .padding(spacing)
         ) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                TransaksiHeaderRow(headerBg, textSize)
-                LazyColumn {
-                    items(dummyTransactions) { transaksi ->
-                        TransaksiRow(transaksi, textSize)
+            Spacer(modifier = Modifier.height(25.dp))
+
+            Text(
+                text = "Lihat Riwayat Transaksi",
+                fontSize = titleSize,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF04A5D4)
+            )
+
+            Spacer(modifier = Modifier.height(spacing))
+
+            Card(
+                modifier = Modifier.fillMaxSize(),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+            ) {
+                Column {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(headerColor)
+                            .padding(vertical = 12.dp, horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TableHeaderCell("No", 40.dp, textSize, headerTextColor)
+                        TableHeaderCell("Kode", 100.dp, textSize, headerTextColor)
+                        TableHeaderCell("Peminjam", 120.dp, textSize, headerTextColor)
+                        TableHeaderCell("Gedung", 120.dp, textSize, headerTextColor)
+                        TableHeaderCell("Nominal", 100.dp, textSize, headerTextColor)
+                        TableHeaderCell("Status", 100.dp, textSize, headerTextColor)
+                    }
+
+                    Divider(color = Color.LightGray)
+
+                    LazyColumn {
+                        itemsIndexed(transaksiList) { index, booking ->
+                            TransaksiRow(
+                                no = index + 1,
+                                booking = booking,
+                                fontSize = textSize
+                            )
+                        }
                     }
                 }
             }
@@ -68,49 +102,64 @@ fun RiwayatTransaksiPage(
 }
 
 @Composable
-fun TransaksiHeaderRow(bgColor: Color, fontSize: TextUnit) {
+fun TransaksiRow(
+    no: Int,
+    booking: Booking,
+    fontSize: TextUnit,
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(bgColor)
-            .padding(vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        TableHeaderCell("Kode Booking", 100.dp, fontSize)
-        TableHeaderCell("Nama Peminjam", 100.dp, fontSize)
-        TableHeaderCell("Nama Gedung", 120.dp, fontSize)
-        TableHeaderCell("Nominal Pembayaran", 130.dp, fontSize)
-        TableHeaderCell("Status Pembayaran", 120.dp, fontSize)
-        Spacer(modifier = Modifier.weight(1f))
-    }
-}
-
-@Composable
-fun TransaksiRow(transaksi: Transaksi, fontSize: TextUnit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.White)
-            .padding(vertical = 10.dp, horizontal = 8.dp),
+            .background(if (no % 2 == 0) Color(0xFFF8FAFF) else Color.White)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = transaksi.kodeBooking,
-            color = Color(0xFF007BFF),
+            text = no.toString(),
             fontSize = fontSize,
-            textDecoration = TextDecoration.Underline,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.width(36.dp)
+        )
+
+        Text(
+            text = booking.booking_id,
+            fontSize = fontSize,
             modifier = Modifier.width(100.dp)
         )
-        Text(transaksi.namaPeminjam, fontSize = fontSize, modifier = Modifier.width(100.dp))
-        Text(transaksi.namaGedung, fontSize = fontSize, modifier = Modifier.width(120.dp))
-        Text(transaksi.nominal, fontSize = fontSize, modifier = Modifier.width(130.dp))
-        StatusBadge(transaksi.status, fontSize, Modifier.width(120.dp))
+
+        Text(
+            text = booking.customer_id,
+            fontSize = fontSize,
+            modifier = Modifier.width(150.dp)
+        )
+
+        Text(
+            text = booking.room_id,
+            fontSize = fontSize,
+            modifier = Modifier.width(150.dp)
+        )
+
+        Text(
+            text = "Rp${booking.booking_price}",
+            fontSize = fontSize,
+            modifier = Modifier.width(120.dp)
+        )
+
+        StatusBadge(
+            status = if (booking.booking_status == 1) "Lunas" else "Belum lunas",
+            fontSize = fontSize,
+            modifier = Modifier.width(120.dp)
+        )
     }
 }
 
 @Composable
-fun StatusBadge(status: String, fontSize: TextUnit, modifier: Modifier = Modifier) {
-    val isLunas = status.equals("lunas", ignoreCase = true)
+fun StatusBadge(
+    status: String,
+    fontSize: TextUnit,
+    modifier: Modifier = Modifier
+) {
+    val isLunas = status.equals("Lunas", ignoreCase = true)
     val bgColor = if (isLunas) Color(0xFFE3FCEF) else Color(0xFFFFE6E6)
     val textColor = if (isLunas) Color(0xFF2ECC71) else Color(0xFFEA4335)
 
@@ -129,24 +178,40 @@ fun StatusBadge(status: String, fontSize: TextUnit, modifier: Modifier = Modifie
     }
 }
 
-// Dummy model & data
-data class Transaksi(
-    val kodeBooking: String,
-    val namaPeminjam: String,
-    val namaGedung: String,
-    val nominal: String,
-    val status: String
-)
 
-val dummyTransactions = listOf(
-    Transaksi("12358G", "Jesicca", "GKM Lantai 2", "Rp 50.000", "Belum lunas"),
-    Transaksi("12358G", "Jesicca", "GKM Lantai 1", "Rp 70.000", "Lunas"),
-    Transaksi("12358G", "Jesicca", "GKM Lantai 1", "Rp 70.000", "Lunas"),
-    Transaksi("12358G", "Jesicca", "GKM Lantai 3", "Rp 50.000", "Belum lunas")
-)
-
-@Preview(showBackground = true, widthDp = 762, heightDp = 768)
+@Preview(showBackground = true, widthDp = 1024, heightDp = 768)
 @Composable
 fun RiwayatTransaksiPreview() {
-    RiwayatTransaksiPage(onBack = {})
+    RiwayatTransaksiPage(
+        transaksiList = listOf(
+            Booking(
+                booking_id = "KA3F",
+                customer_id = "Jessica",
+                room_id = "Lavender",
+                booking_code = 1234,
+                booking_date = "",
+                booking_start = "",
+                booking_end = "",
+                booking_desc = "",
+                booking_price = 50000,
+                booking_status = 0,
+                created_at = null,
+                updated_at = null
+            ),
+            Booking(
+                booking_id = "A2XZ",
+                customer_id = "Fajar",
+                room_id = "Cendana",
+                booking_code = 4321,
+                booking_date = "",
+                booking_start = "",
+                booking_end = "",
+                booking_desc = "",
+                booking_price = 65000,
+                booking_status = 1,
+                created_at = null,
+                updated_at = null
+            )
+        )
+    )
 }
