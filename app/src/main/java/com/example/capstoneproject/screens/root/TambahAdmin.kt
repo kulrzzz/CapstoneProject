@@ -108,7 +108,7 @@ fun TambahAdminPage(
                         ) {
                             Text("Kembali", fontSize = 16.sp)
                         }
-                        Spacer(modifier = Modifier.width(350.dp))
+                        Spacer(modifier = Modifier.width(300.dp))
 
                         Button(
                             onClick = {
