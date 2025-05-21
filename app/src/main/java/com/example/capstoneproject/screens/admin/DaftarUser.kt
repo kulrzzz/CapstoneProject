@@ -17,18 +17,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.capstoneproject.model.Booking
+import com.example.capstoneproject.model.Customer
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
 
 @Composable
 fun DaftarUserPage(
-    transaksiList: List<Booking>,
-    onDetailClick: (Booking) -> Unit = {},
+    customerList: List<Customer>,
+    onDetailClick: (Customer) -> Unit = {},
     onNavigate: (Screen) -> Unit = {},
     onLogout: () -> Unit = {}
 ) {
-    Row (
+    Row(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F7FF))
@@ -38,12 +38,15 @@ fun DaftarUserPage(
             onNavigate = onNavigate,
             onLogout = onLogout
         )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color(0xFFF5F7FF))
                 .padding(24.dp)
         ) {
+            Spacer(modifier = Modifier.height(25.dp))
+
             Text(
                 text = "Lihat Daftar User",
                 fontSize = 26.sp,
@@ -53,14 +56,12 @@ fun DaftarUserPage(
             )
 
             LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                items(transaksiList) { booking ->
+                items(customerList) { customer ->
                     DaftarUserCard(
-                        customerName = booking.customer_id,
-                        gedung = booking.room_id,
-                        tanggal = booking.booking_date,
-                        waktu = "${booking.booking_start} - ${booking.booking_end} WIB",
-                        kodeBooking = booking.booking_code.toString(),
-                        onDetailClick = { onDetailClick(booking) }
+                        id = customer.customer_id,
+                        nama = customer.customer_fullname,
+                        email = customer.customer_email,
+                        onDetailClick = { onDetailClick(customer) }
                     )
                 }
             }
@@ -70,11 +71,9 @@ fun DaftarUserPage(
 
 @Composable
 fun DaftarUserCard(
-    customerName: String,
-    gedung: String,
-    tanggal: String,
-    waktu: String,
-    kodeBooking: String,
+    id: String,
+    nama: String,
+    email: String,
     onDetailClick: () -> Unit
 ) {
     Card(
@@ -87,8 +86,7 @@ fun DaftarUserCard(
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Row(
-            modifier = Modifier
-                .padding(16.dp),
+            modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -103,11 +101,9 @@ fun DaftarUserCard(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Nama Peminjam          :     $customerName")
-                Text("Nama Gedung              :     $gedung")
-                Text("Tanggal Pinjam            :     $tanggal")
-                Text("Waktu Pinjam               :     $waktu")
-                Text("Kode Booking               :     $kodeBooking")
+                Text("ID Customer       : $id")
+                Text("Nama                   : $nama")
+                Text("Email                    : $email")
             }
 
             Button(
@@ -124,36 +120,24 @@ fun DaftarUserCard(
 @Preview(showBackground = true, widthDp = 1024, heightDp = 768)
 @Composable
 fun DaftarUserPagePreview() {
-    val dummyList = listOf(
-        Booking(
-            booking_id = "B001",
-            customer_id = "Jessica",
-            room_id = "GKM Lantai 1",
-            booking_code = 12356,
-            booking_date = "08 Desember 2025",
-            booking_start = "08.00",
-            booking_end = "12.00",
-            booking_desc = "Keperluan presentasi",
-            booking_price = 50000,
-            booking_status = 1,
+    val dummyCustomerList = listOf(
+        Customer(
+            customer_id = "CUS001",
+            customer_fullname = "Jessica",
+            customer_email = "jessica@example.com",
+            customer_pass = "secret",
             created_at = null,
             updated_at = null
         ),
-        Booking(
-            booking_id = "B002",
-            customer_id = "Fajar",
-            room_id = "GKB 2 Ruang 203",
-            booking_code = 78901,
-            booking_date = "09 Desember 2025",
-            booking_start = "13.00",
-            booking_end = "15.00",
-            booking_desc = "Meeting divisi",
-            booking_price = 65000,
-            booking_status = 1,
+        Customer(
+            customer_id = "CUS002",
+            customer_fullname = "Fajar",
+            customer_email = "fajar@example.com",
+            customer_pass = "secret",
             created_at = null,
             updated_at = null
         )
     )
 
-    DaftarUserPage(transaksiList = dummyList)
+    DaftarUserPage(customerList = dummyCustomerList)
 }
