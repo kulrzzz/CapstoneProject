@@ -1,52 +1,85 @@
 package com.example.capstoneproject.network
 
 import com.example.capstoneproject.util.Constants
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
+// ==========================
+// 🔐 Interceptor untuk Auth
+// ==========================
+class AuthInterceptor(private val token: String) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val requestWithAuth = chain.request().newBuilder()
+            .addHeader("Authorization", "Bearer $token")
+            .build()
+        return chain.proceed(requestWithAuth)
+    }
+}
+
 object ApiClient {
 
     private const val BASE_URL = "http://3.219.80.4:8000/"
 
-    // =========================================
-    // 🪵 Logging Interceptor untuk Debugging
-    // =========================================
+    // ==========================
+    // 🪵 Logging Interceptor
+    // ==========================
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY // ✅ Gunakan Level.NONE untuk build production
+        level = HttpLoggingInterceptor.Level.BODY
     }
 
-    // =========================================
-    // 🌐 OkHttpClient Configuration
-    // =========================================
-    private val httpClient: OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor(loggingInterceptor) // Tambahkan logging
-        .connectTimeout(10, TimeUnit.SECONDS) // ⏱ Connection timeout
-        .readTimeout(15, TimeUnit.SECONDS)    // ⏱ Response timeout
-        .writeTimeout(15, TimeUnit.SECONDS)   // ⏱ Optional: waktu upload data
+    // ==========================
+    // 🌐 OkHttp Tanpa Auth
+    // ==========================
+    private val httpClientNoAuth: OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(loggingInterceptor)
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(15, TimeUnit.SECONDS)
+        .writeTimeout(15, TimeUnit.SECONDS)
         .build()
 
-    // =========================================
-    // 🔧 Retrofit Instance (Gson + OkHttp)
-    // =========================================
+    // ==========================
+    // 🔧 Retrofit Tanpa Auth
+    // ==========================
     private val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(Constants.BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create()) // Gunakan Gson
-            .client(httpClient) // Gunakan client yang sudah diset
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(httpClientNoAuth)
             .build()
     }
 
-    // =========================================
-    // 🌍 API Service Singleton
-    // =========================================
+    // ==========================
+    // 🌍 API Service Tanpa Auth
+    // ==========================
     val apiService: ApiService by lazy {
         retrofit.create(ApiService::class.java)
     }
 
     val adminService: AdminService by lazy {
         retrofit.create(AdminService::class.java)
+    }
+
+    // ======================================================
+    // 🌐 Retrofit + OkHttp Client dengan Token Authorization
+    // ======================================================
+    fun getClientWithAuth(token: String): Retrofit {
+        val clientWithAuth = OkHttpClient.Builder()
+            .addInterceptor(AuthInterceptor(token))
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(15, TimeUnit.SECONDS)
+            .writeTimeout(15, TimeUnit.SECONDS)
+            .build()
+
+        return Retrofit.Builder()
+            .baseUrl(Constants.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(clientWithAuth)
+            .build()
     }
 }
