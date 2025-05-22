@@ -1,11 +1,13 @@
 package com.example.capstoneproject.screens.admin
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -77,16 +79,33 @@ fun DetailUserPage(
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
+                border = BorderStroke(1.dp, Color(0xFFFF9800)),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(4.dp)
+
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    InfoText(label = "ID Pengguna        :", value = customer.customer_id)
-                    InfoText(label = "Nama Lengkap    :", value = customer.customer_fullname)
-                    InfoText(label = "Email                      :", value = customer.customer_email)
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = null,
+                        tint = Color(0xFF2196F3),
+                        modifier = Modifier
+                            .size(48.dp)
+                            .padding(end = 16.dp)
+                    )
+                    Column {
+                        InfoText(label = "ID Pengguna         :", value = customer.customer_id)
+                        InfoText(label = "Nama Lengkap    :", value = customer.customer_fullname)
+                        InfoText(
+                            label = "Email                      :",
+                            value = customer.customer_email
+                        )
+                    }
                 }
             }
-
             Spacer(modifier = Modifier.height(24.dp))
 
             // Tabel Riwayat Peminjaman
@@ -144,7 +163,7 @@ fun DetailUserPage(
 @Composable
 fun InfoText(label: String, value: String) {
     Row(modifier = Modifier.padding(vertical = 4.dp)) {
-        Text("$label ", modifier = Modifier.width(140.dp), fontWeight = FontWeight.SemiBold)
+        Text("$label ", modifier = Modifier.width(140.dp))
         Text(text = value)
     }
 }

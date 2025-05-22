@@ -102,9 +102,9 @@ fun DaftarUserCard(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text("ID Customer       : $id")
-                Text("Nama                   : $nama")
-                Text("Email                    : $email")
+                Text("ID Customer       :      $id")
+                Text("Nama                   :      $nama")
+                Text("Email                    :      $email")
             }
 
             Button(
