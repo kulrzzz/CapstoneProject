@@ -10,6 +10,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.capstoneproject.navigation.AppNavGraph
 import com.example.capstoneproject.ui.theme.CapstoneProjectTheme
 import com.example.capstoneproject.viewmodel.AdminViewModel
+import com.example.capstoneproject.viewmodel.BookingViewModel
+import com.example.capstoneproject.viewmodel.CustomerViewModel
 import com.example.capstoneproject.viewmodel.LoginViewModel
 import com.example.capstoneproject.viewmodel.MainViewModel
 import com.example.capstoneproject.viewmodel.RuanganViewModel
@@ -28,6 +30,9 @@ class MainActivity : ComponentActivity() {
             val loginViewModel: LoginViewModel = viewModel()
             val adminViewModel: AdminViewModel = viewModel()
             val ruanganViewModel: RuanganViewModel = viewModel()
+            val bookingViewModel: BookingViewModel = viewModel()
+            val customerViewModel: CustomerViewModel = viewModel()
+
 
             CapstoneProjectTheme {
                 AppNavGraph(
@@ -35,7 +40,9 @@ class MainActivity : ComponentActivity() {
                     mainViewModel = mainViewModel,
                     loginViewModel = loginViewModel,
                     adminViewModel = adminViewModel,
-                    ruanganViewModel = ruanganViewModel
+                    ruanganViewModel = ruanganViewModel,
+                    bookingViewModel = bookingViewModel,
+                    customerViewModel = customerViewModel
                 )
             }
         }

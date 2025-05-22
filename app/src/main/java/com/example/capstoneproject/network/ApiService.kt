@@ -9,6 +9,15 @@ import retrofit2.http.*
 
 interface ApiService {
 
+    // ---------------- LOGIN ----------------
+    @FormUrlEncoded
+    @POST("api/login/admin")
+    suspend fun loginAdmin(
+        @Field("access_token") token: String,
+        @Field("admin_email") email: String,
+        @Field("admin_pass") password: String
+    ): LoginResponse
+
     // ---------------- ROOM ----------------
     @GET("api/room/all")
     suspend fun getAllRooms(
@@ -65,30 +74,6 @@ interface ApiService {
         @Query("access_token") token: String
     ): Response<ResponseBody>
 
-    // ---------------- ADMIN ----------------
-    @GET("api/admin/all")
-    suspend fun getAllAdmins(
-        @Query("access_token") token: String
-    ): List<Admin>
-
-    @POST("api/admin/add")
-    suspend fun createAdmin(
-        @Body admin: Admin,
-        @Query("access_token") token: String
-    ): Response<ResponseBody>
-
-    @PUT("api/admin/update")
-    suspend fun updateAdmin(
-        @Body updatedFields: Map<String, String>,
-        @Query("access_token") token: String
-    ): Response<ResponseBody>
-
-    @HTTP(method = "DELETE", path = "api/admin/delete", hasBody = true)
-    suspend fun deleteAdmin(
-        @Body payload: Map<String, String>,
-        @Query("access_token") token: String
-    ): Response<ResponseBody>
-
     // ---------------- CUSTOMER ----------------
     @GET("api/customer/all")
     suspend fun getAllCustomers(
@@ -100,6 +85,8 @@ interface ApiService {
     suspend fun getAllBookings(
         @Query("access_token") token: String
     ): BookingResponse
+
+    // Fungsi di bawah ini hanya dibutuhkan jika kamu ingin membuat, edit, atau hapus transaksi booking
 
     @POST("api/booking/add")
     suspend fun createBooking(

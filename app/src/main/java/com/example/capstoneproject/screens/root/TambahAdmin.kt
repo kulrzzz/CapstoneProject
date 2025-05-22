@@ -125,7 +125,7 @@ fun TambahAdminPage(
 
                                 CoroutineScope(Dispatchers.IO).launch {
                                     try {
-                                        val response = ApiClient.apiService.createAdmin(
+                                        val response = ApiClient.adminService.createAdmin(
                                             admin = newAdmin,
                                             token = Constants.ACCESS_TOKEN
                                         )

@@ -7,12 +7,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.capstoneproject.viewmodel.AdminViewModel
-import com.example.capstoneproject.viewmodel.LoginViewModel
-import com.example.capstoneproject.viewmodel.MainViewModel
-import com.example.capstoneproject.viewmodel.RuanganViewModel
-import com.example.capstoneproject.screens.admin.DaftarUserPage
-import com.example.capstoneproject.screens.admin.RiwayatTransaksiPage
+import com.example.capstoneproject.viewmodel.*
+import com.example.capstoneproject.screens.admin.*
 import com.example.capstoneproject.screens.dashboard.DashboardScreen
 import com.example.capstoneproject.screens.login.AnimatedLoginPage
 import com.example.capstoneproject.screens.root.*
@@ -23,7 +19,9 @@ fun AppNavGraph(
     mainViewModel: MainViewModel,
     loginViewModel: LoginViewModel,
     adminViewModel: AdminViewModel,
-    ruanganViewModel: RuanganViewModel
+    ruanganViewModel: RuanganViewModel,
+    bookingViewModel: BookingViewModel,
+    customerViewModel: CustomerViewModel // ✅ Ditambahkan
 ) {
     NavHost(
         navController = navController,
@@ -64,25 +62,89 @@ fun AppNavGraph(
             )
         }
 
-        // 🧾 Riwayat dan Daftar User
-//        composable(Screen.RiwayatTransaksi.route) {
-//            RiwayatTransaksiPage(onBack = { navController.popBackStack() })
-//        }
+        // 🧾 Riwayat Transaksi
+        composable(Screen.RiwayatTransaksi.route) {
+            LaunchedEffect(Unit) {
+                bookingViewModel.fetchAllBookings()
+            }
 
-//        composable(Screen.DaftarUser.route) {
-//            DaftarUserPage(onBack = { navController.popBackStack() })
-//        }
+            RiwayatTransaksiPage(
+                transaksiList = bookingViewModel.allBookings,
+                onNavigate = { screen ->
+                    navController.navigate(screen.route)
+                },
+                onLogout = {
+                    loginViewModel.clearLoginState()
+                    mainViewModel.logout()
+                    navController.navigate(Screen.Login.route) { popUpTo(0) }
+                }
+            )
+        }
+
+        // 👥 Daftar User
+        composable(Screen.DaftarUser.route) {
+            LaunchedEffect(Unit) {
+                customerViewModel.fetchAllCustomers()
+            }
+
+            DaftarUserPage(
+                customerList = customerViewModel.customerList,
+                onUserSelected = { userId ->
+                    navController.navigate("detail_user/$userId")
+                },
+                onNavigate = { navController.navigate(it.route) },
+                onLogout = {
+                    loginViewModel.clearLoginState()
+                    mainViewModel.logout()
+                    navController.navigate(Screen.Login.route) { popUpTo(0) }
+                }
+            )
+        }
+
+        // 📄 Detail User (Turunan dari DaftarUser)
+        composable("detail_user/{userId}") { backStackEntry ->
+            val userId = backStackEntry.arguments?.getString("userId")
+
+            LaunchedEffect(Unit) {
+                if (customerViewModel.customerList.isEmpty()) {
+                    customerViewModel.fetchAllCustomers()
+                }
+                if (bookingViewModel.allBookings.isEmpty()) {
+                    bookingViewModel.fetchAllBookings()
+                }
+            }
+
+            val customer = customerViewModel.customerList.find { it.customer_id == userId }
+            val bookings = bookingViewModel.allBookings.filter { it.customer_id == userId }
+
+            if (customer != null) {
+                DetailUserPage(
+                    customer = customer,
+                    bookingList = bookings,
+                    onBackClick = { navController.popBackStack() },
+                    onNavigate = { screen -> navController.navigate(screen.route) },
+                    onLogout = {
+                        loginViewModel.clearLoginState()
+                        mainViewModel.logout()
+                        navController.navigate(Screen.Login.route) { popUpTo(0) }
+                    }
+                )
+            }
+        }
 
         // 🛠️ Manajemen Admin
         composable(Screen.ManajemenAdmin.route) {
             val context = LocalContext.current
 
+            // Jalankan hanya sekali saat composable pertama kali muncul
             LaunchedEffect(Unit) {
                 adminViewModel.fetchAdmins()
             }
 
             ManajemenAdminPage(
                 adminRequestList = adminViewModel.adminList.filter { it.admin_who == 1 },
+                isLoading = adminViewModel.isLoading.value,
+                errorMessage = adminViewModel.errorMessage.value,
                 onTambahAdminClick = {
                     navController.navigate(Screen.TambahAdmin.route)
                 },
@@ -99,16 +161,12 @@ fun AppNavGraph(
                     }
                 },
                 onNavigate = { screen ->
-                    navController.navigate(screen.route) {
-                        launchSingleTop = true
-                    }
+                    navController.navigate(screen.route) { launchSingleTop = true }
                 },
                 onLogout = {
                     loginViewModel.clearLoginState()
                     mainViewModel.logout()
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0)
-                    }
+                    navController.navigate(Screen.Login.route) { popUpTo(0) }
                 }
             )
         }
@@ -153,9 +211,7 @@ fun AppNavGraph(
                     navController.navigate(Screen.Login.route) { popUpTo(0) }
                 },
                 roomList = ruanganViewModel.roomList,
-                onEditRoom = { room ->
-                    // Navigasi ke edit_room bisa ditambahkan di sini nanti
-                },
+                onEditRoom = { /* future */ },
                 onDeleteRoom = { room ->
                     ruanganViewModel.deleteRoomById(room.room_id) { success ->
                         Toast.makeText(
@@ -168,6 +224,7 @@ fun AppNavGraph(
             )
         }
 
+        // ➕ Tambah Ruangan
         composable(Screen.TambahRuangan.route) {
             TambahRuanganPage(onBack = { navController.popBackStack() })
         }

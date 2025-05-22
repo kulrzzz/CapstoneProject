@@ -126,6 +126,15 @@ fun DetailUserPage(
                             )
                         }
                     }
+
+                    if (bookingList.isEmpty()) {
+                        Text(
+                            "Belum ada riwayat peminjaman.",
+                            modifier = Modifier.padding(16.dp),
+                            color = Color.Gray,
+                            fontStyle = MaterialTheme.typography.bodySmall.fontStyle
+                        )
+                    }
                 }
             }
         }

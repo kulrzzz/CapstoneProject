@@ -23,9 +23,16 @@ import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
 import com.example.capstoneproject.ui.theme.TableHeaderCell
 
+/**
+ * Halaman utama Manajemen Admin yang menampilkan daftar admin.
+ * Menyediakan aksi: tambah, edit, hapus.
+ * Meng-handle state loading, error, dan tampilan kosong.
+ */
 @Composable
 fun ManajemenAdminPage(
     adminRequestList: List<Admin>,
+    isLoading: Boolean = false,
+    errorMessage: String? = null,
     onTambahAdminClick: () -> Unit,
     onEditAdmin: (Admin) -> Unit,
     onDeleteAdmin: (Admin) -> Unit,
@@ -38,10 +45,12 @@ fun ManajemenAdminPage(
     val headerColor = Color(0xFFF0F4FF)
     val headerTextColor = Color(0xFF1A237E)
 
-    Row(modifier = Modifier
-        .fillMaxSize()
-        .background(Color(0xFFF5F7FF))
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F7FF))
     ) {
+        // Sidebar navigasi kiri
         SideBar(
             userRole = "root",
             onNavigate = onNavigate,
@@ -53,7 +62,6 @@ fun ManajemenAdminPage(
                 .weight(1f)
                 .fillMaxHeight()
                 .padding(spacing)
-
         ) {
             Spacer(modifier = Modifier.height(25.dp))
 
@@ -66,10 +74,11 @@ fun ManajemenAdminPage(
 
             Spacer(modifier = Modifier.height(spacing))
 
+            // Tombol tambah admin
             Button(
                 onClick = onTambahAdminClick,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1570EF)),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(12.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.tambahadmin),
@@ -81,41 +90,85 @@ fun ManajemenAdminPage(
                 Text("Tambah Admin", fontSize = 14.sp, color = Color.White)
             }
 
-
             Spacer(modifier = Modifier.height(spacing))
 
+            // Container card berisi konten utama (tabel)
             Card(
                 modifier = Modifier.fillMaxSize(),
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
-                Column {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(headerColor)
-                            .padding(vertical = 12.dp, horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // 👉 Atur ulang lebar kolom sesuai kebutuhanmu
-                        TableHeaderCell("No", 75.dp, textSize, headerTextColor)
-                        TableHeaderCell("Fullname", 240.dp, textSize, headerTextColor)
-                        TableHeaderCell("Email", 240.dp, textSize, headerTextColor)
-                        TableHeaderCell("Actions", 120.dp, textSize, headerTextColor)
+                // ================================
+                // 📦 STATE HANDLING: Loading / Error / Kosong / Konten
+                // ================================
+                when {
+                    isLoading -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(24.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
 
-                    Divider(color = Color.LightGray)
-
-                    LazyColumn(
-                    ) {
-                        itemsIndexed(adminRequestList) { index, admin ->
-                            AdminRow(
-                                no = index + 1,
-                                admin = admin,
-                                textSize = textSize,
-                                onEdit = { onEditAdmin(admin) },
-                                onDelete = { onDeleteAdmin(admin) }
+                    errorMessage != null -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(24.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = errorMessage,
+                                color = MaterialTheme.colorScheme.error,
+                                fontSize = 16.sp
                             )
+                        }
+                    }
+
+                    adminRequestList.isEmpty() -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(24.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("Tidak ada admin yang ditemukan.")
+                        }
+                    }
+
+                    else -> {
+                        Column {
+                            // Header Tabel
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(headerColor)
+                                    .padding(vertical = 12.dp, horizontal = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                TableHeaderCell("No", 75.dp, textSize, headerTextColor)
+                                TableHeaderCell("Fullname", 240.dp, textSize, headerTextColor)
+                                TableHeaderCell("Email", 240.dp, textSize, headerTextColor)
+                                TableHeaderCell("Actions", 120.dp, textSize, headerTextColor)
+                            }
+
+                            Divider(color = Color.LightGray)
+
+                            // Konten Tabel
+                            LazyColumn {
+                                itemsIndexed(adminRequestList) { index, admin ->
+                                    AdminRow(
+                                        no = index + 1,
+                                        admin = admin,
+                                        textSize = textSize,
+                                        onEdit = { onEditAdmin(admin) },
+                                        onDelete = { onDeleteAdmin(admin) }
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -124,6 +177,9 @@ fun ManajemenAdminPage(
     }
 }
 
+/**
+ * Baris individual dalam daftar admin.
+ */
 @Composable
 fun AdminRow(
     no: Int,
@@ -151,7 +207,6 @@ fun AdminRow(
         Text(
             text = admin.admin_fullname,
             fontSize = textSize,
-            textAlign = TextAlign.Start,
             modifier = Modifier
                 .width(240.dp)
                 .padding(start = 48.dp)
@@ -160,7 +215,6 @@ fun AdminRow(
         Text(
             text = admin.admin_email,
             fontSize = textSize,
-            textAlign = TextAlign.Start,
             modifier = Modifier
                 .width(240.dp)
                 .padding(start = 48.dp)
@@ -175,7 +229,7 @@ fun AdminRow(
                 Icon(
                     painter = painterResource(id = R.drawable.edit),
                     contentDescription = "Edit",
-                    tint = Color (0xFF1570EF),
+                    tint = Color(0xFF1570EF),
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -189,30 +243,4 @@ fun AdminRow(
             }
         }
     }
-}
-
-@Preview(showBackground = true, widthDp = 1024, heightDp = 768)
-@Composable
-fun PreviewManajemenAdminPage() {
-    ManajemenAdminPage(
-        adminRequestList = listOf(
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
-            Admin("1", "Muhammad Raffi Ghifari", "rafi@gmail.com", "1234", 1, "2024-01-01", "2024-01-01"),
-        ),
-        onTambahAdminClick = {},
-        onEditAdmin = {},
-        onDeleteAdmin = {},
-        onNavigate = {},
-        onLogout = {}
-    )
 }

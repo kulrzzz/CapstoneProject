@@ -3,7 +3,7 @@ package com.example.capstoneproject.viewmodel
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.capstoneproject.model.Admin
+import com.example.capstoneproject.model.LoginResponse
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.network.ApiClient
 import com.example.capstoneproject.util.Constants
@@ -29,18 +29,15 @@ class LoginViewModel : ViewModel() {
             _loginError.value = null
 
             try {
-                val trimmedEmail = email.trim()
-                val trimmedPassword = password.trim()
+                val response: LoginResponse = ApiClient.apiService.loginAdmin(
+                    Constants.ACCESS_TOKEN,
+                    email.trim(),
+                    password.trim()
+                )
 
-                val adminList = ApiClient.apiService.getAllAdmins(Constants.ACCESS_TOKEN)
-                val user = adminList.find {
-                    it.admin_email?.trim()?.equals(trimmedEmail, ignoreCase = true) == true &&
-                            it.admin_pass?.trim() == trimmedPassword
-                }
-
-                if (user != null) {
-                    userName = user.admin_fullname ?: "User"
-                    userRole = when (user.admin_who) {
+                if (response.status == "success") {
+                    userName = response.admin.admin_fullname ?: "User"
+                    userRole = when (response.admin.admin_who) {
                         2 -> "root"
                         1 -> "admin"
                         else -> null
@@ -53,7 +50,7 @@ class LoginViewModel : ViewModel() {
                         onResult(null)
                     }
                 } else {
-                    _loginError.value = "Email atau password salah"
+                    _loginError.value = response.message
                     onResult(null)
                 }
 

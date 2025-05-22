@@ -24,7 +24,7 @@ import com.example.capstoneproject.screens.sidebar.SideBar
 @Composable
 fun DaftarUserPage(
     customerList: List<Customer>,
-    onDetailClick: (Customer) -> Unit = {},
+    onUserSelected: (String) -> Unit, // ✅ Kirim ID ke navigator
     onNavigate: (Screen) -> Unit = {},
     onLogout: () -> Unit = {}
 ) {
@@ -42,7 +42,6 @@ fun DaftarUserPage(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F7FF))
                 .padding(24.dp)
         ) {
             Spacer(modifier = Modifier.height(25.dp))
@@ -61,7 +60,9 @@ fun DaftarUserPage(
                         id = customer.customer_id,
                         nama = customer.customer_fullname,
                         email = customer.customer_email,
-                        onDetailClick = { onDetailClick(customer) }
+                        onClick = {
+                            onUserSelected(customer.customer_id)
+                        }
                     )
                 }
             }
@@ -74,7 +75,7 @@ fun DaftarUserCard(
     id: String,
     nama: String,
     email: String,
-    onDetailClick: () -> Unit
+    onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -107,7 +108,7 @@ fun DaftarUserCard(
             }
 
             Button(
-                onClick = onDetailClick,
+                onClick = onClick,
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE3F2FD)),
                 modifier = Modifier.padding(start = 8.dp)
             ) {
@@ -138,6 +139,4 @@ fun DaftarUserPagePreview() {
             updated_at = null
         )
     )
-
-    DaftarUserPage(customerList = dummyCustomerList)
 }

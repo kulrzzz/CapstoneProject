@@ -17,9 +17,11 @@ import com.example.capstoneproject.navigation.AppNavGraph
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
 import com.example.capstoneproject.viewmodel.AdminViewModel
+import com.example.capstoneproject.viewmodel.BookingViewModel
 import com.example.capstoneproject.viewmodel.LoginViewModel
 import com.example.capstoneproject.viewmodel.MainViewModel
 import com.example.capstoneproject.viewmodel.RuanganViewModel
+import com.example.capstoneproject.viewmodel.CustomerViewModel
 
 @Composable
 fun DashboardScreen(
@@ -139,12 +141,16 @@ fun DashboardSidebarPreview() {
     val loginViewModel = LoginViewModel()
     val adminViewModel = AdminViewModel()
     val ruanganViewModel = RuanganViewModel()
+    val bookingViewModel = BookingViewModel()
+    val customerViewModel = CustomerViewModel()
 
     AppNavGraph(
         navController = navController,
         mainViewModel = mainViewModel,
         loginViewModel = loginViewModel,
         adminViewModel = adminViewModel,
-        ruanganViewModel = ruanganViewModel
+        ruanganViewModel = ruanganViewModel,
+        bookingViewModel = bookingViewModel,
+        customerViewModel = customerViewModel
     )
 }

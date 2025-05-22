@@ -1,7 +1,8 @@
 package com.example.capstoneproject.model
 
-data class BookingResponse(
+data class LoginResponse(
     val status: String,
     val message: String,
-    val data: List<Booking>
+    val rule: String,
+    val admin: Admin
 )
