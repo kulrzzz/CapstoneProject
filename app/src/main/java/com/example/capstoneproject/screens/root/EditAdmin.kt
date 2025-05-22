@@ -7,7 +7,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -22,6 +21,8 @@ import com.example.capstoneproject.model.Admin
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
 import com.example.capstoneproject.viewmodel.AdminViewModel
+import androidx.compose.ui.text.input.VisualTransformation
+
 
 @Composable
 fun EditAdminPage(
@@ -43,7 +44,6 @@ fun EditAdminPage(
             onNavigate = onNavigate,
             onLogout = onLogout
         )
-
         Column(
             modifier = Modifier
                 .weight(1f)
@@ -56,89 +56,126 @@ fun EditAdminPage(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Text("Nama Lengkap", fontSize = 14.sp, color = Color.Gray)
-            TextField(
-                value = admin.admin_fullname ?: "",
-                onValueChange = {},
-                enabled = false,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text("Email", fontSize = 14.sp, color = Color.Gray)
-            TextField(
-                value = admin.admin_email ?: "",
-                onValueChange = {},
-                enabled = false,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text("Password Baru", fontSize = 14.sp, color = Color.Gray)
-            TextField(
-                value = newPassword,
-                onValueChange = { newPassword = it },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text("Konfirmasi Password", fontSize = 14.sp, color = Color.Gray)
-            TextField(
-                value = confirmPassword,
-                onValueChange = { confirmPassword = it },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(32.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
-                Button(
-                    onClick = onBack,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
-                ) {
-                    Text("Kembali")
+
+                Column(
+                    modifier = Modifier.padding(24.dp)
+                ){
+                    AdminInputField(
+                        label = "Nama Lengkap",
+                        value = admin.admin_fullname ?: "",
+                        onValueChange = {},
+                        enabled = false
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    AdminInputField(
+                        label = "Email",
+                        value = admin.admin_email ?: "",
+                        onValueChange = {},
+                        enabled = false
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    AdminInputField(
+                        label = "Password Baru",
+                        value = newPassword,
+                        onValueChange = { newPassword = it },
+                        isPassword = true,
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    AdminInputField(
+                        label = "Konfirmasi Password",
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        isPassword = true
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Button(
+                            onClick = onBack,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                        ) {
+                            Text("Kembali")
+                        }
+
+                        Button(
+                            onClick = {
+                                if (newPassword.isBlank() || confirmPassword.isBlank()) {
+                                    Toast.makeText(context, "Password tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
+                                if (newPassword != confirmPassword) {
+                                    Toast.makeText(context, "Password tidak cocok", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
+
+                                isLoading = true
+                                adminViewModel.updateAdminPassword(admin.admin_id ?: "", newPassword) { success ->
+                                    isLoading = false
+                                    if (success) {
+                                        Toast.makeText(context, "Password berhasil diperbarui", Toast.LENGTH_SHORT).show()
+                                        onBack()
+                                    } else {
+                                        Toast.makeText(context, "Gagal memperbarui password", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            },
+                            enabled = !isLoading,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color (0xFF1570EF))
+                        ) {
+                            Text(if (isLoading) "Menyimpan..." else "Simpan", color = Color.White)
+                        }
+                    }
                 }
 
-                Button(
-                    onClick = {
-                        if (newPassword.isBlank() || confirmPassword.isBlank()) {
-                            Toast.makeText(context, "Password tidak boleh kosong", Toast.LENGTH_SHORT).show()
-                            return@Button
-                        }
-                        if (newPassword != confirmPassword) {
-                            Toast.makeText(context, "Password tidak cocok", Toast.LENGTH_SHORT).show()
-                            return@Button
-                        }
-
-                        isLoading = true
-                        adminViewModel.updateAdminPassword(admin.admin_id ?: "", newPassword) { success ->
-                            isLoading = false
-                            if (success) {
-                                Toast.makeText(context, "Password berhasil diperbarui", Toast.LENGTH_SHORT).show()
-                                onBack()
-                            } else {
-                                Toast.makeText(context, "Gagal memperbarui password", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    },
-                    enabled = !isLoading,
-                    colors = ButtonDefaults.buttonColors(containerColor = Color (0xFF1570EF))
-                ) {
-                    Text(if (isLoading) "Menyimpan..." else "Simpan", color = Color.White)
-                }
             }
         }
     }
+}
+
+@Composable
+fun AdminInputField(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    isPassword: Boolean = false,
+    enabled: Boolean = true
+) {
+    val containerColor = if (enabled) Color.White else Color(0xFFF3F4F6)
+
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        enabled = enabled,
+        label = { Text(label) },
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = if (isPassword) KeyboardOptions(keyboardType = KeyboardType.Password) else KeyboardOptions.Default,
+        modifier = Modifier
+            .fillMaxWidth(),
+        singleLine = true,
+        shape = RoundedCornerShape(24.dp),
+
+        colors = OutlinedTextFieldDefaults.colors(
+            disabledTextColor = Color.Gray,
+            disabledLabelColor = Color.Gray,
+            disabledBorderColor = Color.LightGray
+        )
+    )
 }
 
 @Preview(showBackground = true, widthDp = 1024, heightDp = 768)
