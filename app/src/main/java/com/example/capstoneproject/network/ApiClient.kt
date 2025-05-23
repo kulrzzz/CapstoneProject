@@ -8,6 +8,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.ConcurrentHashMap
 
 // ==========================
 // 🔐 Interceptor untuk Auth
@@ -25,22 +26,30 @@ object ApiClient {
 
     private const val BASE_URL = Constants.BASE_URL
 
+    init {
+        require(BASE_URL.isNotEmpty()) { "BASE_URL harus di-set di Constants" }
+    }
+
     // ==========================
     // 🪵 Logging Interceptor
     // ==========================
-    private val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BODY
+    private val loggingInterceptor: HttpLoggingInterceptor by lazy {
+        HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
     }
 
     // ==========================
     // 🌐 OkHttpClient Tanpa Auth
     // ==========================
-    private val httpClientNoAuth: OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor(loggingInterceptor)
-        .connectTimeout(10, TimeUnit.SECONDS)
-        .readTimeout(15, TimeUnit.SECONDS)
-        .writeTimeout(15, TimeUnit.SECONDS)
-        .build()
+    private val httpClientNoAuth: OkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(15, TimeUnit.SECONDS)
+            .writeTimeout(15, TimeUnit.SECONDS)
+            .build()
+    }
 
     // ==========================
     // 🔧 Retrofit Tanpa Auth
@@ -54,7 +63,7 @@ object ApiClient {
     }
 
     // ==========================
-    // 🌍 API Service Tanpa Auth
+    // 🌍 API Services Tanpa Auth
     // ==========================
     val apiService: ApiService by lazy {
         retrofitNoAuth.create(ApiService::class.java)
@@ -64,10 +73,18 @@ object ApiClient {
         retrofitNoAuth.create(AdminService::class.java)
     }
 
-    // ======================================================
-    // 🌐 Retrofit Instance Dengan Authorization Header
-    // ======================================================
+    // ============================================
+    // 🔄 Retrofit Instance Dengan Auth + Caching
+    // ============================================
+    private val retrofitCache = ConcurrentHashMap<String, Retrofit>()
+
     fun getClientWithAuth(token: String): Retrofit {
+        return retrofitCache[token] ?: createRetrofitWithAuth(token).also {
+            retrofitCache[token] = it
+        }
+    }
+
+    private fun createRetrofitWithAuth(token: String): Retrofit {
         val clientWithAuth = OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(token))
             .addInterceptor(loggingInterceptor)

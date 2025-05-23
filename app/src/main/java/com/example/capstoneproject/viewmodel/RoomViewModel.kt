@@ -1,5 +1,7 @@
 package com.example.capstoneproject.viewmodel
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
@@ -49,7 +51,6 @@ class RoomViewModel : ViewModel() {
     private val roomImageService = ApiClient.getClientWithAuth(Constants.ACCESS_TOKEN).create(RoomImageService::class.java)
     private val facilityService = ApiClient.getClientWithAuth(Constants.ACCESS_TOKEN).create(FacilityService::class.java)
 
-    // ================== GET ==================
     fun fetchRooms() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -80,16 +81,23 @@ class RoomViewModel : ViewModel() {
         }
     }
 
-    // ================== POST ==================
     fun addFullRoom(
+        context: Context,
         room: Room,
-        imageFile: File,
+        imageUri: Uri?,
         fasilitasList: List<String>,
         onComplete: (Boolean) -> Unit
     ) {
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
+
+            if (Constants.ACCESS_TOKEN.isBlank()) {
+                _errorMessage.value = "Token tidak valid. Mohon login ulang."
+                _isLoading.value = false
+                onComplete(false)
+                return@launch
+            }
 
             try {
                 val roomFields = mapOf(
@@ -114,7 +122,7 @@ class RoomViewModel : ViewModel() {
                     }
                     delay(1000)
 
-                    val imageSuccess = uploadRoomImageSync(roomId, imageFile)
+                    val imageSuccess = if (imageUri != null) uploadRoomImageFromUri(context, roomId, imageUri) else true
                     val failedFacilities = uploadAllFacilities(roomId, fasilitasList)
 
                     if (!imageSuccess) {
@@ -147,14 +155,19 @@ class RoomViewModel : ViewModel() {
         }
     }
 
-    private suspend fun uploadRoomImageSync(roomId: String, imageFile: File): Boolean = withContext(Dispatchers.IO) {
+    private suspend fun uploadRoomImageFromUri(context: Context, roomId: String, uri: Uri): Boolean = withContext(Dispatchers.IO) {
         try {
-            val imageBody = imageFile.asRequestBody(imageMediaType)
-            val multipartImage = MultipartBody.Part.createFormData("ri_image", imageFile.name, imageBody)
+            val inputStream = context.contentResolver.openInputStream(uri) ?: return@withContext false
+            val file = File(context.cacheDir, "upload_image.jpg")
+            file.outputStream().use { inputStream.copyTo(it) }
+
+            val imageBody = file.asRequestBody(imageMediaType)
+            val multipartImage = MultipartBody.Part.createFormData("ri_image", file.name, imageBody)
             val roomIdBody = roomId.toRequestBody(textPlain)
             val response = roomImageService.addRoomImageMultipart("Bearer ${Constants.ACCESS_TOKEN}", multipartImage, roomIdBody)
             return@withContext response.isSuccessful
         } catch (e: Exception) {
+            Log.e("UploadImageUri", "Upload gagal: ${e.message}")
             return@withContext false
         }
     }
@@ -174,7 +187,6 @@ class RoomViewModel : ViewModel() {
     private suspend fun addFacilitySync(roomId: String, facilityName: String): Boolean = withContext(Dispatchers.IO) {
         try {
             val result = facilityService.addFacility(facilityName, roomId, Constants.ACCESS_TOKEN)
-
             if (result.isSuccessful) {
                 Log.d("FacilityResponse", "facility_id = ${result.body()?.data?.facility_id}")
             } else {
@@ -182,6 +194,7 @@ class RoomViewModel : ViewModel() {
             }
             return@withContext result.isSuccessful
         } catch (e: Exception) {
+            Log.e("AddFacilitySync", "Exception: ${e.message}")
             return@withContext false
         }
     }

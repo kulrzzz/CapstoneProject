@@ -29,7 +29,6 @@ import com.example.capstoneproject.model.Room
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
 import com.example.capstoneproject.viewmodel.RoomViewModel
-import java.io.File
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -254,13 +253,6 @@ fun TambahRuanganPage(
                                 Toast.makeText(context, "Tambahkan setidaknya 1 fasilitas", Toast.LENGTH_SHORT).show()
                                 return@Button
                             }
-                            val inputStream = context.contentResolver.openInputStream(imageUri.value!!)
-                            if (inputStream == null) {
-                                Toast.makeText(context, "Gagal membaca gambar", Toast.LENGTH_SHORT).show()
-                                return@Button
-                            }
-                            val tempFile = File.createTempFile("upload", ".jpg", context.cacheDir)
-                            tempFile.outputStream().use { output -> inputStream.copyTo(output) }
                             val room = Room(
                                 room_id = "",
                                 room_name = namaRuangan,
@@ -268,13 +260,13 @@ fun TambahRuanganPage(
                                 room_kategori = kategoriRuangan,
                                 room_capacity = kapasitas.toIntOrNull() ?: 0,
                                 room_price = hargaSewa.toLongOrNull() ?: 0L,
-                                room_available = 1, // ✅ default aktif
+                                room_available = 1,
                                 room_start = startTime,
                                 room_end = endTime,
                                 created_at = "",
                                 updated_at = ""
                             )
-                            viewModel.addFullRoom(room, tempFile, fasilitasList) { success ->
+                            viewModel.addFullRoom(context, room, imageUri.value, fasilitasList) { success ->
                                 if (success) {
                                     Toast.makeText(context, "Ruangan berhasil ditambahkan", Toast.LENGTH_SHORT).show()
                                     viewModel.clearMessages()
