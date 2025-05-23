@@ -28,17 +28,17 @@ fun SideBar(
     // 🧠 Sidebar state to highlight selected
     var selectedScreen by remember { mutableStateOf<Screen?>(null) }
 
-    val menuItems = remember(userRole) {
-        buildList {
-            add(SidebarItemModel("Dashboard", R.drawable.homebefore, Screen.Dashboard))
-            add(SidebarItemModel("Riwayat Transaksi", R.drawable.riwayat, Screen.RiwayatTransaksi))
-            add(SidebarItemModel("Daftar User", R.drawable.daftaruser, Screen.DaftarUser))
+    val isRoot = userRole == "2"
 
-            if (userRole == "root") {
-                add(SidebarItemModel("DIVIDER", -1, Screen.Dashboard)) // Divider marker
-                add(SidebarItemModel("Manajemen Admin", R.drawable.adminbefore, Screen.ManajemenAdmin))
-                add(SidebarItemModel("Manajemen Ruangan", R.drawable.ruanganbefore, Screen.ManajemenRuangan))
-            }
+    val menuItems = buildList {
+        add(SidebarItemModel("Dashboard", R.drawable.homebefore, Screen.Dashboard))
+        add(SidebarItemModel("Riwayat Transaksi", R.drawable.riwayat, Screen.RiwayatTransaksi))
+        add(SidebarItemModel("Daftar User", R.drawable.daftaruser, Screen.DaftarUser))
+
+        if (isRoot) {
+            add(SidebarItemModel("DIVIDER", -1, Screen.Dashboard))
+            add(SidebarItemModel("Manajemen Admin", R.drawable.adminbefore, Screen.ManajemenAdmin))
+            add(SidebarItemModel("Manajemen Ruangan", R.drawable.ruanganbefore, Screen.ManajemenRuangan))
         }
     }
 
@@ -155,7 +155,7 @@ data class SidebarItemModel(
 @Composable
 fun SideBarPreview() {
     SideBar(
-        userRole = "root",
+        userRole = "2",
         onNavigate = {},
         onLogout = {}
     )

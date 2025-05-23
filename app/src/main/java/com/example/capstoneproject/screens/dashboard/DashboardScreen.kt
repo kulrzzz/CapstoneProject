@@ -6,22 +6,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.rememberNavController
-import com.example.capstoneproject.navigation.AppNavGraph
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
-import com.example.capstoneproject.viewmodel.AdminViewModel
-import com.example.capstoneproject.viewmodel.BookingViewModel
-import com.example.capstoneproject.viewmodel.LoginViewModel
-import com.example.capstoneproject.viewmodel.MainViewModel
-import com.example.capstoneproject.viewmodel.RoomViewModel
-import com.example.capstoneproject.viewmodel.CustomerViewModel
 
 @Composable
 fun DashboardScreen(
@@ -29,16 +21,27 @@ fun DashboardScreen(
     onNavigate: (Screen) -> Unit,
     onLogout: () -> Unit
 ) {
+    // ⏳ Tunda render jika role belum siap
+    if (userRole == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+        return
+    }
+
     Row(modifier = Modifier.fillMaxSize()) {
 
-        // Sidebar dinamis
+        // ✅ Sidebar sesuai role dinamis
         SideBar(
             userRole = userRole,
             onNavigate = onNavigate,
             onLogout = onLogout
         )
 
-        // Konten dashboard utama
+        // 📊 Konten dashboard utama
         Surface(
             modifier = Modifier
                 .weight(1f)
@@ -132,25 +135,3 @@ val sampleRiwayat = listOf(
     RiwayatData("Subin Sedhai", "GKM Lantai 4.4", "Gladi Bersih", "12.00 - 20.00", "863265F"),
     RiwayatData("Vonjola Joshi", "GKM Lantai 3.2", "Upgrading 2", "12.00 - 20.00", "459872E")
 )
-
-@Preview(showBackground = true, widthDp = 762, heightDp = 768)
-@Composable
-fun DashboardSidebarPreview() {
-    val navController = rememberNavController()
-    val mainViewModel = MainViewModel()
-    val loginViewModel = LoginViewModel()
-    val adminViewModel = AdminViewModel()
-    val roomViewModel = RoomViewModel()
-    val bookingViewModel = BookingViewModel()
-    val customerViewModel = CustomerViewModel()
-
-    AppNavGraph(
-        navController = navController,
-        mainViewModel = mainViewModel,
-        loginViewModel = loginViewModel,
-        adminViewModel = adminViewModel,
-        roomViewModel = roomViewModel,
-        bookingViewModel = bookingViewModel,
-        customerViewModel = customerViewModel
-    )
-}

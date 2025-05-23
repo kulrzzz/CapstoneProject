@@ -1,11 +1,11 @@
 package com.example.capstoneproject.network
 
 import com.example.capstoneproject.model.*
-import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 
 interface ApiService {
 
@@ -13,9 +13,9 @@ interface ApiService {
     @FormUrlEncoded
     @POST("api/login/admin")
     suspend fun loginAdmin(
-        @Field("access_token") token: String,
         @Field("admin_email") email: String,
-        @Field("admin_pass") password: String
+        @Field("admin_pass") password: String,
+        @Field("access_token") token: String
     ): LoginResponse
 
     // ---------------- CUSTOMER ----------------

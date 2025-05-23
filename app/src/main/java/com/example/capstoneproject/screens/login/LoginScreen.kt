@@ -59,9 +59,18 @@ fun LoginPage(
     val loginError by loginViewModel.loginError
     val isAuthenticating by loginViewModel.isAuthenticating
 
-    // Clear error otomatis saat user mengetik ulang
+    // Clear error saat mengetik ulang
     LaunchedEffect(email, password) {
         loginViewModel.clearLoginState()
+    }
+
+    // ✅ Navigasi hanya saat token dan role valid
+    LaunchedEffect(loginViewModel.token, loginViewModel.userRole) {
+        val token = loginViewModel.token
+        val role = loginViewModel.userRole
+        if (!token.isNullOrBlank() && !role.isNullOrBlank()) {
+            onLoginSuccess(Screen.Dashboard)
+        }
     }
 
     Box(
@@ -89,7 +98,9 @@ fun LoginPage(
                 onValueChange = { email = it },
                 singleLine = true,
                 placeholder = { Text("Email", color = Color.Gray) },
-                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = Color.Gray) },
+                leadingIcon = {
+                    Icon(Icons.Default.Email, contentDescription = null, tint = Color.Gray)
+                },
                 modifier = Modifier
                     .width(500.dp)
                     .background(Color.White.copy(alpha = 0.8f), RoundedCornerShape(24.dp)),
@@ -107,17 +118,25 @@ fun LoginPage(
                 onValueChange = { password = it },
                 singleLine = true,
                 placeholder = { Text("Password", color = Color.Gray) },
-                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = Color.Gray) },
+                leadingIcon = {
+                    Icon(Icons.Default.Lock, contentDescription = null, tint = Color.Gray)
+                },
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
-                            imageVector = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            imageVector = if (passwordVisible)
+                                Icons.Default.Visibility
+                            else
+                                Icons.Default.VisibilityOff,
                             contentDescription = null,
                             tint = Color.Gray
                         )
                     }
                 },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (passwordVisible)
+                    VisualTransformation.None
+                else
+                    PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 modifier = Modifier
                     .width(500.dp)
@@ -137,11 +156,7 @@ fun LoginPage(
                         if (email.isBlank() || password.isBlank()) {
                             loginViewModel.clearLoginState()
                         } else {
-                            loginViewModel.login(email, password) { result ->
-                                if (result != null) {
-                                    onLoginSuccess(result)
-                                }
-                            }
+                            loginViewModel.login(email, password) { /* handled by effect */ }
                         }
                     }
                 },

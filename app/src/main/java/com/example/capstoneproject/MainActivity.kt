@@ -13,25 +13,23 @@ import com.example.capstoneproject.viewmodel.BookingViewModel
 import com.example.capstoneproject.viewmodel.CustomerViewModel
 import com.example.capstoneproject.viewmodel.LoginViewModel
 import com.example.capstoneproject.viewmodel.MainViewModel
-import com.example.capstoneproject.viewmodel.RoomViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Android ViewModel scoped to Activity lifecycle (recommended over manual instantiation)
         val mainViewModel: MainViewModel by viewModels()
 
         setContent {
             val navController = rememberNavController()
 
-            // Compose-aware ViewModel instantiation
             val loginViewModel: LoginViewModel = viewModel()
             val adminViewModel: AdminViewModel = viewModel()
-            val roomViewModel: RoomViewModel = viewModel()
             val bookingViewModel: BookingViewModel = viewModel()
             val customerViewModel: CustomerViewModel = viewModel()
 
+            // ❌ JANGAN buat RoomViewModel di sini!
+            // ✅ RoomViewModel akan dibuat dengan Factory di NavGraph saat butuh saja
 
             CapstoneProjectTheme {
                 AppNavGraph(
@@ -39,7 +37,6 @@ class MainActivity : ComponentActivity() {
                     mainViewModel = mainViewModel,
                     loginViewModel = loginViewModel,
                     adminViewModel = adminViewModel,
-                    roomViewModel = roomViewModel,
                     bookingViewModel = bookingViewModel,
                     customerViewModel = customerViewModel
                 )

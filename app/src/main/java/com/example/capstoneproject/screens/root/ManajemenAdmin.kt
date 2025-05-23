@@ -17,18 +17,14 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.capstoneproject.R
-import com.example.capstoneproject.model.Admin
+import com.example.capstoneproject.model.admin.Admin
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
 import com.example.capstoneproject.ui.theme.TableHeaderCell
 
-/**
- * Halaman utama Manajemen Admin yang menampilkan daftar admin.
- * Menyediakan aksi: tambah, edit, hapus.
- * Meng-handle state loading, error, dan tampilan kosong.
- */
 @Composable
 fun ManajemenAdminPage(
+    userRole: String?,
     adminRequestList: List<Admin>,
     isLoading: Boolean = false,
     errorMessage: String? = null,
@@ -51,7 +47,7 @@ fun ManajemenAdminPage(
     ) {
         // Sidebar navigasi kiri
         SideBar(
-            userRole = "root",
+            userRole = userRole,
             onNavigate = onNavigate,
             onLogout = onLogout
         )
@@ -97,9 +93,6 @@ fun ManajemenAdminPage(
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
-                // ================================
-                // 📦 STATE HANDLING: Loading / Error / Kosong / Konten
-                // ================================
                 when {
                     isLoading -> {
                         Box(
@@ -156,7 +149,6 @@ fun ManajemenAdminPage(
 
                             Divider(color = Color.LightGray)
 
-                            // Konten Tabel
                             LazyColumn {
                                 itemsIndexed(adminRequestList) { index, admin ->
                                     AdminRow(
@@ -176,9 +168,6 @@ fun ManajemenAdminPage(
     }
 }
 
-/**
- * Baris individual dalam daftar admin.
- */
 @Composable
 fun AdminRow(
     no: Int,

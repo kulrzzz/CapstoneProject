@@ -1,4 +1,7 @@
-package com.example.capstoneproject.model
+package com.example.capstoneproject.model.room
+
+import com.example.capstoneproject.model.room.RoomImage
+import com.example.capstoneproject.model.facility.Facility
 
 data class RoomWithDetails(
     val room_id: String,

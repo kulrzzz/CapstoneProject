@@ -1,28 +1,20 @@
 package com.example.capstoneproject.viewmodel
 
-import android.content.Context
-import android.net.Uri
-import android.util.Log
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.capstoneproject.model.Room
-import com.example.capstoneproject.model.RoomWithDetails
-import com.example.capstoneproject.model.RoomSingleResponse
-import com.example.capstoneproject.model.FacilityResponse
+import com.example.capstoneproject.model.facility.FacilityCreatePayload
+import com.example.capstoneproject.model.facility.FacilityCreateRequest
+import com.example.capstoneproject.model.facility.FacilityDeleteRequest
+import com.example.capstoneproject.model.room.*
 import com.example.capstoneproject.network.ApiClient
 import com.example.capstoneproject.network.FacilityService
 import com.example.capstoneproject.network.RoomImageService
 import com.example.capstoneproject.network.RoomService
-import com.example.capstoneproject.util.Constants
-import kotlinx.coroutines.*
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import kotlinx.coroutines.launch
 import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.File
 
-class RoomViewModel : ViewModel() {
+class RoomViewModel(private val token: String) : ViewModel() {
 
     private val _roomList = mutableStateListOf<Room>()
     val roomList: List<Room> get() = _roomList
@@ -39,187 +31,89 @@ class RoomViewModel : ViewModel() {
     private val _successMessage = mutableStateOf<String?>(null)
     val successMessage: State<String?> = _successMessage
 
+    private val roomService by lazy { ApiClient.retrofit.create(RoomService::class.java) }
+    private val roomImageService by lazy { ApiClient.retrofit.create(RoomImageService::class.java) }
+    private val facilityService by lazy { ApiClient.retrofit.create(FacilityService::class.java) }
+
     fun clearMessages() {
         _errorMessage.value = null
         _successMessage.value = null
     }
 
-    private val textPlain = "text/plain".toMediaTypeOrNull()
-    private val imageMediaType = "image/*".toMediaTypeOrNull()
-
-    private val roomService = ApiClient.getClientWithAuth(Constants.ACCESS_TOKEN).create(RoomService::class.java)
-    private val roomImageService = ApiClient.getClientWithAuth(Constants.ACCESS_TOKEN).create(RoomImageService::class.java)
-    private val facilityService = ApiClient.getClientWithAuth(Constants.ACCESS_TOKEN).create(FacilityService::class.java)
-
+    // 🚪 Ambil daftar ruangan
     fun fetchRooms() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            _errorMessage.value = null
+        launchWithLoading {
             try {
-                val response = roomService.getAllRooms(Constants.ACCESS_TOKEN)
-                _roomList.clear()
-                _roomList.addAll(response.data)
+                val response = roomService.getAllRooms(token)
+                _roomList.apply {
+                    clear()
+                    addAll(response.data)
+                }
             } catch (e: Exception) {
-                _errorMessage.value = "Gagal mengambil data ruangan: ${e.message}"
-            } finally {
-                _isLoading.value = false
+                setError("Gagal mengambil data ruangan", e)
             }
         }
     }
 
+    // 🏷 Ambil detail ruangan
     fun fetchRoomDetailById(roomId: String) {
-        viewModelScope.launch {
-            _isLoading.value = true
+        launchWithLoading {
             try {
-                val detail = roomService.getRoomDetail(roomId, Constants.ACCESS_TOKEN)
-                _roomDetail.value = detail
+                _roomDetail.value = roomService.getRoomDetail(roomId, token)
             } catch (e: Exception) {
-                _errorMessage.value = "Gagal mengambil detail ruangan: ${e.message}"
-            } finally {
-                _isLoading.value = false
+                setError("Gagal mengambil detail ruangan", e)
             }
         }
     }
 
+    // ➕ Tambah ruangan + gambar + fasilitas
     fun addFullRoom(
-        context: Context,
         room: Room,
-        imageUri: Uri?,
-        fasilitasList: List<String>,
+        imageUris: List<String>,
+        fasilitasNames: List<String>,
         onComplete: (Boolean) -> Unit
     ) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            _errorMessage.value = null
+        val imagePayloads = imageUris.map { RoomImageCreatePayload(it) }
+        val fasilitasPayloads = fasilitasNames.map { FacilityCreatePayload(it) }
 
+        submitRoomWithExtras(room, fasilitasPayloads, imagePayloads, onComplete)
+    }
+
+    private fun submitRoomWithExtras(
+        room: Room,
+        fasilitas: List<FacilityCreatePayload>,
+        images: List<RoomImageCreatePayload>,
+        onComplete: (Boolean) -> Unit
+    ) {
+        launchWithLoading {
             try {
-                val roomFields = mapOf(
-                    "access_token" to Constants.ACCESS_TOKEN,
-                    "room_name" to room.room_name,
-                    "room_desc" to room.room_desc,
-                    "room_kategori" to room.room_kategori,
-                    "room_capacity" to room.room_capacity.toString(),
-                    "room_price" to room.room_price.toString(),
-                    "room_available" to room.room_available.toString(),
-                    "room_start" to room.room_start,
-                    "room_end" to room.room_end
-                )
+                val request = createRoomRequest(room, fasilitas, images)
+                val response = roomService.createRoom(request)
 
-                val response = roomService.addRoomForm(roomFields, Constants.ACCESS_TOKEN)
-
-                if (response.isSuccessful && response.body() != null) {
-                    val roomId = response.body()?.data?.room_id ?: return@launch
-
-                    val imageSuccess = if (imageUri != null) uploadRoomImageFromUri(context, roomId, imageUri) else true
-                    val failedFacilities = uploadAllFacilities(roomId, fasilitasList)
-
-                    if (!imageSuccess || failedFacilities.isNotEmpty()) {
-                        // Optional: rollback ruangan jika gagal
-                        roomService.deleteRoom(mapOf("room_id" to roomId), Constants.ACCESS_TOKEN)
-                    }
-
-                    if (!imageSuccess) {
-                        _errorMessage.value = "Gagal upload gambar."
-                        onComplete(false)
-                        return@launch
-                    }
-
-                    if (failedFacilities.isEmpty()) {
-                        _successMessage.value = "Ruangan berhasil ditambahkan."
-                        fetchRooms()
-                        onComplete(true)
-                    } else {
-                        _errorMessage.value = "Fasilitas gagal: ${failedFacilities.joinToString()}"
-                        fetchRooms()
-                        onComplete(false)
-                    }
-
+                if (response.isSuccessful) {
+                    _successMessage.value = "Ruangan berhasil ditambahkan"
+                    fetchRooms()
+                    onComplete(true)
                 } else {
                     _errorMessage.value = "Gagal tambah ruangan: ${response.message()}"
                     onComplete(false)
                 }
-
             } catch (e: Exception) {
-                _errorMessage.value = "Kesalahan: ${e.message}"
+                setError("Kesalahan saat menambahkan ruangan", e)
                 onComplete(false)
-            } finally {
-                _isLoading.value = false
             }
         }
     }
 
-    private suspend fun uploadRoomImageFromUri(context: Context, roomId: String, uri: Uri): Boolean = withContext(Dispatchers.IO) {
-        try {
-            val inputStream = context.contentResolver.openInputStream(uri) ?: return@withContext false
-            val file = File(context.cacheDir, "upload.jpg").apply {
-                outputStream().use { inputStream.copyTo(it) }
-            }
-
-            val imagePart = MultipartBody.Part.createFormData(
-                "ri_image", file.name, file.asRequestBody(imageMediaType)
-            )
-            val roomIdBody = MultipartBody.Part.createFormData("room_id", roomId)
-            val accessTokenBody = MultipartBody.Part.createFormData("access_token", Constants.ACCESS_TOKEN)
-
-            val response = roomImageService.addRoomImageMultipart(
-                imagePart,
-                roomIdBody,
-                accessTokenBody
-            )
-            return@withContext response.isSuccessful
-        } catch (e: Exception) {
-            Log.e("UploadImageUri", "Upload gagal: ${e.message}")
-            return@withContext false
-        }
-    }
-
-    private suspend fun uploadAllFacilities(roomId: String, fasilitasList: List<String>): List<String> = coroutineScope {
-        val failed = mutableListOf<String>()
-        val jobs = fasilitasList.map { name ->
-            async {
-                val success = addFacilitySync(roomId, name)
-                if (!success) failed.add(name)
-            }
-        }
-        jobs.awaitAll()
-        return@coroutineScope failed
-    }
-
-    private suspend fun addFacilitySync(roomId: String, facilityName: String): Boolean = withContext(Dispatchers.IO) {
-        try {
-            val result = facilityService.addFacility(facilityName, roomId, Constants.ACCESS_TOKEN)
-            if (result.isSuccessful) {
-                Log.d("FacilityResponse", "facility_id = ${result.body()?.data?.facility_id}")
-            } else {
-                Log.e("FacilityResponse", "error = ${result.errorBody()?.string()}")
-            }
-            return@withContext result.isSuccessful
-        } catch (e: Exception) {
-            Log.e("AddFacilitySync", "Exception: ${e.message}")
-            return@withContext false
-        }
-    }
-
-    // ================== UPDATE ==================
-    fun updateRoom(roomId: String, updatedRoom: Room, onResult: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            _isLoading.value = true
+    // ✏️ Perbarui ruangan
+    fun updateRoom(room: Room, onResult: (Boolean) -> Unit) {
+        launchWithLoading {
             try {
-                val updatedFields = mapOf(
-                    "room_id" to roomId,
-                    "room_name" to updatedRoom.room_name,
-                    "room_desc" to updatedRoom.room_desc,
-                    "room_kategori" to updatedRoom.room_kategori,
-                    "room_capacity" to updatedRoom.room_capacity.toString(),
-                    "room_price" to updatedRoom.room_price.toString(),
-                    "room_start" to updatedRoom.room_start,
-                    "room_end" to updatedRoom.room_end,
-                    "room_available" to updatedRoom.room_available.toString()
-                )
+                val request = room.toUpdateRequest(token)
+                val result = roomService.updateRoom(request)
 
-                val result = roomService.updateRoom(updatedFields, Constants.ACCESS_TOKEN)
                 if (result.isSuccessful) {
-                    _successMessage.value = "Ruangan berhasil diperbarui."
+                    _successMessage.value = "Ruangan berhasil diperbarui"
                     fetchRooms()
                     onResult(true)
                 } else {
@@ -227,58 +121,163 @@ class RoomViewModel : ViewModel() {
                     onResult(false)
                 }
             } catch (e: Exception) {
-                _errorMessage.value = "Kesalahan saat update ruangan: ${e.message}"
+                setError("Kesalahan saat update ruangan", e)
                 onResult(false)
-            } finally {
-                _isLoading.value = false
             }
         }
     }
 
+    // 🔁 Ganti status tersedia / tidak
     fun toggleRoomAvailability(room: Room, isAvailable: Boolean, onResult: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            try {
-                val updatedFields = mapOf(
-                    "room_id" to room.room_id,
-                    "room_available" to if (isAvailable) "1" else "0"
-                )
+        val updatedRoom = room.copy(room_available = if (isAvailable) 1 else 0)
+        updateRoom(updatedRoom, onResult)
+    }
 
-                val result = roomService.updateRoom(updatedFields, Constants.ACCESS_TOKEN)
-                if (result.isSuccessful) {
-                    _successMessage.value = "Status ruangan diperbarui."
-                    fetchRooms()
+    // ❌ Hapus ruangan
+    fun deleteRoomById(roomId: String, onResult: (Boolean) -> Unit) {
+        launchWithLoading {
+            try {
+                val request = RoomDeleteRequest(token, roomId)
+                val response = roomService.deleteRoom(request)
+
+                if (response.isSuccessful) {
+                    _roomList.removeAll { it.room_id == roomId }
+                    _successMessage.value = "Ruangan berhasil dihapus"
                     onResult(true)
                 } else {
-                    _errorMessage.value = "Gagal memperbarui status: ${result.message()}"
+                    _errorMessage.value = "Gagal hapus ruangan: ${response.message()}"
                     onResult(false)
                 }
             } catch (e: Exception) {
-                _errorMessage.value = "Kesalahan saat ubah status ruangan: ${e.message}"
+                setError("Kesalahan saat hapus ruangan", e)
                 onResult(false)
-            } finally {
-                _isLoading.value = false
             }
         }
     }
 
-    // ================== DELETE ==================
-    fun deleteRoomById(roomId: String, onResult: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            _isLoading.value = true
+    // ➕ Fasilitas
+    fun addFacilityToRoom(request: FacilityCreateRequest, onResult: (Boolean) -> Unit) {
+        launchWithLoading {
             try {
-                val result = roomService.deleteRoom(mapOf("room_id" to roomId), Constants.ACCESS_TOKEN)
-                if (result.isSuccessful) {
-                    _roomList.removeAll { it.room_id == roomId }
-                    _successMessage.value = "Ruangan berhasil dihapus."
+                val response = facilityService.addFacility(request)
+                if (response.isSuccessful) {
+                    _successMessage.value = "Fasilitas berhasil ditambahkan"
                     onResult(true)
                 } else {
-                    _errorMessage.value = "Gagal hapus ruangan: ${result.message()}"
+                    _errorMessage.value = "Gagal menambahkan fasilitas: ${response.message()}"
                     onResult(false)
                 }
             } catch (e: Exception) {
-                _errorMessage.value = "Kesalahan saat hapus ruangan: ${e.message}"
+                setError("Kesalahan saat menambahkan fasilitas", e)
                 onResult(false)
+            }
+        }
+    }
+
+    // ❌ Fasilitas
+    fun deleteFacilityFromRoom(request: FacilityDeleteRequest, onResult: (Boolean) -> Unit) {
+        launchWithLoading {
+            try {
+                val response = facilityService.deleteFacility(request)
+                if (response.isSuccessful) {
+                    _successMessage.value = "Fasilitas berhasil dihapus"
+                    onResult(true)
+                } else {
+                    _errorMessage.value = "Gagal menghapus fasilitas: ${response.message()}"
+                    onResult(false)
+                }
+            } catch (e: Exception) {
+                setError("Kesalahan saat menghapus fasilitas", e)
+                onResult(false)
+            }
+        }
+    }
+
+    // 🖼 Upload gambar
+    fun uploadRoomImage(
+        imagePart: MultipartBody.Part,
+        roomIdPart: MultipartBody.Part,
+        tokenPart: MultipartBody.Part,
+        onResult: (Boolean) -> Unit
+    ) {
+        launchWithLoading {
+            try {
+                val response = roomImageService.addRoomImageMultipart(imagePart, roomIdPart, tokenPart)
+                if (response.isSuccessful) {
+                    _successMessage.value = "Gambar berhasil diunggah"
+                    onResult(true)
+                } else {
+                    _errorMessage.value = "Gagal unggah gambar: ${response.message()}"
+                    onResult(false)
+                }
+            } catch (e: Exception) {
+                setError("Kesalahan saat unggah gambar", e)
+                onResult(false)
+            }
+        }
+    }
+
+    // ❌ Gambar
+    fun deleteRoomImage(request: RoomImageDeleteRequest, onResult: (Boolean) -> Unit) {
+        launchWithLoading {
+            try {
+                val response = roomImageService.deleteRoomImage(request)
+                if (response.isSuccessful) {
+                    _successMessage.value = "Gambar berhasil dihapus"
+                    onResult(true)
+                } else {
+                    _errorMessage.value = "Gagal hapus gambar: ${response.message()}"
+                    onResult(false)
+                }
+            } catch (e: Exception) {
+                setError("Kesalahan saat hapus gambar", e)
+                onResult(false)
+            }
+        }
+    }
+
+    // 🧩 Helper: mapping room → update request
+    private fun Room.toUpdateRequest(token: String) = RoomUpdateRequest(
+        access_token = token,
+        room_id = room_id,
+        room_name = room_name,
+        room_desc = room_desc,
+        room_kategori = room_kategori,
+        room_capacity = room_capacity,
+        room_price = room_price,
+        room_available = room_available,
+        room_start = room_start,
+        room_end = room_end
+    )
+
+    // 🧩 Helper: create full request
+    private fun createRoomRequest(
+        room: Room,
+        fasilitas: List<FacilityCreatePayload>,
+        images: List<RoomImageCreatePayload>
+    ) = RoomWithExtrasCreateRequest(
+        access_token = token,
+        room_name = room.room_name,
+        room_desc = room.room_desc,
+        room_kategori = room.room_kategori,
+        room_capacity = room.room_capacity,
+        room_price = room.room_price,
+        room_available = room.room_available,
+        room_start = room.room_start,
+        room_end = room.room_end,
+        facility = fasilitas,
+        images = images
+    )
+
+    private fun setError(message: String, e: Exception) {
+        _errorMessage.value = "$message: ${e.localizedMessage ?: e.message}"
+    }
+
+    private fun launchWithLoading(block: suspend () -> Unit) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                block()
             } finally {
                 _isLoading.value = false
             }

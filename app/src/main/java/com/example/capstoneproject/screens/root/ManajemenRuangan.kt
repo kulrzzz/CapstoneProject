@@ -17,13 +17,14 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.capstoneproject.R
-import com.example.capstoneproject.model.Room
+import com.example.capstoneproject.model.room.Room
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
 import com.example.capstoneproject.ui.theme.TableHeaderCell
 
 @Composable
 fun ManajemenRuanganPage(
+    userRole: String?,
     roomList: List<Room>,
     onTambahRuanganClick: () -> Unit,
     onEditRoom: (Room) -> Unit,
@@ -44,7 +45,7 @@ fun ManajemenRuanganPage(
             .background(Color(0xFFF5F7FF))
     ) {
         SideBar(
-            userRole = "root",
+            userRole = userRole,
             onNavigate = onNavigate,
             onLogout = onLogout
         )
@@ -147,27 +148,19 @@ fun RoomRow(
             text = no.toString(),
             fontSize = textSize,
             textAlign = TextAlign.Center,
-            modifier = Modifier
-                .width(36.dp)
-                .wrapContentWidth(Alignment.CenterHorizontally)
+            modifier = Modifier.width(50.dp)
         )
 
         Text(
-            text = room.room_name,
+            text = room.room_name.orEmpty(),
             fontSize = textSize,
-            textAlign = TextAlign.Start,
-            modifier = Modifier
-                .width(180.dp)
-                .padding(start = 8.dp)
+            modifier = Modifier.width(180.dp)
         )
 
         Text(
             text = room.room_kategori.orEmpty(),
             fontSize = textSize,
-            textAlign = TextAlign.Start,
-            modifier = Modifier
-                .width(180.dp)
-                .padding(start = 8.dp)
+            modifier = Modifier.width(180.dp)
         )
 
         Switch(
@@ -180,9 +173,8 @@ fun RoomRow(
         )
 
         Row(
-            modifier = Modifier
-                .width(120.dp)
-                .padding(start = 16.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.width(120.dp)
         ) {
             IconButton(onClick = onEdit) {
                 Icon(

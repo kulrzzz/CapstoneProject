@@ -1,11 +1,13 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
 }
 
 android {
-    namespace = "com.example.capstoneproject"
     compileSdk = 35
+    namespace = "com.example.capstoneproject"
 
     defaultConfig {
         applicationId = "com.example.capstoneproject"
@@ -16,6 +18,13 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+
+        val props = Properties()
+        props.load(rootProject.file("local.properties").inputStream())
+        val token = props.getProperty("api.access_token")
+            ?: throw GradleException("Missing api.access_token in local.properties")
+
+        buildConfigField("String", "API_ACCESS_TOKEN", "\"$token\"")
     }
 
     buildTypes {
@@ -39,6 +48,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {

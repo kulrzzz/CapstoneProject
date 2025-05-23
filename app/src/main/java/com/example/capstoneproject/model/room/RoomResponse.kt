@@ -1,4 +1,4 @@
-package com.example.capstoneproject.model
+package com.example.capstoneproject.model.room
 
 data class RoomResponse(
     val status: String,
