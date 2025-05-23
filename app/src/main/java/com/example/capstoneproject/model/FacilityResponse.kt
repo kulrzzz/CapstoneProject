@@ -1,6 +1,6 @@
 package com.example.capstoneproject.model
 
-data class RoomAddResponse(
+data class FacilityResponse(
     val status: String,
-    val data: Room
+    val data: Facility
 )

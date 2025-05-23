@@ -23,7 +23,7 @@ class AuthInterceptor(private val token: String) : Interceptor {
 
 object ApiClient {
 
-    private const val BASE_URL = "http://3.219.80.4:8000/"
+    private const val BASE_URL = Constants.BASE_URL
 
     // ==========================
     // 🪵 Logging Interceptor
@@ -33,7 +33,7 @@ object ApiClient {
     }
 
     // ==========================
-    // 🌐 OkHttp Tanpa Auth
+    // 🌐 OkHttpClient Tanpa Auth
     // ==========================
     private val httpClientNoAuth: OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(loggingInterceptor)
@@ -45,9 +45,9 @@ object ApiClient {
     // ==========================
     // 🔧 Retrofit Tanpa Auth
     // ==========================
-    private val retrofit: Retrofit by lazy {
+    private val retrofitNoAuth: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl(Constants.BASE_URL)
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(httpClientNoAuth)
             .build()
@@ -57,15 +57,15 @@ object ApiClient {
     // 🌍 API Service Tanpa Auth
     // ==========================
     val apiService: ApiService by lazy {
-        retrofit.create(ApiService::class.java)
+        retrofitNoAuth.create(ApiService::class.java)
     }
 
     val adminService: AdminService by lazy {
-        retrofit.create(AdminService::class.java)
+        retrofitNoAuth.create(AdminService::class.java)
     }
 
     // ======================================================
-    // 🌐 Retrofit + OkHttp Client dengan Token Authorization
+    // 🌐 Retrofit Instance Dengan Authorization Header
     // ======================================================
     fun getClientWithAuth(token: String): Retrofit {
         val clientWithAuth = OkHttpClient.Builder()
@@ -77,7 +77,7 @@ object ApiClient {
             .build()
 
         return Retrofit.Builder()
-            .baseUrl(Constants.BASE_URL)
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(clientWithAuth)
             .build()

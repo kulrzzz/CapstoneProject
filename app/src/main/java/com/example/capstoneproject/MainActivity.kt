@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.capstoneproject.navigation.AppNavGraph
@@ -14,7 +13,7 @@ import com.example.capstoneproject.viewmodel.BookingViewModel
 import com.example.capstoneproject.viewmodel.CustomerViewModel
 import com.example.capstoneproject.viewmodel.LoginViewModel
 import com.example.capstoneproject.viewmodel.MainViewModel
-import com.example.capstoneproject.viewmodel.RuanganViewModel
+import com.example.capstoneproject.viewmodel.RoomViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,7 +28,7 @@ class MainActivity : ComponentActivity() {
             // Compose-aware ViewModel instantiation
             val loginViewModel: LoginViewModel = viewModel()
             val adminViewModel: AdminViewModel = viewModel()
-            val ruanganViewModel: RuanganViewModel = viewModel()
+            val roomViewModel: RoomViewModel = viewModel()
             val bookingViewModel: BookingViewModel = viewModel()
             val customerViewModel: CustomerViewModel = viewModel()
 
@@ -40,7 +39,7 @@ class MainActivity : ComponentActivity() {
                     mainViewModel = mainViewModel,
                     loginViewModel = loginViewModel,
                     adminViewModel = adminViewModel,
-                    ruanganViewModel = ruanganViewModel,
+                    roomViewModel = roomViewModel,
                     bookingViewModel = bookingViewModel,
                     customerViewModel = customerViewModel
                 )

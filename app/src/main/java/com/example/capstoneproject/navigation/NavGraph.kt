@@ -19,9 +19,9 @@ fun AppNavGraph(
     mainViewModel: MainViewModel,
     loginViewModel: LoginViewModel,
     adminViewModel: AdminViewModel,
-    ruanganViewModel: RuanganViewModel,
+    roomViewModel: RoomViewModel,
     bookingViewModel: BookingViewModel,
-    customerViewModel: CustomerViewModel // ✅ Ditambahkan
+    customerViewModel: CustomerViewModel
 ) {
     NavHost(
         navController = navController,
@@ -55,9 +55,7 @@ fun AppNavGraph(
                 onLogout = {
                     loginViewModel.clearLoginState()
                     mainViewModel.logout()
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0)
-                    }
+                    navController.navigate(Screen.Login.route) { popUpTo(0) }
                 }
             )
         }
@@ -70,9 +68,7 @@ fun AppNavGraph(
 
             RiwayatTransaksiPage(
                 transaksiList = bookingViewModel.allBookings,
-                onNavigate = { screen ->
-                    navController.navigate(screen.route)
-                },
+                onNavigate = { navController.navigate(it.route) },
                 onLogout = {
                     loginViewModel.clearLoginState()
                     mainViewModel.logout()
@@ -89,9 +85,7 @@ fun AppNavGraph(
 
             DaftarUserPage(
                 customerList = customerViewModel.customerList,
-                onUserSelected = { userId ->
-                    navController.navigate("detail_user/$userId")
-                },
+                onUserSelected = { userId -> navController.navigate("detail_user/$userId") },
                 onNavigate = { navController.navigate(it.route) },
                 onLogout = {
                     loginViewModel.clearLoginState()
@@ -101,17 +95,13 @@ fun AppNavGraph(
             )
         }
 
-        // 📄 Detail User (Turunan dari DaftarUser)
+        // 📄 Detail User
         composable("detail_user/{userId}") { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId")
 
             LaunchedEffect(Unit) {
-                if (customerViewModel.customerList.isEmpty()) {
-                    customerViewModel.fetchAllCustomers()
-                }
-                if (bookingViewModel.allBookings.isEmpty()) {
-                    bookingViewModel.fetchAllBookings()
-                }
+                if (customerViewModel.customerList.isEmpty()) customerViewModel.fetchAllCustomers()
+                if (bookingViewModel.allBookings.isEmpty()) bookingViewModel.fetchAllBookings()
             }
 
             val customer = customerViewModel.customerList.find { it.customer_id == userId }
@@ -122,7 +112,7 @@ fun AppNavGraph(
                     customer = customer,
                     bookingList = bookings,
                     onBackClick = { navController.popBackStack() },
-                    onNavigate = { screen -> navController.navigate(screen.route) },
+                    onNavigate = { navController.navigate(it.route) },
                     onLogout = {
                         loginViewModel.clearLoginState()
                         mainViewModel.logout()
@@ -136,7 +126,6 @@ fun AppNavGraph(
         composable(Screen.ManajemenAdmin.route) {
             val context = LocalContext.current
 
-            // Jalankan hanya sekali saat composable pertama kali muncul
             LaunchedEffect(Unit) {
                 adminViewModel.fetchAdmins()
             }
@@ -145,12 +134,8 @@ fun AppNavGraph(
                 adminRequestList = adminViewModel.adminList.filter { it.admin_who == 1 },
                 isLoading = adminViewModel.isLoading.value,
                 errorMessage = adminViewModel.errorMessage.value,
-                onTambahAdminClick = {
-                    navController.navigate(Screen.TambahAdmin.route)
-                },
-                onEditAdmin = { admin ->
-                    navController.navigate("edit_admin/${admin.admin_id}")
-                },
+                onTambahAdminClick = { navController.navigate(Screen.TambahAdmin.route) },
+                onEditAdmin = { admin -> navController.navigate("edit_admin/${admin.admin_id}") },
                 onDeleteAdmin = { admin ->
                     adminViewModel.deleteAdmin(admin.admin_id ?: "") { success ->
                         Toast.makeText(
@@ -160,9 +145,7 @@ fun AppNavGraph(
                         ).show()
                     }
                 },
-                onNavigate = { screen ->
-                    navController.navigate(screen.route) { launchSingleTop = true }
-                },
+                onNavigate = { navController.navigate(it.route) },
                 onLogout = {
                     loginViewModel.clearLoginState()
                     mainViewModel.logout()
@@ -195,31 +178,38 @@ fun AppNavGraph(
             val context = LocalContext.current
 
             LaunchedEffect(Unit) {
-                ruanganViewModel.fetchRooms()
+                roomViewModel.fetchRooms()
             }
 
             ManajemenRuanganPage(
-                onTambahRuanganClick = {
-                    navController.navigate(Screen.TambahRuangan.route)
+                roomList = roomViewModel.roomList,
+                onTambahRuanganClick = { navController.navigate(Screen.TambahRuangan.route) },
+                onEditRoom = { room ->
+                    Toast.makeText(context, "Fitur edit belum tersedia", Toast.LENGTH_SHORT).show()
                 },
-                onNavigate = { screen ->
-                    navController.navigate(screen.route) { launchSingleTop = true }
-                },
-                onLogout = {
-                    loginViewModel.clearLoginState()
-                    mainViewModel.logout()
-                    navController.navigate(Screen.Login.route) { popUpTo(0) }
-                },
-                roomList = ruanganViewModel.roomList,
-                onEditRoom = { /* future */ },
                 onDeleteRoom = { room ->
-                    ruanganViewModel.deleteRoomById(room.room_id) { success ->
+                    roomViewModel.deleteRoomById(room.room_id) { success ->
                         Toast.makeText(
                             context,
                             if (success) "Ruangan berhasil dihapus" else "Gagal menghapus ruangan",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
+                },
+                onToggleAvailability = { room, isAvailable ->
+                    roomViewModel.toggleRoomAvailability(room, isAvailable) { success ->
+                        Toast.makeText(
+                            context,
+                            if (success) "Status ruangan diperbarui" else "Gagal mengubah status ruangan",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                },
+                onNavigate = { navController.navigate(it.route) },
+                onLogout = {
+                    loginViewModel.clearLoginState()
+                    mainViewModel.logout()
+                    navController.navigate(Screen.Login.route) { popUpTo(0) }
                 }
             )
         }

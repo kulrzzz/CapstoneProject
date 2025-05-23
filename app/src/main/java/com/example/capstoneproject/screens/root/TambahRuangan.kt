@@ -28,7 +28,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.capstoneproject.model.Room
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
-import com.example.capstoneproject.viewmodel.RuanganViewModel
+import com.example.capstoneproject.viewmodel.RoomViewModel
 import java.io.File
 import java.util.*
 
@@ -117,7 +117,7 @@ fun TambahRuanganPage(
     onBack: () -> Unit = {},
     onNavigate: (Screen) -> Unit = {},
     onLogout: () -> Unit = {},
-    viewModel: RuanganViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: RoomViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -268,11 +268,11 @@ fun TambahRuanganPage(
                                 room_kategori = kategoriRuangan,
                                 room_capacity = kapasitas.toIntOrNull() ?: 0,
                                 room_price = hargaSewa.toLongOrNull() ?: 0L,
-                                room_available = 1,
+                                room_available = 1, // ✅ default aktif
                                 room_start = startTime,
                                 room_end = endTime,
-                                created_at = null,
-                                updated_at = null
+                                created_at = "",
+                                updated_at = ""
                             )
                             viewModel.addFullRoom(room, tempFile, fasilitasList) { success ->
                                 if (success) {

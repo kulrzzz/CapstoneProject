@@ -6,14 +6,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -29,6 +28,7 @@ fun ManajemenRuanganPage(
     onTambahRuanganClick: () -> Unit,
     onEditRoom: (Room) -> Unit,
     onDeleteRoom: (Room) -> Unit,
+    onToggleAvailability: (Room, Boolean) -> Unit,
     onNavigate: (Screen) -> Unit = {},
     onLogout: () -> Unit = {}
 ) {
@@ -38,9 +38,10 @@ fun ManajemenRuanganPage(
     val headerColor = Color(0xFFF0F4FF)
     val headerTextColor = Color(0xFF1A237E)
 
-    Row(modifier = Modifier
-        .fillMaxSize()
-        .background(Color(0xFFF5F7FF))
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F7FF))
     ) {
         SideBar(
             userRole = "root",
@@ -95,9 +96,10 @@ fun ManajemenRuanganPage(
                             .padding(vertical = 12.dp, horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TableHeaderCell("No", 75.dp, textSize, headerTextColor)
-                        TableHeaderCell("Nama Ruangan", 240.dp, textSize, headerTextColor)
-                        TableHeaderCell("Kategori", 240.dp, textSize, headerTextColor)
+                        TableHeaderCell("No", 50.dp, textSize, headerTextColor)
+                        TableHeaderCell("Nama Ruangan", 180.dp, textSize, headerTextColor)
+                        TableHeaderCell("Kategori", 180.dp, textSize, headerTextColor)
+                        TableHeaderCell("Status", 100.dp, textSize, headerTextColor)
                         TableHeaderCell("Actions", 120.dp, textSize, headerTextColor)
                     }
 
@@ -110,7 +112,10 @@ fun ManajemenRuanganPage(
                                 room = room,
                                 textSize = textSize,
                                 onEdit = { onEditRoom(room) },
-                                onDelete = { onDeleteRoom(room) }
+                                onDelete = { onDeleteRoom(room) },
+                                onToggleAvailability = { isAvailable ->
+                                    onToggleAvailability(room, isAvailable)
+                                }
                             )
                         }
                     }
@@ -126,8 +131,11 @@ fun RoomRow(
     room: Room,
     textSize: TextUnit,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onToggleAvailability: (Boolean) -> Unit
 ) {
+    var isAvailable by remember(room.room_id) { mutableStateOf(room.room_available == 1) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -149,8 +157,8 @@ fun RoomRow(
             fontSize = textSize,
             textAlign = TextAlign.Start,
             modifier = Modifier
-                .width(240.dp)
-                .padding(start = 48.dp)
+                .width(180.dp)
+                .padding(start = 8.dp)
         )
 
         Text(
@@ -158,20 +166,29 @@ fun RoomRow(
             fontSize = textSize,
             textAlign = TextAlign.Start,
             modifier = Modifier
-                .width(240.dp)
-                .padding(start = 48.dp)
+                .width(180.dp)
+                .padding(start = 8.dp)
+        )
+
+        Switch(
+            checked = isAvailable,
+            onCheckedChange = {
+                isAvailable = it
+                onToggleAvailability(it)
+            },
+            modifier = Modifier.width(100.dp)
         )
 
         Row(
             modifier = Modifier
                 .width(120.dp)
-                .padding(start = 26.dp)
+                .padding(start = 16.dp)
         ) {
             IconButton(onClick = onEdit) {
                 Icon(
                     painter = painterResource(id = R.drawable.edit),
                     contentDescription = "Edit",
-                    tint = Color (0xFF1570EF),
+                    tint = Color(0xFF1570EF),
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -185,33 +202,4 @@ fun RoomRow(
             }
         }
     }
-}
-
-@Preview(showBackground = true, widthDp = 1024, heightDp = 768)
-@Composable
-fun ManajemenRuanganPreview() {
-    val dummyRooms = List(5) {
-        com.example.capstoneproject.model.Room(
-            room_id = "$it",
-            room_name = "Ruang Meeting ${'A' + it}",
-            room_desc = "Deskripsi ruang meeting",
-            room_kategori = "Gedung GKM Lt. ${1 + (it % 3)}",
-            room_capacity = 20 + it,
-            room_price = 50000L,
-            room_available = 1,
-            room_start = "08:00",
-            room_end = "17:00",
-            created_at = "2024-01-01",
-            updated_at = "2024-01-02"
-        )
-    }
-
-    ManajemenRuanganPage(
-        roomList = dummyRooms,
-        onTambahRuanganClick = {},
-        onEditRoom = {},
-        onDeleteRoom = {},
-        onNavigate = {},
-        onLogout = {}
-    )
 }
