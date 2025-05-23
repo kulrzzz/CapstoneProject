@@ -15,9 +15,9 @@ interface RoomImageService {
     @Multipart
     @POST("api/room-image/add")
     suspend fun addRoomImageMultipart(
-        @Header("Authorization") token: String,
         @Part image: MultipartBody.Part,
-        @Part("room_id") roomId: RequestBody
+        @Part roomId: MultipartBody.Part,
+        @Part accessToken: MultipartBody.Part
     ): Response<ResponseBody>
 
     // ================================

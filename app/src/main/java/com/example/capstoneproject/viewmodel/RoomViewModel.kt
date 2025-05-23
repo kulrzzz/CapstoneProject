@@ -92,15 +92,9 @@ class RoomViewModel : ViewModel() {
             _isLoading.value = true
             _errorMessage.value = null
 
-            if (Constants.ACCESS_TOKEN.isBlank()) {
-                _errorMessage.value = "Token tidak valid. Mohon login ulang."
-                _isLoading.value = false
-                onComplete(false)
-                return@launch
-            }
-
             try {
                 val roomFields = mapOf(
+                    "access_token" to Constants.ACCESS_TOKEN,
                     "room_name" to room.room_name,
                     "room_desc" to room.room_desc,
                     "room_kategori" to room.room_kategori,
@@ -114,19 +108,18 @@ class RoomViewModel : ViewModel() {
                 val response = roomService.addRoomForm(roomFields, Constants.ACCESS_TOKEN)
 
                 if (response.isSuccessful && response.body() != null) {
-                    val roomId = response.body()?.data?.room_id
-                    if (roomId.isNullOrEmpty()) {
-                        _errorMessage.value = "room_id tidak tersedia dari server"
-                        onComplete(false)
-                        return@launch
-                    }
-                    delay(1000)
+                    val roomId = response.body()?.data?.room_id ?: return@launch
 
                     val imageSuccess = if (imageUri != null) uploadRoomImageFromUri(context, roomId, imageUri) else true
                     val failedFacilities = uploadAllFacilities(roomId, fasilitasList)
 
+                    if (!imageSuccess || failedFacilities.isNotEmpty()) {
+                        // Optional: rollback ruangan jika gagal
+                        roomService.deleteRoom(mapOf("room_id" to roomId), Constants.ACCESS_TOKEN)
+                    }
+
                     if (!imageSuccess) {
-                        _errorMessage.value = "Gambar gagal diupload."
+                        _errorMessage.value = "Gagal upload gambar."
                         onComplete(false)
                         return@launch
                     }
@@ -136,13 +129,13 @@ class RoomViewModel : ViewModel() {
                         fetchRooms()
                         onComplete(true)
                     } else {
-                        _errorMessage.value = "Sebagian fasilitas gagal ditambahkan: ${failedFacilities.joinToString()}"
+                        _errorMessage.value = "Fasilitas gagal: ${failedFacilities.joinToString()}"
                         fetchRooms()
                         onComplete(false)
                     }
 
                 } else {
-                    _errorMessage.value = "Gagal menambahkan ruangan: ${response.code()} - ${response.message()}"
+                    _errorMessage.value = "Gagal tambah ruangan: ${response.message()}"
                     onComplete(false)
                 }
 
@@ -158,13 +151,21 @@ class RoomViewModel : ViewModel() {
     private suspend fun uploadRoomImageFromUri(context: Context, roomId: String, uri: Uri): Boolean = withContext(Dispatchers.IO) {
         try {
             val inputStream = context.contentResolver.openInputStream(uri) ?: return@withContext false
-            val file = File(context.cacheDir, "upload_image.jpg")
-            file.outputStream().use { inputStream.copyTo(it) }
+            val file = File(context.cacheDir, "upload.jpg").apply {
+                outputStream().use { inputStream.copyTo(it) }
+            }
 
-            val imageBody = file.asRequestBody(imageMediaType)
-            val multipartImage = MultipartBody.Part.createFormData("ri_image", file.name, imageBody)
-            val roomIdBody = roomId.toRequestBody(textPlain)
-            val response = roomImageService.addRoomImageMultipart("Bearer ${Constants.ACCESS_TOKEN}", multipartImage, roomIdBody)
+            val imagePart = MultipartBody.Part.createFormData(
+                "ri_image", file.name, file.asRequestBody(imageMediaType)
+            )
+            val roomIdBody = MultipartBody.Part.createFormData("room_id", roomId)
+            val accessTokenBody = MultipartBody.Part.createFormData("access_token", Constants.ACCESS_TOKEN)
+
+            val response = roomImageService.addRoomImageMultipart(
+                imagePart,
+                roomIdBody,
+                accessTokenBody
+            )
             return@withContext response.isSuccessful
         } catch (e: Exception) {
             Log.e("UploadImageUri", "Upload gagal: ${e.message}")
