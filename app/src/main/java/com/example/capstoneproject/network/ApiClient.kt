@@ -15,14 +15,14 @@ object ApiClient {
         require(BASE_URL.isNotBlank()) { "BASE_URL in Constants must not be blank!" }
     }
 
-    // 🪵 Logging Interceptor - Logs entire request/response
+    // 🪵 Logging interceptor: log full body of request & response
     private val loggingInterceptor: HttpLoggingInterceptor by lazy {
         HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
     }
 
-    // 🌐 OkHttpClient
+    // 🌐 OkHttp client with timeout and logging
     private val httpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
@@ -32,7 +32,7 @@ object ApiClient {
             .build()
     }
 
-    // 🔧 Retrofit
+    // 🔧 Retrofit builder with GSON
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
@@ -41,7 +41,7 @@ object ApiClient {
             .build()
     }
 
-    // 🌍 API Services (Reusable Instances)
+    // 🔌 Services (reusable instances)
     val apiService: ApiService by lazy {
         retrofit.create(ApiService::class.java)
     }

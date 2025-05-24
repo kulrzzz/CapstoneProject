@@ -27,7 +27,6 @@ fun AppNavGraph(
         navController = navController,
         startDestination = Screen.Login.route
     ) {
-
         // 🔐 Login
         composable(Screen.Login.route) {
             AnimatedLoginPage(
@@ -192,6 +191,7 @@ fun AppNavGraph(
                     token = loginViewModel.token,
                     onBack = { navController.popBackStack() },
                     adminViewModel = adminViewModel,
+                    userRole = loginViewModel.userRole,
                     onNavigate = { navController.navigate(it.route) },
                     onLogout = {
                         loginViewModel.clearLoginState()
@@ -257,14 +257,15 @@ fun AppNavGraph(
                 )
 
                 TambahRuanganPage(
+                    userRole = loginViewModel.userRole,
+                    viewModel = roomViewModel,
                     onBack = { navController.popBackStack() },
                     onNavigate = { screen -> navController.navigate(screen.route) },
                     onLogout = {
                         loginViewModel.clearLoginState()
                         mainViewModel.logout()
                         navController.navigate(Screen.Login.route) { popUpTo(0) }
-                    },
-                    viewModel = roomViewModel
+                    }
                 )
             } else {
                 LaunchedEffect(Unit) {

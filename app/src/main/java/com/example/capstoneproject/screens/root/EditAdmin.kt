@@ -24,6 +24,7 @@ import com.example.capstoneproject.viewmodel.AdminViewModel
 
 @Composable
 fun EditAdminPage(
+    userRole: String?,
     admin: Admin,
     token: String?,
     onBack: () -> Unit,
@@ -42,7 +43,7 @@ fun EditAdminPage(
             .background(color = Color(0xFFF5F7FF))
     ) {
         SideBar(
-            userRole = "root",
+            userRole = userRole,
             onNavigate = onNavigate,
             onLogout = onLogout
         )

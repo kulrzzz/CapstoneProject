@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import com.example.capstoneproject.model.facility.FacilityCreateRequest
 import com.example.capstoneproject.model.room.Room
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
@@ -40,7 +41,6 @@ fun CustomTextField(
     singleLine: Boolean = true,
     minHeight: Dp = 64.dp
 ) {
-
     Column {
         Text(text = label, color = Color.Gray, fontSize = 14.sp)
         OutlinedTextField(
@@ -114,6 +114,7 @@ fun CustomDropdownField(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TambahRuanganPage(
+    userRole: String?,
     onBack: () -> Unit = {},
     onNavigate: (Screen) -> Unit = {},
     onLogout: () -> Unit = {},
@@ -156,7 +157,7 @@ fun TambahRuanganPage(
     val kategoriList = listOf("Meeting", "Auditorium", "Kelas", "Lab")
 
     Row(Modifier.fillMaxSize().background(Color(0xFFF5F7FF))) {
-        SideBar(userRole = "root", onNavigate = onNavigate, onLogout = onLogout)
+        SideBar(userRole = userRole, onNavigate = onNavigate, onLogout = onLogout)
 
         Column(
             modifier = Modifier
@@ -176,47 +177,27 @@ fun TambahRuanganPage(
                 Column(
                     modifier = Modifier.padding(24.dp).verticalScroll(scrollState)
                 ) {
-                    CustomTextField(
-                        label = "Nama Ruangan",
-                        value = namaRuangan,
-                        onValueChange = { namaRuangan = it }
-                    )
+                    CustomTextField("Nama Ruangan", namaRuangan, { namaRuangan = it })
                     Spacer(Modifier.height(16.dp))
-
                     CustomTextField("Deskripsi Ruangan", deskripsiRuangan, { deskripsiRuangan = it }, false, 100.dp)
                     Spacer(Modifier.height(16.dp))
-
                     CustomDropdownField("Kategori Ruangan", kategoriRuangan, { kategoriRuangan = it }, kategoriList)
                     Spacer(Modifier.height(16.dp))
-
-                    CustomTextField(
-                        label = "Kapasitas",
-                        value = kapasitas,
-                        onValueChange = { kapasitas = it }
-                    )
+                    CustomTextField("Kapasitas", kapasitas, { kapasitas = it })
                     Spacer(Modifier.height(16.dp))
-
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("Jam Mulai: ${startTime.ifEmpty { "Belum dipilih" }}")
                         Spacer(Modifier.width(16.dp))
                         Button(onClick = { timePickerDialogStart.show() }) { Text("Pilih Jam Mulai") }
                     }
-
                     Spacer(Modifier.height(16.dp))
-
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text("Jam Selesai: ${endTime.ifEmpty { "Belum dipilih" }}")
                         Spacer(Modifier.width(16.dp))
                         Button(onClick = { timePickerDialogEnd.show() }) { Text("Pilih Jam Selesai") }
                     }
-
                     Spacer(Modifier.height(16.dp))
-
-                    CustomTextField(
-                        label = "Harga Sewa",
-                        value = hargaSewa,
-                        onValueChange = { hargaSewa = it }
-                    )
+                    CustomTextField("Harga Sewa", hargaSewa, { hargaSewa = it })
                     Spacer(Modifier.height(24.dp))
 
                     Text("Upload Gambar", fontSize = 14.sp, color = Color.Gray)
@@ -253,15 +234,14 @@ fun TambahRuanganPage(
                     }
                     Spacer(Modifier.height(8.dp))
                     fasilitasList.forEach { Text("- $it", fontSize = 14.sp, color = Color.DarkGray) }
-
                     Spacer(Modifier.height(16.dp))
+
                     viewModel.errorMessage.value?.let {
                         Text(it, color = Color.Red, fontSize = 14.sp)
                     }
                     viewModel.successMessage.value?.let {
                         Text(it, color = Color(0xFF16A34A), fontSize = 14.sp)
                     }
-
                     if (viewModel.isLoading.value) {
                         Spacer(Modifier.height(8.dp))
                         CircularProgressIndicator(Modifier.align(Alignment.CenterHorizontally))
@@ -270,49 +250,28 @@ fun TambahRuanganPage(
                     Spacer(Modifier.height(24.dp))
                     Button(
                         onClick = {
-                            if (!validateForm(
-                                    context,
-                                    namaRuangan,
-                                    deskripsiRuangan,
-                                    kategoriRuangan,
-                                    kapasitas,
-                                    hargaSewa,
-                                    startTime,
-                                    endTime,
-                                    fasilitasList,
-                                    imageUri.value
-                                )
-                            ) return@Button
+                            viewModel.clearMessages()
+                            if (!validateForm(context, namaRuangan, deskripsiRuangan, kategoriRuangan, kapasitas, hargaSewa, startTime, endTime, fasilitasList, imageUri.value))
+                                return@Button
 
                             val room = Room(
-                                room_id = "",
-                                room_name = namaRuangan,
-                                room_desc = deskripsiRuangan,
-                                room_kategori = kategoriRuangan,
-                                room_capacity = kapasitas.toIntOrNull() ?: 0,
-                                room_price = hargaSewa.toLongOrNull() ?: 0L,
-                                room_available = 1,
-                                room_start = startTime,
-                                room_end = endTime,
-                                created_at = "",
-                                updated_at = ""
+                                room_id = "", room_name = namaRuangan, room_desc = deskripsiRuangan,
+                                room_kategori = kategoriRuangan, room_capacity = kapasitas.toIntOrNull() ?: 0,
+                                room_price = hargaSewa.toLongOrNull() ?: 0L, room_available = 1,
+                                room_start = startTime, room_end = endTime, created_at = "", updated_at = ""
                             )
 
-                            val imagePath = imageUri.value?.toString().orEmpty()
-                            viewModel.addFullRoom(room, listOf(imagePath), fasilitasList) { success ->
+                            viewModel.addRoomWithImageAndFacilities(
+                                room = room,
+                                imageUri = imageUri.value,
+                                context = context,
+                                fasilitasList = fasilitasList
+                            ) { success ->
                                 if (success) {
                                     Toast.makeText(context, "Ruangan berhasil ditambahkan", Toast.LENGTH_SHORT).show()
-                                    viewModel.clearMessages()
-                                    namaRuangan = ""
-                                    deskripsiRuangan = ""
-                                    kategoriRuangan = ""
-                                    kapasitas = ""
-                                    hargaSewa = ""
-                                    startTime = ""
-                                    endTime = ""
-                                    fasilitasInput = ""
-                                    fasilitasList.clear()
-                                    imageUri.value = null
+                                    namaRuangan = ""; deskripsiRuangan = ""; kategoriRuangan = ""; kapasitas = ""
+                                    hargaSewa = ""; startTime = ""; endTime = ""; fasilitasInput = ""
+                                    fasilitasList.clear(); imageUri.value = null
                                 } else {
                                     Toast.makeText(context, "Gagal menambahkan ruangan", Toast.LENGTH_SHORT).show()
                                 }
@@ -349,16 +308,13 @@ fun validateForm(
         Toast.makeText(context, "Harap lengkapi semua kolom", Toast.LENGTH_SHORT).show()
         return false
     }
-
     if (image == null) {
         Toast.makeText(context, "Harap pilih gambar", Toast.LENGTH_SHORT).show()
         return false
     }
-
     if (fasilitas.isEmpty()) {
         Toast.makeText(context, "Tambahkan setidaknya 1 fasilitas", Toast.LENGTH_SHORT).show()
         return false
     }
-
     return true
 }
