@@ -1,5 +1,6 @@
 package com.example.capstoneproject.screens.admin
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -9,32 +10,52 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.capstoneproject.model.Customer
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.capstoneproject.model.customer.Customer
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
+import com.example.capstoneproject.viewmodel.CustomerViewModel
 
 @Composable
 fun DaftarUserPage(
-    customerList: List<Customer>,
-    onUserSelected: (String) -> Unit, // ✅ Kirim ID ke navigator
+    userRole: String?,
+    onUserSelected: (String) -> Unit,
     onNavigate: (Screen) -> Unit = {},
-    onLogout: () -> Unit = {}
+    onLogout: () -> Unit = {},
+    viewModel: CustomerViewModel = hiltViewModel()
 ) {
+    val customerList by remember { derivedStateOf { viewModel.customerList } }
+    val isLoading by remember { derivedStateOf { viewModel.isLoading } }
+    val errorMessage by remember { derivedStateOf { viewModel.errorMessage } }
+
+    val context = LocalContext.current
+
+    // Coba muat data di dalam try-catch, hanya jika list kosong
+    LaunchedEffect(Unit) {
+        try {
+            if (customerList.isEmpty()) {
+                viewModel.fetchAllCustomers()
+            }
+        } catch (e: Exception) {
+            viewModel.setError("Gagal memuat data: ${e.localizedMessage ?: "Unknown Error"}")
+        }
+    }
+
     Row(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF5F7FF))
     ) {
         SideBar(
-            userRole = "root",
+            userRole = userRole,
             onNavigate = onNavigate,
             onLogout = onLogout
         )
@@ -54,16 +75,40 @@ fun DaftarUserPage(
                 modifier = Modifier.padding(bottom = 24.dp)
             )
 
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                items(customerList) { customer ->
-                    DaftarUserCard(
-                        id = customer.customer_id,
-                        nama = customer.customer_fullname,
-                        email = customer.customer_email,
-                        onClick = {
-                            onUserSelected(customer.customer_id)
-                        }
+            when {
+                isLoading -> {
+                    CircularProgressIndicator(color = Color(0xFF04A5D4))
+                }
+                errorMessage != null -> {
+                    Text(
+                        text = errorMessage ?: "Terjadi kesalahan.",
+                        color = Color.Red,
+                        fontSize = 16.sp
                     )
+                }
+                customerList.isEmpty() -> {
+                    Text(
+                        text = "Belum ada data customer tersedia.",
+                        color = Color.Gray,
+                        fontSize = 14.sp
+                    )
+                }
+                else -> {
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                        items(customerList) { customer ->
+                            DaftarUserCard(
+                                nama = customer.customer_fullname,
+                                email = customer.customer_email,
+                                onClick = {
+                                    try {
+                                        onUserSelected(customer.customer_id)
+                                    } catch (e: Exception) {
+                                        Toast.makeText(context, "Navigasi gagal", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -72,7 +117,6 @@ fun DaftarUserPage(
 
 @Composable
 fun DaftarUserCard(
-    id: String,
     nama: String,
     email: String,
     onClick: () -> Unit
@@ -102,9 +146,8 @@ fun DaftarUserCard(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text("ID Customer       :      $id")
-                Text("Nama                   :      $nama")
-                Text("Email                    :      $email")
+                Text("Nama   : $nama")
+                Text("Email  : $email")
             }
 
             Button(
@@ -116,27 +159,4 @@ fun DaftarUserCard(
             }
         }
     }
-}
-
-@Preview(showBackground = true, widthDp = 1024, heightDp = 768)
-@Composable
-fun DaftarUserPagePreview() {
-    val dummyCustomerList = listOf(
-        Customer(
-            customer_id = "CUS001",
-            customer_fullname = "Jessica",
-            customer_email = "jessica@example.com",
-            customer_pass = "secret",
-            created_at = null,
-            updated_at = null
-        ),
-        Customer(
-            customer_id = "CUS002",
-            customer_fullname = "Fajar",
-            customer_email = "fajar@example.com",
-            customer_pass = "secret",
-            created_at = null,
-            updated_at = null
-        )
-    )
 }

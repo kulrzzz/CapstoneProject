@@ -61,4 +61,8 @@ object ApiClient {
     val roomImageService: RoomImageService by lazy {
         retrofit.create(RoomImageService::class.java)
     }
+
+    val customerService: CustomerService by lazy {
+        retrofit.create(CustomerService::class.java)
+    }
 }

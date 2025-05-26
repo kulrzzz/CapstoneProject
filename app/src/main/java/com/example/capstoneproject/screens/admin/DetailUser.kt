@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.capstoneproject.model.Booking
-import com.example.capstoneproject.model.Customer
+import com.example.capstoneproject.model.customer.Customer
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
 import com.example.capstoneproject.ui.theme.TableHeaderCell
@@ -32,6 +32,7 @@ import java.util.*
 fun DetailUserPage(
     customer: Customer,
     bookingList: List<Booking>,
+    userRole: String?,
     onBackClick: () -> Unit = {},
     onNavigate: (Screen) -> Unit = {},
     onLogout: () -> Unit = {}
@@ -45,17 +46,16 @@ fun DetailUserPage(
             .background(Color(0xFFF5F7FF))
     ) {
         SideBar(
-            userRole = "root",
+            userRole = userRole,
             onNavigate = onNavigate,
             onLogout = onLogout
         )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F7FF))
                 .padding(24.dp)
         ) {
-            // Header
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBackClick) {
                     Icon(
@@ -75,14 +75,13 @@ fun DetailUserPage(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Informasi Pengguna
+            // Info pengguna
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 border = BorderStroke(1.dp, Color(0xFFFF9800)),
                 colors = CardDefaults.cardColors(containerColor = Color.White),
                 elevation = CardDefaults.cardElevation(4.dp)
-
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
@@ -97,38 +96,29 @@ fun DetailUserPage(
                             .padding(end = 16.dp)
                     )
                     Column {
-                        InfoText(label = "ID Pengguna         :", value = customer.customer_id)
-                        InfoText(label = "Nama Lengkap    :", value = customer.customer_fullname)
-                        InfoText(
-                            label = "Email                      :",
-                            value = customer.customer_email
-                        )
+                        InfoText(label = "ID Pengguna", value = customer.customer_id)
+                        InfoText(label = "Nama Lengkap", value = customer.customer_fullname)
+                        InfoText(label = "Email", value = customer.customer_email)
                     }
                 }
             }
+
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Tabel Riwayat Peminjaman
-            Card (
+            // Tabel Riwayat
+            Card(
                 modifier = Modifier.fillMaxSize(),
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
                 Column {
-                    // Header
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color(0xFFE0E0E0))
                             .padding(vertical = 12.dp, horizontal = 10.dp)
                     ) {
-                        TableHeaderCell(
-                            "No",
-                            40.dp,
-                            textSize,
-                            headerTextColor,
-                            textAlign = TextAlign.Center
-                        )
+                        TableHeaderCell("No", 40.dp, textSize, headerTextColor)
                         TableHeaderCell("Kode Booking", 100.dp, textSize, headerTextColor)
                         TableHeaderCell("Nama Gedung", 120.dp, textSize, headerTextColor)
                         TableHeaderCell("Tanggal Peminjaman", 120.dp, textSize, headerTextColor)
@@ -163,7 +153,7 @@ fun DetailUserPage(
 @Composable
 fun InfoText(label: String, value: String) {
     Row(modifier = Modifier.padding(vertical = 4.dp)) {
-        Text("$label ", modifier = Modifier.width(140.dp))
+        Text(text = "$label:", modifier = Modifier.width(140.dp), fontWeight = FontWeight.Medium)
         Text(text = value)
     }
 }
@@ -247,6 +237,7 @@ fun DetailUserPagePreview() {
     DetailUserPage(
         customer = dummyCustomer,
         bookingList = dummyBookings,
+        userRole = "root",
         onBackClick = {}
     )
 }

@@ -3,6 +3,7 @@ package com.example.capstoneproject.navigation
 import android.widget.Toast
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -12,7 +13,6 @@ import com.example.capstoneproject.screens.admin.*
 import com.example.capstoneproject.screens.dashboard.DashboardScreen
 import com.example.capstoneproject.screens.login.AnimatedLoginPage
 import com.example.capstoneproject.screens.root.*
-import com.example.capstoneproject.viewmodel.RoomViewModelFactory
 
 @Composable
 fun AppNavGraph(
@@ -20,14 +20,14 @@ fun AppNavGraph(
     mainViewModel: MainViewModel,
     loginViewModel: LoginViewModel,
     adminViewModel: AdminViewModel,
-    bookingViewModel: BookingViewModel,
-    customerViewModel: CustomerViewModel
+    bookingViewModel: BookingViewModel
 ) {
+    val context = LocalContext.current
+
     NavHost(
         navController = navController,
         startDestination = Screen.Login.route
     ) {
-        // 🔐 Login
         composable(Screen.Login.route) {
             AnimatedLoginPage(
                 visible = true,
@@ -48,7 +48,6 @@ fun AppNavGraph(
             )
         }
 
-        // 🧭 Dashboard
         composable(Screen.Dashboard.route) {
             DashboardScreen(
                 userRole = loginViewModel.userRole,
@@ -61,20 +60,19 @@ fun AppNavGraph(
                 onLogout = {
                     loginViewModel.clearLoginState()
                     mainViewModel.logout()
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(0)
-                    }
+                    navController.navigate(Screen.Login.route) { popUpTo(0) }
                 }
             )
         }
 
-        // 🧾 Riwayat Transaksi
         composable(Screen.RiwayatTransaksi.route) {
             LaunchedEffect(Unit) {
                 bookingViewModel.fetchAllBookings()
             }
+            val transaksiList = bookingViewModel.allBookings ?: emptyList()
+
             RiwayatTransaksiPage(
-                transaksiList = bookingViewModel.allBookings,
+                transaksiList = transaksiList,
                 onNavigate = { navController.navigate(it.route) },
                 onLogout = {
                     loginViewModel.clearLoginState()
@@ -84,54 +82,64 @@ fun AppNavGraph(
             )
         }
 
-        // 👥 Daftar User
         composable(Screen.DaftarUser.route) {
-            LaunchedEffect(Unit) {
-                customerViewModel.fetchAllCustomers()
-            }
+            val customerViewModel: CustomerViewModel = hiltViewModel()
+
             DaftarUserPage(
-                customerList = customerViewModel.customerList,
-                onUserSelected = { userId -> navController.navigate("detail_user/$userId") },
+                onUserSelected = { userId ->
+                    navController.navigate("detail_user/$userId")
+                },
                 onNavigate = { navController.navigate(it.route) },
                 onLogout = {
                     loginViewModel.clearLoginState()
                     mainViewModel.logout()
                     navController.navigate(Screen.Login.route) { popUpTo(0) }
-                }
+                },
+                viewModel = customerViewModel
             )
         }
 
-        // 📄 Detail User
         composable("detail_user/{userId}") { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId")
+            val customerViewModel: CustomerViewModel = hiltViewModel()
 
-            LaunchedEffect(Unit) {
-                if (customerViewModel.customerList.isEmpty()) customerViewModel.fetchAllCustomers()
-                if (bookingViewModel.allBookings.isEmpty()) bookingViewModel.fetchAllBookings()
-            }
+            if (userId != null) {
+                LaunchedEffect(Unit) {
+                    if (customerViewModel.customerList.isEmpty()) customerViewModel.fetchAllCustomers()
+                    if (bookingViewModel.allBookings.isEmpty()) bookingViewModel.fetchAllBookings()
+                }
 
-            val customer = customerViewModel.customerList.find { it.customer_id == userId }
-            val bookings = bookingViewModel.allBookings.filter { it.customer_id == userId }
+                val customer = customerViewModel.customerList.find { it.customer_id == userId }
+                val bookings = bookingViewModel.allBookings.filter { it.customer_id == userId }
 
-            customer?.let {
-                DetailUserPage(
-                    customer = it,
-                    bookingList = bookings,
-                    onBackClick = { navController.popBackStack() },
-                    onNavigate = { navController.navigate(it.route) },
-                    onLogout = {
-                        loginViewModel.clearLoginState()
-                        mainViewModel.logout()
-                        navController.navigate(Screen.Login.route) { popUpTo(0) }
+                if (customer != null) {
+                    DetailUserPage(
+                        customer = customer,
+                        bookingList = bookings,
+                        onBackClick = { navController.popBackStack() },
+                        onNavigate = { navController.navigate(it.route) },
+                        onLogout = {
+                            loginViewModel.clearLoginState()
+                            mainViewModel.logout()
+                            navController.navigate(Screen.Login.route) { popUpTo(0) }
+                        }
+                    )
+                } else {
+                    LaunchedEffect(Unit) {
+                        navController.popBackStack()
+                        Toast.makeText(context, "Data user tidak ditemukan", Toast.LENGTH_SHORT).show()
                     }
-                )
+                }
+            } else {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.DaftarUser.route) {
+                        popUpTo(Screen.DaftarUser.route) { inclusive = true }
+                    }
+                }
             }
         }
 
-        // 🛠️ Manajemen Admin
         composable(Screen.ManajemenAdmin.route) {
-            val context = LocalContext.current
-
             LaunchedEffect(loginViewModel.token) {
                 loginViewModel.token?.let { token ->
                     adminViewModel.fetchAdmins(token)
@@ -165,7 +173,6 @@ fun AppNavGraph(
             )
         }
 
-        // ➕ Tambah Admin
         composable(Screen.TambahAdmin.route) {
             TambahAdminPage(
                 userRole = loginViewModel.userRole,
@@ -180,35 +187,39 @@ fun AppNavGraph(
             )
         }
 
-        // ✏️ Edit Admin
         composable("edit_admin/{adminId}") { backStackEntry ->
             val adminId = backStackEntry.arguments?.getString("adminId")
-            val admin = adminViewModel.adminList.find { it.admin_id == adminId }
+            if (adminId != null) {
+                val admin = adminViewModel.adminList.find { it.admin_id == adminId }
 
-            admin?.let {
-                EditAdminPage(
-                    admin = it,
-                    token = loginViewModel.token,
-                    onBack = { navController.popBackStack() },
-                    adminViewModel = adminViewModel,
-                    userRole = loginViewModel.userRole,
-                    onNavigate = { navController.navigate(it.route) },
-                    onLogout = {
-                        loginViewModel.clearLoginState()
-                        mainViewModel.logout()
-                        navController.navigate(Screen.Login.route) { popUpTo(0) }
-                    }
-                )
+                if (admin != null) {
+                    EditAdminPage(
+                        admin = admin,
+                        token = loginViewModel.token,
+                        onBack = { navController.popBackStack() },
+                        adminViewModel = adminViewModel,
+                        userRole = loginViewModel.userRole,
+                        onNavigate = { navController.navigate(it.route) },
+                        onLogout = {
+                            loginViewModel.clearLoginState()
+                            mainViewModel.logout()
+                            navController.navigate(Screen.Login.route) { popUpTo(0) }
+                        }
+                    )
+                } else {
+                    Toast.makeText(context, "Data admin tidak ditemukan", Toast.LENGTH_SHORT).show()
+                    navController.popBackStack()
+                }
+            } else {
+                navController.navigate(Screen.ManajemenAdmin.route) {
+                    popUpTo(Screen.ManajemenAdmin.route) { inclusive = true }
+                }
             }
         }
 
-        // 🏢 Manajemen Ruangan
         composable(Screen.ManajemenRuangan.route) {
-            val context = LocalContext.current
-
-            val roomViewModel: RoomViewModel = viewModel(
-                factory = RoomViewModelFactory(loginViewModel.token ?: "")
-            )
+            val token = loginViewModel.token ?: ""
+            val roomViewModel: RoomViewModel = viewModel(factory = RoomViewModelFactory(token))
 
             LaunchedEffect(Unit) {
                 roomViewModel.fetchRooms()
@@ -248,30 +259,21 @@ fun AppNavGraph(
             )
         }
 
-        // ➕ Tambah Ruangan
         composable(Screen.TambahRuangan.route) {
-            val token = loginViewModel.token
-            if (token != null) {
-                val roomViewModel: RoomViewModel = viewModel(
-                    factory = RoomViewModelFactory(token)
-                )
+            val token = loginViewModel.token ?: ""
+            val roomViewModel: RoomViewModel = viewModel(factory = RoomViewModelFactory(token))
 
-                TambahRuanganPage(
-                    userRole = loginViewModel.userRole,
-                    viewModel = roomViewModel,
-                    onBack = { navController.popBackStack() },
-                    onNavigate = { screen -> navController.navigate(screen.route) },
-                    onLogout = {
-                        loginViewModel.clearLoginState()
-                        mainViewModel.logout()
-                        navController.navigate(Screen.Login.route) { popUpTo(0) }
-                    }
-                )
-            } else {
-                LaunchedEffect(Unit) {
+            TambahRuanganPage(
+                userRole = loginViewModel.userRole,
+                viewModel = roomViewModel,
+                onBack = { navController.popBackStack() },
+                onNavigate = { screen -> navController.navigate(screen.route) },
+                onLogout = {
+                    loginViewModel.clearLoginState()
+                    mainViewModel.logout()
                     navController.navigate(Screen.Login.route) { popUpTo(0) }
                 }
-            }
+            )
         }
     }
 }

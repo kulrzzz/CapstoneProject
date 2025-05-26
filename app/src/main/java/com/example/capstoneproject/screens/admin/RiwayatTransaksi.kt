@@ -25,6 +25,7 @@ import com.example.capstoneproject.ui.theme.TableHeaderCell
 
 @Composable
 fun RiwayatTransaksiPage(
+    userRole: String?,
     transaksiList: List<Booking>,
     onNavigate: (Screen) -> Unit = {},
     onLogout: () -> Unit = {}
@@ -41,7 +42,7 @@ fun RiwayatTransaksiPage(
             .background(Color(0xFFF5F7FF))
     ) {
         SideBar(
-            userRole = "root",
+            userRole = userRole,
             onNavigate = onNavigate,
             onLogout = onLogout
         )
@@ -176,42 +177,4 @@ fun StatusBadge(
             fontWeight = FontWeight.Medium
         )
     }
-}
-
-
-@Preview(showBackground = true, widthDp = 1024, heightDp = 768)
-@Composable
-fun RiwayatTransaksiPreview() {
-    RiwayatTransaksiPage(
-        transaksiList = listOf(
-            Booking(
-                booking_id = "KA3F",
-                customer_id = "Jessica",
-                room_id = "Lavender",
-                booking_code = 1234,
-                booking_date = "",
-                booking_start = "",
-                booking_end = "",
-                booking_desc = "",
-                booking_price = 50000,
-                booking_status = 0,
-                created_at = null,
-                updated_at = null
-            ),
-            Booking(
-                booking_id = "A2XZ",
-                customer_id = "Fajar",
-                room_id = "Cendana",
-                booking_code = 4321,
-                booking_date = "",
-                booking_start = "",
-                booking_end = "",
-                booking_desc = "",
-                booking_price = 65000,
-                booking_status = 1,
-                created_at = null,
-                updated_at = null
-            )
-        )
-    )
 }

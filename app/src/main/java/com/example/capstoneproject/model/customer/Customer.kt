@@ -1,4 +1,4 @@
-package com.example.capstoneproject.model
+package com.example.capstoneproject.model.customer
 
 data class Customer(
     val customer_id: String,

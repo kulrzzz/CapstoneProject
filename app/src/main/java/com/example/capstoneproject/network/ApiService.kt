@@ -18,12 +18,6 @@ interface ApiService {
         @Field("access_token") token: String
     ): LoginResponse
 
-    // ---------------- CUSTOMER ----------------
-    @GET("api/customer/all")
-    suspend fun getAllCustomers(
-        @Query("access_token") token: String
-    ): CustomerResponse
-
     // ---------------- BOOKING ----------------
     @GET("api/booking/all")
     suspend fun getAllBookings(
