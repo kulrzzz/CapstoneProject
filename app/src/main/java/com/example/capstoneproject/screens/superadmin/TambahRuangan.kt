@@ -1,4 +1,4 @@
-package com.example.capstoneproject.screens.root
+package com.example.capstoneproject.screens.superadmin
 
 import android.app.TimePickerDialog
 import android.net.Uri
@@ -25,7 +25,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import com.example.capstoneproject.model.facility.FacilityCreateRequest
 import com.example.capstoneproject.model.room.Room
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar

@@ -12,7 +12,7 @@ import com.example.capstoneproject.viewmodel.*
 import com.example.capstoneproject.screens.admin.*
 import com.example.capstoneproject.screens.dashboard.DashboardScreen
 import com.example.capstoneproject.screens.login.AnimatedLoginPage
-import com.example.capstoneproject.screens.root.*
+import com.example.capstoneproject.screens.superadmin.*
 
 @Composable
 fun AppNavGraph(
@@ -33,9 +33,12 @@ fun AppNavGraph(
                 visible = true,
                 loginViewModel = loginViewModel,
                 onLoginSuccess = { screen ->
+                    val role = loginViewModel.userRole
+                    println("ROLE AT NAVIGATION: $role") // Tambahkan debug ini
+
                     if (
                         loginViewModel.token != null &&
-                        loginViewModel.userRole != null &&
+                        role == "superadmin" || role == "admin" &&
                         loginViewModel.admin != null
                     ) {
                         mainViewModel.setLoggedIn(true)
@@ -43,6 +46,8 @@ fun AppNavGraph(
                             popUpTo(Screen.Login.route) { inclusive = true }
                             launchSingleTop = true
                         }
+                    } else {
+                        println("🚨 Navigasi ditunda karena role belum sesuai")
                     }
                 }
             )
@@ -73,6 +78,7 @@ fun AppNavGraph(
 
             RiwayatTransaksiPage(
                 transaksiList = transaksiList,
+                userRole = loginViewModel.userRole,
                 onNavigate = { navController.navigate(it.route) },
                 onLogout = {
                     loginViewModel.clearLoginState()
@@ -86,16 +92,17 @@ fun AppNavGraph(
             val customerViewModel: CustomerViewModel = hiltViewModel()
 
             DaftarUserPage(
+                viewModel = customerViewModel,
                 onUserSelected = { userId ->
                     navController.navigate("detail_user/$userId")
                 },
+                userRole = loginViewModel.userRole,
                 onNavigate = { navController.navigate(it.route) },
                 onLogout = {
                     loginViewModel.clearLoginState()
                     mainViewModel.logout()
                     navController.navigate(Screen.Login.route) { popUpTo(0) }
                 },
-                viewModel = customerViewModel
             )
         }
 
@@ -117,6 +124,7 @@ fun AppNavGraph(
                         customer = customer,
                         bookingList = bookings,
                         onBackClick = { navController.popBackStack() },
+                        userRole = loginViewModel.userRole,
                         onNavigate = { navController.navigate(it.route) },
                         onLogout = {
                             loginViewModel.clearLoginState()
@@ -175,9 +183,9 @@ fun AppNavGraph(
 
         composable(Screen.TambahAdmin.route) {
             TambahAdminPage(
-                userRole = loginViewModel.userRole,
                 token = loginViewModel.token,
                 onBack = { navController.popBackStack() },
+                userRole = loginViewModel.userRole,
                 onNavigate = { navController.navigate(it.route) },
                 onLogout = {
                     loginViewModel.clearLoginState()

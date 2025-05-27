@@ -58,14 +58,14 @@ class LoginViewModel : ViewModel() {
 
                     // Normalisasi role
                     userRole = when (response.role.lowercase()) {
-                        "admin", "1" -> "1"
-                        "superadmin", "2" -> "2"
-                        else -> response.role
+                        "admin", "1" -> "admin"
+                        "superadmin", "2" -> "superadmin"
+                        else -> response.role.lowercase()
                     }
 
                     // Navigasi berdasarkan role
                     when (userRole) {
-                        "1", "2" -> onResult(Screen.Dashboard)
+                        "admin", "superadmin" -> onResult(Screen.Dashboard)
                         else -> {
                             _loginError.value = "Role pengguna tidak dikenali."
                             onResult(null)

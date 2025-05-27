@@ -17,5 +17,5 @@ sealed class Screen(val route: String) {
     object TambahAdmin : Screen("tambah_admin")
     object ManajemenRuangan : Screen("manajemen_ruangan")
     object TambahRuangan : Screen("tambah_ruangan")
-    object EditAdmin : Screen("edit_admin") // Tambahan berdasarkan file EditAdmin.kt
+    object EditAdmin : Screen("edit_admin")
 }

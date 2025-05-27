@@ -60,8 +60,19 @@ class AdminViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = ApiClient.adminService.createAdmin(request)
-                onResult(response.isSuccessful)
+
+                if (response.isSuccessful) {
+                    // Log isi respons jika diperlukan untuk debugging
+                    println("✅ Admin created: ${response.body()?.toString()}")
+                    onResult(true)
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    println("❌ Gagal menambahkan admin (HTTP ${response.code()}): $errorBody")
+                    onResult(false)
+                }
+
             } catch (e: Exception) {
+                println("❗ Exception saat membuat admin: ${e.localizedMessage}")
                 e.printStackTrace()
                 onResult(false)
             }

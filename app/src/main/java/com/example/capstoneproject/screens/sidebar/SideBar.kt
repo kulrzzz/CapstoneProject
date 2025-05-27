@@ -25,17 +25,16 @@ fun SideBar(
     onNavigate: (Screen) -> Unit,
     onLogout: () -> Unit
 ) {
-    // 🧠 Sidebar state to highlight selected
     var selectedScreen by remember { mutableStateOf<Screen?>(null) }
 
-    val isRoot = userRole == "2"
+    val isSuperAdmin = userRole?.lowercase() == "superadmin"
 
     val menuItems = buildList {
         add(SidebarItemModel("Dashboard", R.drawable.homebefore, Screen.Dashboard))
         add(SidebarItemModel("Riwayat Transaksi", R.drawable.riwayat, Screen.RiwayatTransaksi))
         add(SidebarItemModel("Daftar User", R.drawable.daftaruser, Screen.DaftarUser))
 
-        if (isRoot) {
+        if (isSuperAdmin) {
             add(SidebarItemModel("DIVIDER", -1, Screen.Dashboard))
             add(SidebarItemModel("Manajemen Admin", R.drawable.adminbefore, Screen.ManajemenAdmin))
             add(SidebarItemModel("Manajemen Ruangan", R.drawable.ruanganbefore, Screen.ManajemenRuangan))
@@ -155,7 +154,7 @@ data class SidebarItemModel(
 @Composable
 fun SideBarPreview() {
     SideBar(
-        userRole = "2",
+        userRole = "superadmin", // ✅ Fixed here
         onNavigate = {},
         onLogout = {}
     )

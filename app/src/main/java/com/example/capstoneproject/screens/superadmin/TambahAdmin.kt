@@ -1,4 +1,4 @@
-package com.example.capstoneproject.screens.root
+package com.example.capstoneproject.screens.superadmin
 
 import android.widget.Toast
 import androidx.compose.foundation.background

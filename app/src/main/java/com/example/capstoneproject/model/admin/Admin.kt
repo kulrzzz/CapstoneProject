@@ -6,6 +6,6 @@ data class Admin(
     val admin_email: String,
     val admin_pass: String,
     val admin_who: Int,
-    val created_at: String,
-    val updated_at: String
+    val created_at: String?,
+    val updated_at: String?
 )
