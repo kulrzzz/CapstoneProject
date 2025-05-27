@@ -1,65 +1,60 @@
 package com.example.capstoneproject.viewmodel
 
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.capstoneproject.BuildConfig
 import com.example.capstoneproject.model.customer.Customer
 import com.example.capstoneproject.network.ApiClient
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import android.util.Log
 
 class CustomerViewModel : ViewModel() {
 
-    // State untuk daftar customer
-    var customerList by mutableStateOf<List<Customer>>(emptyList())
-        private set
+    private val _customerList = mutableStateListOf<Customer>()
+    val customerList: SnapshotStateList<Customer> get() = _customerList
 
-    // State untuk status loading
-    var isLoading by mutableStateOf(false)
-        private set
+    private val _isLoading = mutableStateOf(false)
+    val isLoading: State<Boolean> get() = _isLoading
 
-    // State untuk pesan error (jika ada)
-    var errorMessage by mutableStateOf<String?>(null)
-        private set
+    private val _errorMessage = mutableStateOf<String?>(null)
+    val errorMessage: State<String?> get() = _errorMessage
 
-    /**
-     * Ambil access token dari konfigurasi BuildConfig.
-     * Gantilah dengan sistem token dinamis jika menggunakan login user.
-     */
-    private val token: String
-        get() = BuildConfig.API_ACCESS_TOKEN
-
-    /**
-     * Fungsi untuk mengambil semua data customer dari API.
-     */
-    fun fetchAllCustomers() {
+    fun fetchCustomers(token: String, retryCount: Int = 3) {
         viewModelScope.launch {
-            isLoading = true
-            errorMessage = null
+            _isLoading.value = true
+            _errorMessage.value = null
 
-            try {
-                // API Anda langsung mengembalikan List<Customer>
-                val result = ApiClient.customerService.getAllCustomers(token)
-                customerList = result
-            } catch (e: Exception) {
-                Log.e("CustomerViewModel", "Fetch failed", e)
-                errorMessage = "Gagal memuat data customer: ${e.localizedMessage ?: "Tidak diketahui"}"
-            } finally {
-                isLoading = false
+            repeat(retryCount) { attempt ->
+                try {
+                    val result = ApiClient.customerService.getAllCustomers(token)
+                    _customerList.clear()
+                    _customerList.addAll(result)
+                    _isLoading.value = false
+                    return@launch
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    if (attempt == retryCount - 1) {
+                        _errorMessage.value = "Gagal memuat data customer: ${e.localizedMessage}"
+                    } else {
+                        delay(500)
+                    }
+                }
             }
+
+            _isLoading.value = false
         }
     }
 
-    /**
-     * Mengambil data customer berdasarkan ID.
-     * Berguna untuk menampilkan detail user.
-     */
-    fun getCustomerById(id: String): Customer? {
-        return customerList.find { it.customer_id == id }
+    fun refreshCustomers(token: String) {
+        fetchCustomers(token)
     }
 
-    fun setError(msg: String) {
-        errorMessage = msg
+    fun getCustomerById(id: String): Customer? {
+        return _customerList.find { it.customer_id == id }
+    }
+
+    fun setError(message: String) {
+        _errorMessage.value = message
     }
 }

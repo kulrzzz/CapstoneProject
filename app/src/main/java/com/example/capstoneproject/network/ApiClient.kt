@@ -1,7 +1,11 @@
 package com.example.capstoneproject.network
 
 import com.example.capstoneproject.util.Constants
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -15,33 +19,58 @@ object ApiClient {
         require(BASE_URL.isNotBlank()) { "BASE_URL in Constants must not be blank!" }
     }
 
-    // 🪵 Logging interceptor: log full body of request & response
+    // ✅ Logging Interceptor for full request/response
     private val loggingInterceptor: HttpLoggingInterceptor by lazy {
         HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
     }
 
-    // 🌐 OkHttp client with timeout and logging
+    // 🔁 Retry Interceptor (optional, retry up to 3 times)
+    private val retryInterceptor = Interceptor { chain ->
+        var request = chain.request()
+        var response = chain.proceed(request)
+        var tryCount = 0
+        val maxTries = 3
+
+        while (!response.isSuccessful && tryCount < maxTries) {
+            tryCount++
+            response.close()
+            response = chain.proceed(request)
+        }
+
+        response
+    }
+
+    // 🔧 Gson config with lenient parsing & nulls support
+    private val gson: Gson by lazy {
+        GsonBuilder()
+            .setLenient()
+            .serializeNulls()
+            .create()
+    }
+
+    // 🌐 OkHttp Client with retry, logging, and custom timeouts
     private val httpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
-            .connectTimeout(15, TimeUnit.SECONDS)
-            .readTimeout(15, TimeUnit.SECONDS)
-            .writeTimeout(15, TimeUnit.SECONDS)
+            .addInterceptor(retryInterceptor)
+            .connectTimeout(20, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
             .build()
     }
 
-    // 🔧 Retrofit builder with GSON
+    // 🚀 Retrofit instance with configured Gson
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .client(httpClient)
             .build()
     }
 
-    // 🔌 Services (reusable instances)
+    // 🔌 API Services
     val apiService: ApiService by lazy {
         retrofit.create(ApiService::class.java)
     }

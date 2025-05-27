@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.capstoneproject.BuildConfig
 import com.example.capstoneproject.model.customer.Customer
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
@@ -33,19 +34,17 @@ fun DaftarUserPage(
     viewModel: CustomerViewModel = hiltViewModel()
 ) {
     val customerList by remember { derivedStateOf { viewModel.customerList } }
-    val isLoading by remember { derivedStateOf { viewModel.isLoading } }
-    val errorMessage by remember { derivedStateOf { viewModel.errorMessage } }
-
+    val isLoading by viewModel.isLoading
+    val errorMessage by viewModel.errorMessage
     val context = LocalContext.current
 
-    // Coba muat data di dalam try-catch, hanya jika list kosong
-    LaunchedEffect(Unit) {
-        try {
-            if (customerList.isEmpty()) {
-                viewModel.fetchAllCustomers()
+    LaunchedEffect(key1 = true) {
+        if (customerList.isEmpty() && !isLoading) {
+            try {
+                viewModel.fetchCustomers(BuildConfig.API_ACCESS_TOKEN)
+            } catch (e: Exception) {
+                viewModel.setError("Gagal memuat data: ${e.localizedMessage ?: "Unknown Error"}")
             }
-        } catch (e: Exception) {
-            viewModel.setError("Gagal memuat data: ${e.localizedMessage ?: "Unknown Error"}")
         }
     }
 
@@ -87,11 +86,22 @@ fun DaftarUserPage(
                     )
                 }
                 customerList.isEmpty() -> {
-                    Text(
-                        text = "Belum ada data customer tersedia.",
-                        color = Color.Gray,
-                        fontSize = 14.sp
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        AssistChip(
+                            onClick = {},
+                            label = { Text("Data user tidak ditemukan") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.AccountCircle,
+                                    contentDescription = null
+                                )
+                            }
+                        )
+                    }
                 }
                 else -> {
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -100,11 +110,7 @@ fun DaftarUserPage(
                                 nama = customer.customer_fullname,
                                 email = customer.customer_email,
                                 onClick = {
-                                    try {
-                                        onUserSelected(customer.customer_id)
-                                    } catch (e: Exception) {
-                                        Toast.makeText(context, "Navigasi gagal", Toast.LENGTH_SHORT).show()
-                                    }
+                                    onUserSelected(customer.customer_id)
                                 }
                             )
                         }
@@ -143,9 +149,7 @@ fun DaftarUserCard(
                     .padding(end = 16.dp)
             )
 
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text("Nama  : $nama")
                 Text("Email : $email")
             }

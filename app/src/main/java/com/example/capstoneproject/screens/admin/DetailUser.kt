@@ -94,7 +94,6 @@ fun DetailUserPage(
                             .padding(end = 16.dp)
                     )
                     Column {
-                        InfoText(label = "ID Pengguna", value = customer.customer_id)
                         InfoText(label = "Nama Lengkap", value = customer.customer_fullname)
                         InfoText(label = "Email", value = customer.customer_email)
                     }

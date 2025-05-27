@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.capstoneproject.BuildConfig
 import com.example.capstoneproject.viewmodel.*
 import com.example.capstoneproject.screens.admin.*
 import com.example.capstoneproject.screens.dashboard.DashboardScreen
@@ -34,11 +35,11 @@ fun AppNavGraph(
                 loginViewModel = loginViewModel,
                 onLoginSuccess = { screen ->
                     val role = loginViewModel.userRole
-                    println("ROLE AT NAVIGATION: $role") // Tambahkan debug ini
+                    println("ROLE AT NAVIGATION: $role")
 
                     if (
                         loginViewModel.token != null &&
-                        role == "superadmin" || role == "admin" &&
+                        (role == "superadmin" || role == "admin") &&
                         loginViewModel.admin != null
                     ) {
                         mainViewModel.setLoggedIn(true)
@@ -112,12 +113,14 @@ fun AppNavGraph(
 
             if (userId != null) {
                 LaunchedEffect(Unit) {
-                    if (customerViewModel.customerList.isEmpty()) customerViewModel.fetchAllCustomers()
+                    if (customerViewModel.customerList.isEmpty()) {
+                        customerViewModel.fetchCustomers(BuildConfig.API_ACCESS_TOKEN)
+                    }
                     if (bookingViewModel.allBookings.isEmpty()) bookingViewModel.fetchAllBookings()
                 }
 
                 val customer = customerViewModel.customerList.find { it.customer_id == userId }
-                val bookings = bookingViewModel.allBookings.filter { it.customer_id == userId }
+                val bookings = bookingViewModel.getBookingsByCustomerId(userId)
 
                 if (customer != null) {
                     DetailUserPage(
