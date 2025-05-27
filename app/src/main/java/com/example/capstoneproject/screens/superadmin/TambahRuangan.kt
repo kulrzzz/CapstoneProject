@@ -38,7 +38,7 @@ fun CustomTextField(
     value: String,
     onValueChange: (String) -> Unit,
     singleLine: Boolean = true,
-    minHeight: Dp = 64.dp
+    minHeight: Dp = 50.dp
 ) {
     Column {
         Text(text = label, color = Color.Gray, fontSize = 14.sp)
@@ -164,6 +164,7 @@ fun TambahRuanganPage(
                 .fillMaxHeight()
                 .padding(24.dp)
         ) {
+            Spacer(Modifier.height(20.dp))
             Text("Tambah Ruangan", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Color(0xFF04A5D4))
             Spacer(Modifier.height(24.dp))
 
@@ -184,56 +185,129 @@ fun TambahRuanganPage(
                     Spacer(Modifier.height(16.dp))
                     CustomTextField("Kapasitas", kapasitas, { kapasitas = it }, true, 50.dp)
                     Spacer(Modifier.height(16.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Jam Mulai      : ${startTime.ifEmpty { "Belum dipilih" }}")
-                        Spacer(Modifier.width(16.dp))
-                        Button(onClick = { timePickerDialogStart.show() }) { Text("Pilih Jam Mulai") }
-                    }
-                    Spacer(Modifier.height(16.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Jam Selesai   : ${endTime.ifEmpty { "Belum dipilih" }}")
-                        Spacer(Modifier.width(16.dp))
-                        Button(onClick = { timePickerDialogEnd.show() }) { Text("Pilih Jam Selesai") }
-                    }
-                    Spacer(Modifier.height(16.dp))
                     CustomTextField("Harga Sewa", hargaSewa, { hargaSewa = it }, true, 50.dp)
-                    Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(16.dp))
+
+                    // Fasilitas
+                    Text(text = "Fasilitas", fontSize = 14.sp, color = Color.Gray)
+                    Spacer(Modifier.height(4.dp))
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        OutlinedTextField(
+                            value = fasilitasInput,
+                            onValueChange = { fasilitasInput = it },
+                            modifier = Modifier
+                                .weight(1f)
+                                .heightIn(min = 56.dp), // sesuaikan dengan min height sebelumnya
+                            shape = RoundedCornerShape(24.dp),
+                            textStyle = TextStyle(fontSize = 16.sp),
+                            singleLine = true,
+                            placeholder = { Text("Masukkan Fasilitas") },
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = Color(0xFF0284C7),
+                                unfocusedBorderColor = Color.Gray,
+                                containerColor = Color.White
+                            )
+                        )
+
+                        Spacer(Modifier.width(8.dp))
+
+                        Button(
+                            onClick = {
+                                if (fasilitasInput.isNotBlank()) {
+                                    fasilitasList.add(fasilitasInput.trim())
+                                    fasilitasInput = ""
+                                }
+                            },
+                            modifier = Modifier.height(56.dp) // sejajarkan tinggi dengan input
+                        ) {
+                            Text("Tambahkan")
+                        }
+                    }
+
+
+                    Spacer(Modifier.height(8.dp))
+                    fasilitasList.forEach { Text("- $it", fontSize = 14.sp, color = Color.DarkGray) }
+                    Spacer(Modifier.height(20.dp))
+
+                    // Jam Mulai
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Jam Mulai      :      ${startTime.ifEmpty { "Belum dipilih" }}",
+                                color = if (startTime.isNotEmpty()) Color.Black else Color.Gray,
+                                fontSize = 14.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Button(
+                            onClick = { timePickerDialogStart.show() },
+                            modifier = Modifier
+                                .width(200.dp)
+                                .height(44.dp),
+                            shape = RoundedCornerShape(100.dp),
+                        ) {
+                            Text("Pilih Jam Mulai", fontSize = 14.sp)
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Jam Selesai
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Jam Selesai   :      ${endTime.ifEmpty { "Belum dipilih" }}",
+                                color = if (endTime.isNotEmpty()) Color.Black else Color.Gray,
+                                fontSize = 14.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Button(
+                            onClick = { timePickerDialogEnd.show() },
+                            modifier = Modifier
+                                .width(200.dp)
+                                .height(44.dp),
+                            shape = RoundedCornerShape(100.dp),
+                        ) {
+                            Text("Pilih Jam Selesai", fontSize = 14.sp)
+                        }
+                    }
+
+
+                    Spacer(modifier = Modifier.height(16.dp))
 
                     Text("Upload Gambar", fontSize = 14.sp, color = Color.Gray)
-                    Button(onClick = { launcher.launch("image/*") }) { Text("Pilih Gambar") }
+
+                    Button(
+                        onClick = { launcher.launch("image/*") },
+                        modifier = Modifier.width(200.dp)
+                    ) {
+                        Text("Pilih Gambar")
+                    }
+
                     imageUri.value?.let {
                         Spacer(Modifier.height(8.dp))
                         Image(
                             painter = rememberAsyncImagePainter(it),
                             contentDescription = null,
-                            modifier = Modifier.fillMaxWidth().height(150.dp).clip(RoundedCornerShape(12.dp)),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(150.dp)
+                                .clip(RoundedCornerShape(12.dp)),
                             contentScale = ContentScale.Crop
                         )
                     }
 
                     Spacer(Modifier.height(24.dp))
-
-                    Text("Fasilitas", fontSize = 14.sp, color = Color.Gray)
-                    Spacer(Modifier.height(4.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        OutlinedTextField(
-                            value = fasilitasInput,
-                            onValueChange = { fasilitasInput = it },
-                            modifier = Modifier.weight(1f),
-                            label = { Text("Masukkan Fasilitas") },
-                            singleLine = true
-                        )
-                        Spacer(Modifier.width(8.dp))
-                        Button(onClick = {
-                            if (fasilitasInput.isNotBlank()) {
-                                fasilitasList.add(fasilitasInput.trim())
-                                fasilitasInput = ""
-                            }
-                        }) { Text("Tambahkan") }
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    fasilitasList.forEach { Text("- $it", fontSize = 14.sp, color = Color.DarkGray) }
-                    Spacer(Modifier.height(16.dp))
 
                     viewModel.errorMessage.value?.let {
                         Text(it, color = Color.Red, fontSize = 14.sp)
@@ -247,41 +321,60 @@ fun TambahRuanganPage(
                     }
 
                     Spacer(Modifier.height(24.dp))
-                    Button(
-                        onClick = {
-                            viewModel.clearMessages()
-                            if (!validateForm(context, namaRuangan, deskripsiRuangan, kategoriRuangan, kapasitas, hargaSewa, startTime, endTime, fasilitasList, imageUri.value))
-                                return@Button
-
-                            val room = Room(
-                                room_id = "", room_name = namaRuangan, room_desc = deskripsiRuangan,
-                                room_kategori = kategoriRuangan, room_capacity = kapasitas.toIntOrNull() ?: 0,
-                                room_price = hargaSewa.toLongOrNull() ?: 0L, room_available = 1,
-                                room_start = startTime, room_end = endTime, created_at = "", updated_at = ""
-                            )
-
-                            viewModel.addRoomWithImageAndFacilities(
-                                room = room,
-                                imageUri = imageUri.value,
-                                context = context,
-                                fasilitasList = fasilitasList
-                            ) { success ->
-                                if (success) {
-                                    Toast.makeText(context, "Ruangan berhasil ditambahkan", Toast.LENGTH_SHORT).show()
-                                    namaRuangan = ""; deskripsiRuangan = ""; kategoriRuangan = ""; kapasitas = ""
-                                    hargaSewa = ""; startTime = ""; endTime = ""; fasilitasInput = ""
-                                    fasilitasList.clear(); imageUri.value = null
-                                } else {
-                                    Toast.makeText(context, "Gagal menambahkan ruangan", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        },
-                        modifier = Modifier.align(Alignment.End),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1570EF)),
-                        enabled = !viewModel.isLoading.value
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text("Tambah Ruangan", fontSize = 16.sp)
+                        // Tombol Kembali di kiri
+                        Button(
+                            onClick = onBack,
+                            modifier = Modifier.width(200.dp),
+                            shape = RoundedCornerShape(100.dp),
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+
+                        ) {
+                            Text("Kembali", fontSize = 14.sp)
+                        }
+
+                        // Tombol Tambah Ruangan di kanan
+                        Button(
+                            onClick = {
+                                viewModel.clearMessages()
+                                if (!validateForm(context, namaRuangan, deskripsiRuangan, kategoriRuangan, kapasitas, hargaSewa, startTime, endTime, fasilitasList, imageUri.value))
+                                    return@Button
+
+                                val room = Room(
+                                    room_id = "", room_name = namaRuangan, room_desc = deskripsiRuangan,
+                                    room_kategori = kategoriRuangan, room_capacity = kapasitas.toIntOrNull() ?: 0,
+                                    room_price = hargaSewa.toLongOrNull() ?: 0L, room_available = 1,
+                                    room_start = startTime, room_end = endTime, created_at = "", updated_at = ""
+                                )
+
+                                viewModel.addRoomWithImageAndFacilities(
+                                    room = room,
+                                    imageUri = imageUri.value,
+                                    context = context,
+                                    fasilitasList = fasilitasList
+                                ) { success ->
+                                    if (success) {
+                                        Toast.makeText(context, "Ruangan berhasil ditambahkan", Toast.LENGTH_SHORT).show()
+                                        namaRuangan = ""; deskripsiRuangan = ""; kategoriRuangan = ""; kapasitas = ""
+                                        hargaSewa = ""; startTime = ""; endTime = ""; fasilitasInput = ""
+                                        fasilitasList.clear(); imageUri.value = null
+                                    } else {
+                                        Toast.makeText(context, "Gagal menambahkan ruangan", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                            },
+                            modifier = Modifier.width(200.dp),
+                            shape = RoundedCornerShape(100.dp),
+                            enabled = !viewModel.isLoading.value
+                        ) {
+                            Text("Tambah", fontSize = 14.sp)
+                        }
                     }
                 }
             }
