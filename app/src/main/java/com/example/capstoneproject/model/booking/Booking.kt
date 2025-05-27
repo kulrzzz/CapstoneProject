@@ -1,4 +1,4 @@
-package com.example.capstoneproject.model
+package com.example.capstoneproject.model.booking
 
 data class Booking(
     val booking_id: String,

@@ -4,7 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -20,11 +20,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.capstoneproject.model.Booking
+import com.example.capstoneproject.model.booking.Booking
 import com.example.capstoneproject.model.customer.Customer
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
-import com.example.capstoneproject.ui.theme.TableHeaderCell
 import java.text.NumberFormat
 import java.util.*
 
@@ -75,7 +74,6 @@ fun DetailUserPage(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Info pengguna
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -105,43 +103,37 @@ fun DetailUserPage(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Tabel Riwayat
             Card(
                 modifier = Modifier.fillMaxSize(),
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
-                Column {
+                Column(modifier = Modifier.padding(12.dp)) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(Color(0xFFE0E0E0))
-                            .padding(vertical = 12.dp, horizontal = 10.dp)
+                            .padding(vertical = 12.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        TableHeaderCell("No", 40.dp, textSize, headerTextColor)
-                        TableHeaderCell("Kode Booking", 100.dp, textSize, headerTextColor)
-                        TableHeaderCell("Nama Gedung", 120.dp, textSize, headerTextColor)
-                        TableHeaderCell("Tanggal Peminjaman", 120.dp, textSize, headerTextColor)
-                        TableHeaderCell("Waktu Peminjaman", 120.dp, textSize, headerTextColor)
-                        TableHeaderCell("Nominal Pembayaran", 140.dp, textSize, headerTextColor)
+                        TableHeader("Kode Booking", 100.dp, textSize, headerTextColor)
+                        TableHeader("Nama Gedung", 120.dp, textSize, headerTextColor)
+                        TableHeader("Tanggal", 100.dp, textSize, headerTextColor)
+                        TableHeader("Waktu", 100.dp, textSize, headerTextColor)
+                        TableHeader("Nominal", 100.dp, textSize, headerTextColor)
                     }
 
                     LazyColumn {
-                        itemsIndexed(bookingList) { index, booking ->
-                            DetailRow(
-                                no = index + 1,
-                                booking = booking,
-                                textSize = textSize
-                            )
+                        items(bookingList) { booking ->
+                            TableRow(booking = booking, textSize = textSize)
                         }
                     }
 
                     if (bookingList.isEmpty()) {
                         Text(
-                            "Belum ada riwayat peminjaman.",
+                            text = "Belum ada riwayat peminjaman.",
                             modifier = Modifier.padding(16.dp),
-                            color = Color.Gray,
-                            fontStyle = MaterialTheme.typography.bodySmall.fontStyle
+                            color = Color.Gray
                         )
                     }
                 }
@@ -159,26 +151,32 @@ fun InfoText(label: String, value: String) {
 }
 
 @Composable
-fun DetailRow(
-    no: Int,
-    booking: Booking,
-    textSize: androidx.compose.ui.unit.TextUnit
-) {
-    val rowBg = if (no % 2 == 0) Color(0xFFF8FAFF) else Color.White
+fun TableHeader(text: String, width: Dp, fontSize: androidx.compose.ui.unit.TextUnit, color: Color) {
+    Text(
+        text = text,
+        fontSize = fontSize,
+        fontWeight = FontWeight.SemiBold,
+        modifier = Modifier.width(width),
+        color = color,
+        textAlign = TextAlign.Center
+    )
+}
 
+@Composable
+fun TableRow(booking: Booking, textSize: androidx.compose.ui.unit.TextUnit) {
+    val rowBg = Color.White
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(rowBg)
-            .padding(vertical = 12.dp, horizontal = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(vertical = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        TableCell(no.toString(), 45.dp, textSize, TextAlign.Center)
         TableCell(booking.booking_code.toString(), 100.dp, textSize)
         TableCell(booking.room_id, 120.dp, textSize)
-        TableCell(booking.booking_date, 120.dp, textSize)
-        TableCell("${booking.booking_start} - ${booking.booking_end}", 120.dp, textSize)
-        TableCell(formatCurrency(booking.booking_price), 140.dp, textSize)
+        TableCell(booking.booking_date, 100.dp, textSize)
+        TableCell("${booking.booking_start} - ${booking.booking_end}", 100.dp, textSize)
+        TableCell(formatCurrency(booking.booking_price), 100.dp, textSize)
     }
 }
 
@@ -187,7 +185,7 @@ fun TableCell(
     text: String,
     width: Dp,
     fontSize: androidx.compose.ui.unit.TextUnit,
-    textAlign: TextAlign = TextAlign.Start
+    textAlign: TextAlign = TextAlign.Center
 ) {
     Text(
         text = text,
@@ -203,41 +201,4 @@ fun TableCell(
 fun formatCurrency(amount: Long): String {
     val formatter = NumberFormat.getCurrencyInstance(Locale("in", "ID"))
     return formatter.format(amount)
-}
-
-@Preview(showBackground = true, widthDp = 1024, heightDp = 768)
-@Composable
-fun DetailUserPagePreview() {
-    val dummyCustomer = Customer(
-        customer_id = "02102",
-        customer_fullname = "Jessica",
-        customer_email = "jessica@gmail.com",
-        customer_pass = "password123",
-        created_at = null,
-        updated_at = null
-    )
-
-    val dummyBookings = List(8) {
-        Booking(
-            booking_id = "B${it + 1}",
-            customer_id = "02102",
-            room_id = "GKM Lantai 2",
-            booking_code = 12358,
-            booking_date = "12-09-24",
-            booking_start = "07.00",
-            booking_end = "13.00",
-            booking_desc = "Untuk presentasi",
-            booking_price = 50000,
-            booking_status = 1,
-            created_at = null,
-            updated_at = null
-        )
-    }
-
-    DetailUserPage(
-        customer = dummyCustomer,
-        bookingList = dummyBookings,
-        userRole = "root",
-        onBackClick = {}
-    )
 }

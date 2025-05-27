@@ -1,6 +1,8 @@
 package com.example.capstoneproject.network
 
 import com.example.capstoneproject.model.*
+import com.example.capstoneproject.model.booking.Booking
+import com.example.capstoneproject.model.booking.BookingResponse
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
