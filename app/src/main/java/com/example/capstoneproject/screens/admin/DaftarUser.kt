@@ -69,7 +69,7 @@ fun DaftarUserPage(
 
             Text(
                 text = "Lihat Daftar User",
-                fontSize = 26.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF04A5D4),
                 modifier = Modifier.padding(bottom = 24.dp)

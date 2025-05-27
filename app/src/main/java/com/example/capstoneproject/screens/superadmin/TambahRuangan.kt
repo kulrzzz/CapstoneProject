@@ -176,27 +176,27 @@ fun TambahRuanganPage(
                 Column(
                     modifier = Modifier.padding(24.dp).verticalScroll(scrollState)
                 ) {
-                    CustomTextField("Nama Ruangan", namaRuangan, { namaRuangan = it })
+                    CustomTextField("Nama Ruangan", namaRuangan, { namaRuangan = it }, true, 50.dp)
                     Spacer(Modifier.height(16.dp))
-                    CustomTextField("Deskripsi Ruangan", deskripsiRuangan, { deskripsiRuangan = it }, false, 100.dp)
+                    CustomTextField("Deskripsi Ruangan", deskripsiRuangan, { deskripsiRuangan = it }, false, 50.dp)
                     Spacer(Modifier.height(16.dp))
                     CustomDropdownField("Kategori Ruangan", kategoriRuangan, { kategoriRuangan = it }, kategoriList)
                     Spacer(Modifier.height(16.dp))
-                    CustomTextField("Kapasitas", kapasitas, { kapasitas = it })
+                    CustomTextField("Kapasitas", kapasitas, { kapasitas = it }, true, 50.dp)
                     Spacer(Modifier.height(16.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Jam Mulai: ${startTime.ifEmpty { "Belum dipilih" }}")
+                        Text("Jam Mulai      : ${startTime.ifEmpty { "Belum dipilih" }}")
                         Spacer(Modifier.width(16.dp))
                         Button(onClick = { timePickerDialogStart.show() }) { Text("Pilih Jam Mulai") }
                     }
                     Spacer(Modifier.height(16.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("Jam Selesai: ${endTime.ifEmpty { "Belum dipilih" }}")
+                        Text("Jam Selesai   : ${endTime.ifEmpty { "Belum dipilih" }}")
                         Spacer(Modifier.width(16.dp))
                         Button(onClick = { timePickerDialogEnd.show() }) { Text("Pilih Jam Selesai") }
                     }
                     Spacer(Modifier.height(16.dp))
-                    CustomTextField("Harga Sewa", hargaSewa, { hargaSewa = it })
+                    CustomTextField("Harga Sewa", hargaSewa, { hargaSewa = it }, true, 50.dp)
                     Spacer(Modifier.height(24.dp))
 
                     Text("Upload Gambar", fontSize = 14.sp, color = Color.Gray)
