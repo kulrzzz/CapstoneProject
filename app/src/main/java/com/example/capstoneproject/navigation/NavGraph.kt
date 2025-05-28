@@ -10,7 +10,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.capstoneproject.BuildConfig
-import com.example.capstoneproject.model.booking.BookingDetail
 import com.example.capstoneproject.viewmodel.*
 import com.example.capstoneproject.screens.admin.*
 import com.example.capstoneproject.screens.dashboard.DashboardScreen
@@ -123,62 +122,71 @@ fun AppNavGraph(
             val customerError by customerViewModel.errorMessage
 
             val bookingList by bookingViewModel.userBookings
-            val isBookingLoading = bookingViewModel.isLoading
-            val bookingError = bookingViewModel.errorMessage
+            val isBookingLoading by remember { derivedStateOf { bookingViewModel.isLoading } }
+            val bookingError by remember { derivedStateOf { bookingViewModel.errorMessage } }
 
-            var isDataLoaded by remember { mutableStateOf(false) }
+//            var isDataLoaded by remember { mutableStateOf(false) }
 
-            // Fetch data user dan booking saat pertama kali tampil
-            LaunchedEffect(key1 = userId) {
-                if (!userId.isNullOrEmpty() && !isDataLoaded) {
-                    isDataLoaded = true
+            // Fetch data once
+            LaunchedEffect(userId) {
+                if (!userId.isNullOrEmpty()) {
+                    println("📡 Memulai fetch data untuk userId: $userId")
                     customerViewModel.fetchCustomerById(userId, BuildConfig.API_ACCESS_TOKEN)
                     bookingViewModel.fetchBookingsByCustomerId(userId, BuildConfig.API_ACCESS_TOKEN)
                 }
             }
 
-            when {
-                userId.isNullOrEmpty() -> {
-                    LaunchedEffect("empty-id") {
-                        navController.navigate(Screen.DaftarUser.route) {
-                            popUpTo(Screen.DaftarUser.route) { inclusive = true }
-                        }
+            // Redirect jika userId kosong
+            if (userId.isNullOrEmpty()) {
+                LaunchedEffect(Unit) {
+                    navController.navigate(Screen.DaftarUser.route) {
+                        popUpTo(Screen.DaftarUser.route) { inclusive = true }
                     }
                 }
+                return@composable
+            }
 
-                isCustomerLoading || isBookingLoading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
+            // Loading state
+            if (isCustomerLoading || isBookingLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+                return@composable
+            }
+
+            // Error handling yang aman (tidak crash jika pesan kosong/null)
+            val finalErrorMessage = customerError?.takeIf { it.isNotBlank() }
+                ?: bookingError?.takeIf { it.isNotBlank() }
+
+            if (finalErrorMessage != null) {
+                LaunchedEffect("error-toast") {
+                    Toast.makeText(
+                        context,
+                        finalErrorMessage,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    navController.popBackStack()
+                }
+                return@composable
+            }
+
+            // Menampilkan halaman detail user
+            selectedCustomer?.let { customer ->
+                DetailUserPage(
+                    customer = customer,
+                    bookingList = bookingList,
+                    onBackClick = { navController.popBackStack() },
+                    userRole = loginViewModel.userRole,
+                    onNavigate = { navController.navigate(it.route) },
+                    onLogout = {
+                        loginViewModel.clearLoginState()
+                        mainViewModel.logout()
+                        navController.navigate(Screen.Login.route) { popUpTo(0) }
                     }
-                }
-
-                selectedCustomer != null -> {
-                    DetailUserPage(
-                        customer = selectedCustomer!!,
-                        bookingList = bookingList,
-                        onBackClick = { navController.popBackStack() },
-                        userRole = loginViewModel.userRole,
-                        onNavigate = { navController.navigate(it.route) },
-                        onLogout = {
-                            loginViewModel.clearLoginState()
-                            mainViewModel.logout()
-                            navController.navigate(Screen.Login.route) { popUpTo(0) }
-                        }
-                    )
-                }
-
-                else -> {
-                    if (customerError != null || bookingError != null) {
-                        LaunchedEffect("error-toast") {
-                            Toast.makeText(
-                                context,
-                                customerError ?: bookingError ?: "Terjadi kesalahan",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            navController.popBackStack()
-                        }
-                    }
-                }
+                )
             }
         }
 

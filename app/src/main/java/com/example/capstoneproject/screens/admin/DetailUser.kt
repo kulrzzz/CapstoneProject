@@ -148,9 +148,7 @@ fun BookingHistoryTable(
                     color = Color.Gray
                 )
             } else {
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+                LazyColumn(modifier = Modifier.fillMaxWidth()) {
                     items(bookingList) { booking ->
                         BookingRow(booking = booking, textSize = textSize)
                     }

@@ -49,7 +49,7 @@ class BookingViewModel : ViewModel() {
     }
 
     /**
-     * Ambil booking milik satu customer dari /api/booking/detail/{customer_id}
+     * Ambil booking milik satu customer dari /api/booking/customer/{customer_id}
      */
     fun fetchBookingsByCustomerId(customerId: String, accessToken: String = token) {
         viewModelScope.launch {
@@ -57,9 +57,9 @@ class BookingViewModel : ViewModel() {
             errorMessage = null
             try {
                 val response = ApiClient.bookingService.getBookingsByCustomerId(customerId, accessToken)
-                _userBookings.value = response
+                _userBookings.value = response.booking // <--- Perubahan di sini
             } catch (e: Exception) {
-                errorMessage = "Gagal memuat riwayat transaksi user: ${e.localizedMessage ?: e.message}"
+                errorMessage = "Gagal memuat transaksi user: ${e.localizedMessage}"
                 _userBookings.value = emptyList()
             } finally {
                 isLoading = false
