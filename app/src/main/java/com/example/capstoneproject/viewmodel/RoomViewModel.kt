@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.capstoneproject.model.facility.*
 import com.example.capstoneproject.model.room.*
 import com.example.capstoneproject.network.ApiClient
+import kotlinx.coroutines.delay
 import com.example.capstoneproject.network.FacilityService
 import com.example.capstoneproject.network.RoomImageService
 import com.example.capstoneproject.network.RoomService
@@ -50,18 +51,29 @@ class RoomViewModel(private val token: String) : ViewModel() {
         _roomDetail.value = null
     }
 
-    fun fetchRooms() {
-        launchWithLoading {
-            try {
-                clearMessages()
-                val response = roomService.getAllRooms(token)
-                _roomList.apply {
-                    clear()
-                    addAll(response.data)
+    fun fetchRooms(retryCount: Int = 3) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMessage.value = null
+
+            repeat(retryCount) { attempt ->
+                try {
+                    val result = ApiClient.roomService.getAllRooms(token)
+                    _roomList.clear()
+                    _roomList.addAll(result)
+                    _isLoading.value = false
+                    return@launch
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    if (attempt == retryCount - 1) {
+                        _errorMessage.value = "Gagal memuat data ruangan: ${e.localizedMessage}"
+                    } else {
+                        delay(500) // Coba lagi setelah jeda
+                    }
                 }
-            } catch (e: Exception) {
-                setError("Gagal mengambil data ruangan", e)
             }
+
+            _isLoading.value = false
         }
     }
 

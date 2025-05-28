@@ -11,7 +11,7 @@ interface RoomService {
     @GET("api/room/all")
     suspend fun getAllRooms(
         @Query("access_token") token: String
-    ): RoomResponse
+    ): List<Room>
 
     // 📄 GET Detail Ruangan (termasuk image + facility)
     @GET("api/room/detail/{room_id}")

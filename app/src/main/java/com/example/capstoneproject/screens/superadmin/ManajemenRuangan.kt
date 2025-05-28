@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -97,10 +98,10 @@ fun ManajemenRuanganPage(
                             .padding(vertical = 12.dp, horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TableHeaderCell("No", 50.dp, textSize, headerTextColor)
-                        TableHeaderCell("Nama Ruangan", 180.dp, textSize, headerTextColor)
-                        TableHeaderCell("Kategori", 180.dp, textSize, headerTextColor)
-                        TableHeaderCell("Status", 100.dp, textSize, headerTextColor)
+                        TableHeaderCell("No", 75.dp, textSize, headerTextColor)
+                        TableHeaderCell("Nama Ruangan", 240.dp, textSize, headerTextColor)
+                        TableHeaderCell("Kategori", 120.dp, textSize, headerTextColor)
+                        TableHeaderCell("Status", 120.dp, textSize, headerTextColor)
                         TableHeaderCell("Actions", 120.dp, textSize, headerTextColor)
                     }
 
@@ -135,8 +136,6 @@ fun RoomRow(
     onDelete: () -> Unit,
     onToggleAvailability: (Boolean) -> Unit
 ) {
-    var isAvailable by remember(room.room_id) { mutableStateOf(room.room_available == 1) }
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -148,50 +147,117 @@ fun RoomRow(
             text = no.toString(),
             fontSize = textSize,
             textAlign = TextAlign.Center,
-            modifier = Modifier.width(50.dp)
+            modifier = Modifier
+                .width(36.dp)
+                .wrapContentWidth(Alignment.CenterHorizontally)
         )
 
         Text(
-            text = room.room_name.orEmpty(),
+            text = room.room_name,
             fontSize = textSize,
-            modifier = Modifier.width(180.dp)
+            modifier = Modifier
+                .width(240.dp)
+                .padding(start = 48.dp)
         )
 
         Text(
-            text = room.room_kategori.orEmpty(),
+            text = room.room_kategori,
             fontSize = textSize,
-            modifier = Modifier.width(180.dp)
+            modifier = Modifier
+                .width(126.dp)
+                .padding(start = 48.dp)
         )
 
-        Switch(
-            checked = isAvailable,
-            onCheckedChange = {
-                isAvailable = it
-                onToggleAvailability(it)
-            },
-            modifier = Modifier.width(100.dp)
-        )
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.width(120.dp)
+        Box(
+            modifier = Modifier
+                .width(120.dp)
+                .height(48.dp)
+                .wrapContentWidth(Alignment.CenterHorizontally),
+            contentAlignment = Alignment.Center
         ) {
-            IconButton(onClick = onEdit) {
-                Icon(
-                    painter = painterResource(id = R.drawable.edit),
-                    contentDescription = "Edit",
-                    tint = Color(0xFF1570EF),
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-            IconButton(onClick = onDelete) {
-                Icon(
-                    painter = painterResource(id = R.drawable.trash),
-                    contentDescription = "Delete",
-                    tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(20.dp)
-                )
+            Box(
+                modifier = Modifier
+                    .size(14.dp)
+                    .background(
+                        color = if (room.room_available == 1) Color.Green else Color.Red,
+                        shape = RoundedCornerShape(percent = 50)
+                    )
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .width(160.dp)
+                .fillMaxHeight(),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onEdit) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.edit),
+                        contentDescription = "Edit",
+                        tint = Color(0xFF1570EF),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.trash),
+                        contentDescription = "Delete",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
         }
+    }
+}
+
+@Preview(showBackground = true, widthDp = 1000, heightDp = 600)
+@Composable
+fun ManajemenRuanganPagePreview() {
+    val dummyRooms = listOf(
+        Room(
+            room_id = "1",
+            room_name = "A 1.1",
+            room_desc = "Ruangan 5x8 m",
+            room_kategori = "Lantai 1",
+            room_capacity = 12,
+            room_price = 50000,
+            room_available = 0,
+            room_start = "08:00",
+            room_end = "20:00",
+            created_at = "2025-05-28T14:00:00Z",
+            updated_at = "2025-05-28T14:00:00Z"
+        ),
+        Room(
+            room_id = "2",
+            room_name = "F 3.2",
+            room_desc = "Ruang Kelas dengan fasilitas lengkap",
+            room_kategori = "Lantai 3",
+            room_capacity = 30,
+            room_price = 550000,
+            room_available = 1,
+            room_start = "08:00",
+            room_end = "11:30",
+            created_at = "2025-05-28T14:00:00Z",
+            updated_at = "2025-05-28T14:00:00Z"
+        )
+    )
+
+    Surface {
+        ManajemenRuanganPage(
+            userRole = "superadmin",
+            roomList = dummyRooms,
+            onTambahRuanganClick = {},
+            onEditRoom = {},
+            onDeleteRoom = {},
+            onToggleAvailability = { _, _ -> },
+            onNavigate = {},
+            onLogout = {}
+        )
     }
 }

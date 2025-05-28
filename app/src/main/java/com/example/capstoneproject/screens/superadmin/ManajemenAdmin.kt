@@ -13,6 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -133,7 +134,6 @@ fun ManajemenAdminPage(
 
                     else -> {
                         Column {
-                            // Header Tabel
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -208,26 +208,32 @@ fun AdminRow(
                 .padding(start = 48.dp)
         )
 
-        Row(
+        Box(
             modifier = Modifier
-                .width(120.dp)
-                .padding(start = 26.dp)
+                .width(160.dp)
+                .fillMaxHeight(),
+            contentAlignment = Alignment.Center
         ) {
-            IconButton(onClick = onEdit) {
-                Icon(
-                    painter = painterResource(id = R.drawable.edit),
-                    contentDescription = "Edit",
-                    tint = Color(0xFF1570EF),
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-            IconButton(onClick = onDelete) {
-                Icon(
-                    painter = painterResource(id = R.drawable.trash),
-                    contentDescription = "Delete",
-                    tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(20.dp)
-                )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onEdit) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.edit),
+                        contentDescription = "Edit",
+                        tint = Color(0xFF1570EF),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.trash),
+                        contentDescription = "Delete",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
             }
         }
     }
