@@ -2,9 +2,12 @@ package com.example.capstoneproject.screens.admin
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -14,11 +17,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.capstoneproject.R
 import com.example.capstoneproject.model.booking.BookingDetail
 import com.example.capstoneproject.model.customer.Customer
 import com.example.capstoneproject.navigation.Screen
@@ -54,17 +59,18 @@ fun DetailUserPage(
                 .fillMaxSize()
                 .padding(24.dp)
         ) {
+            Spacer(modifier = Modifier.height(25.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = onBackClick) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        painter = painterResource(id = R.drawable.back),
                         contentDescription = "Kembali",
                         tint = Color(0xFFFF9800)
                     )
                 }
                 Text(
                     text = "Detail User",
-                    fontSize = 24.sp,
+                    fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF04A5D4),
                     modifier = Modifier.padding(start = 8.dp)
@@ -91,12 +97,12 @@ fun UserInfoCard(customer: Customer) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, Color(0xFFFF9800)),
+        border = BorderStroke(1.dp, Color.Gray),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -108,8 +114,8 @@ fun UserInfoCard(customer: Customer) {
                     .padding(end = 16.dp)
             )
             Column {
-                InfoText(label = "Nama", value = customer.customer_fullname)
-                InfoText(label = "Email", value = customer.customer_email)
+                InfoText(label = "Nama  ", value = customer.customer_fullname)
+                InfoText(label = "Email   ", value = customer.customer_email)
             }
         }
     }
@@ -121,24 +127,30 @@ fun BookingHistoryTable(
     textSize: androidx.compose.ui.unit.TextUnit,
     headerTextColor: Color
 ) {
+    val scrollState = rememberScrollState()
     Card(
         modifier = Modifier.fillMaxSize(),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
-        Column(modifier = Modifier.padding(12.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(scrollState)
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color(0xFFE0E0E0))
-                    .padding(vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(vertical = 15.dp, horizontal = 15.dp),
+                horizontalArrangement = Arrangement.Start
             ) {
-                TableHeader("Kode Booking", 100.dp, textSize, headerTextColor)
-                TableHeader("Nama Gedung", 120.dp, textSize, headerTextColor)
-                TableHeader("Tanggal", 100.dp, textSize, headerTextColor)
-                TableHeader("Waktu", 100.dp, textSize, headerTextColor)
-                TableHeader("Nominal", 100.dp, textSize, headerTextColor)
+                TableHeader("No", 60.dp, textSize, headerTextColor)
+                TableHeader("Kode Booking", 180.dp, textSize, headerTextColor)
+                TableHeader("Nama Gedung", 180.dp, textSize, headerTextColor)
+                TableHeader("Tanggal", 180.dp, textSize, headerTextColor)
+                TableHeader("Waktu", 200.dp, textSize, headerTextColor)
+                TableHeader("Nominal", 230.dp, textSize, headerTextColor)
             }
 
             if (bookingList.isEmpty()) {
@@ -148,31 +160,71 @@ fun BookingHistoryTable(
                     color = Color.Gray
                 )
             } else {
-                LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                    items(bookingList) { booking ->
-                        BookingRow(booking = booking, textSize = textSize)
+                LazyColumn {
+                    itemsIndexed(bookingList) { index, booking ->
+                        BookingRow(
+                            no = index + 1,
+                            booking = booking,
+                            textSize = textSize
+                        )
                     }
                 }
+
             }
         }
     }
 }
 
 @Composable
-fun BookingRow(booking: BookingDetail, textSize: androidx.compose.ui.unit.TextUnit) {
-    val rowBg = Color.White
+fun BookingRow(
+    no: Int,
+    booking: BookingDetail,
+    textSize: androidx.compose.ui.unit.TextUnit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(rowBg)
-            .padding(vertical = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+            .background(if (no % 2 == 0) Color(0xFFF8FAFF) else Color.White)
+            .padding(horizontal = 23.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        TableCell(booking.booking_code.toString(), 100.dp, textSize)
-        TableCell(booking.room_name, 120.dp, textSize)
-        TableCell(booking.booking_date, 100.dp, textSize)
-        TableCell("${booking.booking_start} - ${booking.booking_end}", 100.dp, textSize)
-        TableCell(formatCurrency(booking.booking_price), 100.dp, textSize)
+        Text(
+            text = no.toString(),
+            fontSize = textSize,
+            textAlign = TextAlign.Start,
+            modifier = Modifier.width(60.dp)
+        )
+
+        Text(
+            text = booking.booking_code.orEmpty(),
+            fontSize = textSize,
+            textAlign = TextAlign.Start,
+            modifier = Modifier.width(180.dp)
+        )
+
+        Text(
+            text = booking.room_name.orEmpty(),
+            fontSize = textSize,
+            modifier = Modifier.width(165.dp)
+        )
+
+        Text(
+            text = booking.booking_date.orEmpty(),
+            fontSize = textSize,
+            modifier = Modifier.width(160.dp)
+        )
+
+        Text(
+            text = "${booking.booking_start} - ${booking.booking_end}",
+            fontSize = textSize,
+            modifier = Modifier.width(210.dp)
+        )
+
+        Text(
+            text = formatCurrency(booking.booking_price),
+            fontSize = textSize,
+            modifier = Modifier.width(240.dp)
+        )
     }
 }
 
@@ -184,7 +236,7 @@ fun TableHeader(text: String, width: Dp, fontSize: androidx.compose.ui.unit.Text
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier.width(width),
         color = color,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Start
     )
 }
 
@@ -208,8 +260,10 @@ fun TableCell(
 
 @Composable
 fun InfoText(label: String, value: String) {
-    Row(modifier = Modifier.padding(vertical = 4.dp)) {
-        Text(text = "$label:", modifier = Modifier.width(140.dp), fontWeight = FontWeight.Medium)
+    Row(
+        modifier = Modifier.padding(vertical = 2.dp)
+    ) {
+        Text(text = "  $label:   ", modifier = Modifier.width(100.dp), fontWeight = FontWeight.Medium)
         Text(text = value)
     }
 }
