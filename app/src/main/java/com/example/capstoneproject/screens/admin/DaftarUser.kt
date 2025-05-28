@@ -40,14 +40,14 @@ fun DaftarUserPage(
     val deleteSuccess by viewModel.deleteSuccess
     val context = LocalContext.current
 
-    // Fetch data only once on launch
-    LaunchedEffect(key1 = true) {
+    // Fetch customer list on load
+    LaunchedEffect(Unit) {
         if (customerList.isEmpty() && !isLoading) {
             viewModel.fetchCustomers(BuildConfig.API_ACCESS_TOKEN)
         }
     }
 
-    // Show toast when deletion is successful
+    // Show toast on delete success
     LaunchedEffect(deleteSuccess) {
         if (deleteSuccess == true) {
             Toast.makeText(context, "User dihapus", Toast.LENGTH_SHORT).show()
@@ -92,10 +92,9 @@ fun DaftarUserPage(
                     }
 
                     customerList.isEmpty() && !isLoading -> {
-                        Row(
+                        Box(
                             modifier = Modifier.fillMaxSize(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
+                            contentAlignment = Alignment.Center
                         ) {
                             AssistChip(
                                 onClick = {},
@@ -116,7 +115,18 @@ fun DaftarUserPage(
                                 DaftarUserCard(
                                     nama = customer.customer_fullname,
                                     email = customer.customer_email,
-                                    onClick = { onUserSelected(customer.customer_id) },
+                                    onClick = {
+                                        // Navigasi hanya jika customer ID tidak kosong
+                                        if (customer.customer_id.isNotBlank()) {
+                                            onUserSelected(customer.customer_id)
+                                        } else {
+                                            Toast.makeText(
+                                                context,
+                                                "ID user tidak ditemukan.",
+                                                Toast.LENGTH_SHORT
+                                            ).show()
+                                        }
+                                    },
                                     onDelete = {
                                         viewModel.deleteCustomer(
                                             accessToken = BuildConfig.API_ACCESS_TOKEN,

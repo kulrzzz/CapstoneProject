@@ -10,7 +10,7 @@ sealed class Screen(val route: String) {
     // Admin-only Screens
     object RiwayatTransaksi : Screen("riwayat_transaksi")
     object DaftarUser : Screen("daftar_user")
-    object DetailUser : Screen("detail_user") // Diperlukan karena ada di folder admin
+    object DetailUser : Screen("detail_user/{userId}")
 
     // Root-only Screens (akses penuh termasuk fitur admin)
     object ManajemenAdmin : Screen("manajemen_admin")

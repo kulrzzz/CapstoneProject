@@ -7,6 +7,7 @@ import retrofit2.http.Query
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.HTTP
+import retrofit2.http.Path
 
 interface CustomerService {
     @GET("api/customer/all")
@@ -18,4 +19,10 @@ interface CustomerService {
     suspend fun deleteCustomer(
         @Body body: CustomerDeleteRequest
     ): Response<Void>
+
+    @GET("api/customer/detail/{id}")
+    suspend fun getCustomerDetail(
+        @Path("id") customerId: String,
+        @Query("access_token") accessToken: String
+    ): Customer
 }

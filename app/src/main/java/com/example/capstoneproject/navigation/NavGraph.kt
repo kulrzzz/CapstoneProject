@@ -1,6 +1,7 @@
 package com.example.capstoneproject.navigation
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -9,11 +10,16 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.capstoneproject.BuildConfig
+import com.example.capstoneproject.model.booking.BookingDetail
 import com.example.capstoneproject.viewmodel.*
 import com.example.capstoneproject.screens.admin.*
 import com.example.capstoneproject.screens.dashboard.DashboardScreen
 import com.example.capstoneproject.screens.login.AnimatedLoginPage
 import com.example.capstoneproject.screens.superadmin.*
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.material3.CircularProgressIndicator
 
 @Composable
 fun AppNavGraph(
@@ -109,23 +115,47 @@ fun AppNavGraph(
 
         composable("detail_user/{userId}") { backStackEntry ->
             val userId = backStackEntry.arguments?.getString("userId")
-            val customerViewModel: CustomerViewModel = hiltViewModel()
+            val context = LocalContext.current
 
-            if (userId != null) {
-                LaunchedEffect(Unit) {
-                    if (customerViewModel.customerList.isEmpty()) {
-                        customerViewModel.fetchCustomers(BuildConfig.API_ACCESS_TOKEN)
+            val customerViewModel: CustomerViewModel = hiltViewModel()
+            val selectedCustomer by customerViewModel.selectedCustomer
+            val isCustomerLoading by customerViewModel.isLoading
+            val customerError by customerViewModel.errorMessage
+
+            val bookingList by bookingViewModel.userBookings
+            val isBookingLoading = bookingViewModel.isLoading
+            val bookingError = bookingViewModel.errorMessage
+
+            var isDataLoaded by remember { mutableStateOf(false) }
+
+            // Fetch data user dan booking saat pertama kali tampil
+            LaunchedEffect(key1 = userId) {
+                if (!userId.isNullOrEmpty() && !isDataLoaded) {
+                    isDataLoaded = true
+                    customerViewModel.fetchCustomerById(userId, BuildConfig.API_ACCESS_TOKEN)
+                    bookingViewModel.fetchBookingsByCustomerId(userId, BuildConfig.API_ACCESS_TOKEN)
+                }
+            }
+
+            when {
+                userId.isNullOrEmpty() -> {
+                    LaunchedEffect("empty-id") {
+                        navController.navigate(Screen.DaftarUser.route) {
+                            popUpTo(Screen.DaftarUser.route) { inclusive = true }
+                        }
                     }
-                    if (bookingViewModel.allBookings.isEmpty()) bookingViewModel.fetchAllBookings()
                 }
 
-                val customer = customerViewModel.customerList.find { it.customer_id == userId }
-                val bookings = bookingViewModel.getBookingsByCustomerId(userId)
+                isCustomerLoading || isBookingLoading -> {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
 
-                if (customer != null) {
+                selectedCustomer != null -> {
                     DetailUserPage(
-                        customer = customer,
-                        bookingList = bookings,
+                        customer = selectedCustomer!!,
+                        bookingList = bookingList,
                         onBackClick = { navController.popBackStack() },
                         userRole = loginViewModel.userRole,
                         onNavigate = { navController.navigate(it.route) },
@@ -135,16 +165,18 @@ fun AppNavGraph(
                             navController.navigate(Screen.Login.route) { popUpTo(0) }
                         }
                     )
-                } else {
-                    LaunchedEffect(Unit) {
-                        navController.popBackStack()
-                        Toast.makeText(context, "Data user tidak ditemukan", Toast.LENGTH_SHORT).show()
-                    }
                 }
-            } else {
-                LaunchedEffect(Unit) {
-                    navController.navigate(Screen.DaftarUser.route) {
-                        popUpTo(Screen.DaftarUser.route) { inclusive = true }
+
+                else -> {
+                    if (customerError != null || bookingError != null) {
+                        LaunchedEffect("error-toast") {
+                            Toast.makeText(
+                                context,
+                                customerError ?: bookingError ?: "Terjadi kesalahan",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            navController.popBackStack()
+                        }
                     }
                 }
             }

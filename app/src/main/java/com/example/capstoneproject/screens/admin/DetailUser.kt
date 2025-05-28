@@ -16,11 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.capstoneproject.model.booking.Booking
+import com.example.capstoneproject.model.booking.BookingDetail
 import com.example.capstoneproject.model.customer.Customer
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
@@ -30,7 +29,7 @@ import java.util.*
 @Composable
 fun DetailUserPage(
     customer: Customer,
-    bookingList: List<Booking>,
+    bookingList: List<BookingDetail>,
     userRole: String?,
     onBackClick: () -> Unit = {},
     onNavigate: (Screen) -> Unit = {},
@@ -74,66 +73,86 @@ fun DetailUserPage(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                border = BorderStroke(1.dp, Color(0xFFFF9800)),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-                elevation = CardDefaults.cardElevation(4.dp)
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AccountCircle,
-                        contentDescription = null,
-                        tint = Color(0xFF2196F3),
-                        modifier = Modifier
-                            .size(48.dp)
-                            .padding(end = 16.dp)
-                    )
-                    Column {
-                        InfoText(label = "Nama Lengkap", value = customer.customer_fullname)
-                        InfoText(label = "Email", value = customer.customer_email)
-                    }
-                }
-            }
+            UserInfoCard(customer = customer)
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            Card(
-                modifier = Modifier.fillMaxSize(),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+            BookingHistoryTable(
+                bookingList = bookingList,
+                textSize = textSize,
+                headerTextColor = headerTextColor
+            )
+        }
+    }
+}
+
+@Composable
+fun UserInfoCard(customer: Customer) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
+        border = BorderStroke(1.dp, Color(0xFFFF9800)),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.AccountCircle,
+                contentDescription = null,
+                tint = Color(0xFF2196F3),
+                modifier = Modifier
+                    .size(48.dp)
+                    .padding(end = 16.dp)
+            )
+            Column {
+                InfoText(label = "Nama", value = customer.customer_fullname)
+                InfoText(label = "Email", value = customer.customer_email)
+            }
+        }
+    }
+}
+
+@Composable
+fun BookingHistoryTable(
+    bookingList: List<BookingDetail>,
+    textSize: androidx.compose.ui.unit.TextUnit,
+    headerTextColor: Color
+) {
+    Card(
+        modifier = Modifier.fillMaxSize(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFE0E0E0))
+                    .padding(vertical = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(0xFFE0E0E0))
-                            .padding(vertical = 12.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        TableHeader("Kode Booking", 100.dp, textSize, headerTextColor)
-                        TableHeader("Nama Gedung", 120.dp, textSize, headerTextColor)
-                        TableHeader("Tanggal", 100.dp, textSize, headerTextColor)
-                        TableHeader("Waktu", 100.dp, textSize, headerTextColor)
-                        TableHeader("Nominal", 100.dp, textSize, headerTextColor)
-                    }
+                TableHeader("Kode Booking", 100.dp, textSize, headerTextColor)
+                TableHeader("Nama Gedung", 120.dp, textSize, headerTextColor)
+                TableHeader("Tanggal", 100.dp, textSize, headerTextColor)
+                TableHeader("Waktu", 100.dp, textSize, headerTextColor)
+                TableHeader("Nominal", 100.dp, textSize, headerTextColor)
+            }
 
-                    LazyColumn {
-                        items(bookingList) { booking ->
-                            TableRow(booking = booking, textSize = textSize)
-                        }
-                    }
-
-                    if (bookingList.isEmpty()) {
-                        Text(
-                            text = "Belum ada riwayat peminjaman.",
-                            modifier = Modifier.padding(16.dp),
-                            color = Color.Gray
-                        )
+            if (bookingList.isEmpty()) {
+                Text(
+                    text = "Belum ada riwayat peminjaman.",
+                    modifier = Modifier.padding(16.dp),
+                    color = Color.Gray
+                )
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(bookingList) { booking ->
+                        BookingRow(booking = booking, textSize = textSize)
                     }
                 }
             }
@@ -142,10 +161,20 @@ fun DetailUserPage(
 }
 
 @Composable
-fun InfoText(label: String, value: String) {
-    Row(modifier = Modifier.padding(vertical = 4.dp)) {
-        Text(text = "$label:", modifier = Modifier.width(140.dp), fontWeight = FontWeight.Medium)
-        Text(text = value)
+fun BookingRow(booking: BookingDetail, textSize: androidx.compose.ui.unit.TextUnit) {
+    val rowBg = Color.White
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(rowBg)
+            .padding(vertical = 10.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        TableCell(booking.booking_code.toString(), 100.dp, textSize)
+        TableCell(booking.room_name, 120.dp, textSize)
+        TableCell(booking.booking_date, 100.dp, textSize)
+        TableCell("${booking.booking_start} - ${booking.booking_end}", 100.dp, textSize)
+        TableCell(formatCurrency(booking.booking_price), 100.dp, textSize)
     }
 }
 
@@ -159,24 +188,6 @@ fun TableHeader(text: String, width: Dp, fontSize: androidx.compose.ui.unit.Text
         color = color,
         textAlign = TextAlign.Center
     )
-}
-
-@Composable
-fun TableRow(booking: Booking, textSize: androidx.compose.ui.unit.TextUnit) {
-    val rowBg = Color.White
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(rowBg)
-            .padding(vertical = 10.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        TableCell(booking.booking_code.toString(), 100.dp, textSize)
-        TableCell(booking.room_id, 120.dp, textSize)
-        TableCell(booking.booking_date, 100.dp, textSize)
-        TableCell("${booking.booking_start} - ${booking.booking_end}", 100.dp, textSize)
-        TableCell(formatCurrency(booking.booking_price), 100.dp, textSize)
-    }
 }
 
 @Composable
@@ -195,6 +206,14 @@ fun TableCell(
             .padding(horizontal = 4.dp),
         maxLines = 1
     )
+}
+
+@Composable
+fun InfoText(label: String, value: String) {
+    Row(modifier = Modifier.padding(vertical = 4.dp)) {
+        Text(text = "$label:", modifier = Modifier.width(140.dp), fontWeight = FontWeight.Medium)
+        Text(text = value)
+    }
 }
 
 fun formatCurrency(amount: Long): String {
