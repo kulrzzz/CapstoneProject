@@ -72,10 +72,10 @@ fun DaftarUserPage(
                 .padding(24.dp)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                Spacer(modifier = Modifier.height(25.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
                 Text(
-                    text = "Lihat Daftar User",
+                    text = "Daftar User",
                     fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF04A5D4),
@@ -159,10 +159,9 @@ fun DaftarUserCard(
 ) {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
-        border = BorderStroke(1.dp, Color(0xFFFF9800)),
+        border = BorderStroke(1.dp, Color.Gray),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
@@ -181,24 +180,27 @@ fun DaftarUserCard(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text("Nama  : $nama")
-                Text("Email  : $email")
+                Text("Email   : $email")
             }
 
             IconButton(onClick = onClick) {
                 Icon(
-                    painter = painterResource(id = R.drawable.daftaruserafter),
+                    painter = painterResource(id = R.drawable.edit),
                     contentDescription = "Lihat Detail",
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
+                    tint = Color(0xFF1570EF),
+                    modifier = Modifier.size(25.dp)
                 )
             }
 
-            IconButton(onClick = onDelete) {
+            IconButton(
+//                onClick = onDelete
+                onClick = {/*todo*/}
+            ) {
                 Icon(
                     painter = painterResource(id = R.drawable.trash),
                     contentDescription = "Delete",
                     tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(23.dp)
                 )
             }
         }
