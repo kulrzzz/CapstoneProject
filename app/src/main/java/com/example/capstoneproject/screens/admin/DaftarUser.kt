@@ -15,12 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.capstoneproject.BuildConfig
-import com.example.capstoneproject.model.customer.Customer
+import com.example.capstoneproject.R
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
 import com.example.capstoneproject.viewmodel.CustomerViewModel
@@ -36,15 +37,21 @@ fun DaftarUserPage(
     val customerList by remember { derivedStateOf { viewModel.customerList } }
     val isLoading by viewModel.isLoading
     val errorMessage by viewModel.errorMessage
+    val deleteSuccess by viewModel.deleteSuccess
     val context = LocalContext.current
 
+    // Fetch data only once on launch
     LaunchedEffect(key1 = true) {
         if (customerList.isEmpty() && !isLoading) {
-            try {
-                viewModel.fetchCustomers(BuildConfig.API_ACCESS_TOKEN)
-            } catch (e: Exception) {
-                viewModel.setError("Gagal memuat data: ${e.localizedMessage ?: "Unknown Error"}")
-            }
+            viewModel.fetchCustomers(BuildConfig.API_ACCESS_TOKEN)
+        }
+    }
+
+    // Show toast when deletion is successful
+    LaunchedEffect(deleteSuccess) {
+        if (deleteSuccess == true) {
+            Toast.makeText(context, "User dihapus", Toast.LENGTH_SHORT).show()
+            viewModel.resetDeleteState()
         }
     }
 
@@ -59,63 +66,75 @@ fun DaftarUserPage(
             onLogout = onLogout
         )
 
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(24.dp)
         ) {
-            Spacer(modifier = Modifier.height(25.dp))
+            Column(modifier = Modifier.fillMaxSize()) {
+                Spacer(modifier = Modifier.height(25.dp))
 
-            Text(
-                text = "Lihat Daftar User",
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF04A5D4),
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
+                Text(
+                    text = "Lihat Daftar User",
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF04A5D4),
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
 
-            when {
-                isLoading -> {
-                    CircularProgressIndicator(color = Color(0xFF04A5D4))
-                }
-                errorMessage != null -> {
-                    Text(
-                        text = errorMessage ?: "Terjadi kesalahan.",
-                        color = Color.Red,
-                        fontSize = 16.sp
-                    )
-                }
-                customerList.isEmpty() -> {
-                    Row(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        AssistChip(
-                            onClick = {},
-                            label = { Text("Data user tidak ditemukan") },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Default.AccountCircle,
-                                    contentDescription = null
-                                )
-                            }
+                when {
+                    errorMessage != null -> {
+                        Text(
+                            text = errorMessage ?: "Terjadi kesalahan.",
+                            color = Color.Red,
+                            fontSize = 16.sp
                         )
                     }
-                }
-                else -> {
-                    LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                        items(customerList) { customer ->
-                            DaftarUserCard(
-                                nama = customer.customer_fullname,
-                                email = customer.customer_email,
-                                onClick = {
-                                    onUserSelected(customer.customer_id)
+
+                    customerList.isEmpty() && !isLoading -> {
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            AssistChip(
+                                onClick = {},
+                                label = { Text("Data user tidak ditemukan") },
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.daftaruser),
+                                        contentDescription = null
+                                    )
                                 }
                             )
                         }
                     }
+
+                    else -> {
+                        LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                            items(customerList) { customer ->
+                                DaftarUserCard(
+                                    nama = customer.customer_fullname,
+                                    email = customer.customer_email,
+                                    onClick = { onUserSelected(customer.customer_id) },
+                                    onDelete = {
+                                        viewModel.deleteCustomer(
+                                            accessToken = BuildConfig.API_ACCESS_TOKEN,
+                                            customerId = customer.customer_id
+                                        )
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
+            }
+
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = Color(0xFF04A5D4),
+                    modifier = Modifier.align(Alignment.Center)
+                )
             }
         }
     }
@@ -125,7 +144,8 @@ fun DaftarUserPage(
 fun DaftarUserCard(
     nama: String,
     email: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onDelete: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -151,15 +171,25 @@ fun DaftarUserCard(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text("Nama  : $nama")
-                Text("Email : $email")
+                Text("Email  : $email")
             }
 
-            Button(
-                onClick = onClick,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE3F2FD)),
-                modifier = Modifier.padding(start = 8.dp)
-            ) {
-                Text("Lihat Detail", color = Color(0xFF90A4AE))
+            IconButton(onClick = onClick) {
+                Icon(
+                    painter = painterResource(id = R.drawable.daftaruserafter),
+                    contentDescription = "Lihat Detail",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
+            IconButton(onClick = onDelete) {
+                Icon(
+                    painter = painterResource(id = R.drawable.trash),
+                    contentDescription = "Delete",
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(20.dp)
+                )
             }
         }
     }

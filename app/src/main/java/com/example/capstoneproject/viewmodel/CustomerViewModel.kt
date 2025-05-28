@@ -5,9 +5,12 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.capstoneproject.model.customer.Customer
+import com.example.capstoneproject.model.customer.CustomerDeleteRequest
 import com.example.capstoneproject.network.ApiClient
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
+import java.io.IOException
 
 class CustomerViewModel : ViewModel() {
 
@@ -19,6 +22,9 @@ class CustomerViewModel : ViewModel() {
 
     private val _errorMessage = mutableStateOf<String?>(null)
     val errorMessage: State<String?> get() = _errorMessage
+
+    private val _deleteSuccess = mutableStateOf<Boolean?>(null)
+    val deleteSuccess: State<Boolean?> get() = _deleteSuccess
 
     fun fetchCustomers(token: String, retryCount: Int = 3) {
         viewModelScope.launch {
@@ -46,6 +52,29 @@ class CustomerViewModel : ViewModel() {
         }
     }
 
+    fun deleteCustomer(accessToken: String, customerId: String) {
+        viewModelScope.launch {
+            _errorMessage.value = null
+            _deleteSuccess.value = null
+
+            try {
+                val response = ApiClient.customerService.deleteCustomer(
+                    CustomerDeleteRequest(access_token = accessToken, customer_id = customerId)
+                )
+                if (response.isSuccessful) {
+                    _customerList.removeAll { it.customer_id == customerId }
+                    _deleteSuccess.value = true
+                } else {
+                    _errorMessage.value = "Gagal menghapus user: ${response.code()}"
+                    _deleteSuccess.value = false
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = "Error: ${e.localizedMessage}"
+                _deleteSuccess.value = false
+            }
+        }
+    }
+
     fun refreshCustomers(token: String) {
         fetchCustomers(token)
     }
@@ -56,5 +85,9 @@ class CustomerViewModel : ViewModel() {
 
     fun setError(message: String) {
         _errorMessage.value = message
+    }
+
+    fun resetDeleteState() {
+        _deleteSuccess.value = null
     }
 }
