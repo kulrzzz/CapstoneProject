@@ -40,6 +40,15 @@ fun DaftarUserPage(
     val deleteSuccess by viewModel.deleteSuccess
     val context = LocalContext.current
 
+    // 🔍 Search query state
+    var searchQuery by remember { mutableStateOf("") }
+
+    // 🔍 Filtered list based on search query
+    val filteredCustomerList = customerList.filter {
+        it.customer_fullname.contains(searchQuery, ignoreCase = true) ||
+                it.customer_email.contains(searchQuery, ignoreCase = true)
+    }
+
     // Fetch customer list on load
     LaunchedEffect(Unit) {
         if (customerList.isEmpty() && !isLoading) {
@@ -72,15 +81,52 @@ fun DaftarUserPage(
                 .padding(24.dp)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                Text(
-                    text = "Daftar User",
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF04A5D4),
-                    modifier = Modifier.padding(bottom = 24.dp)
-                )
+                // 🔍 Title + Search Row
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Daftar User",
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF04A5D4),
+                    )
+
+                    // 🔍 Search TextField
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = {
+                            Text(
+                                text = "Cari nama atau email...",
+                                color = Color(0xFF94A3B8) // Abu muda
+                            )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.search),
+                                contentDescription = "Search Icon",
+                                tint = Color(0xFF1E3A8A)
+                            )
+                        },
+                        singleLine = true,
+                        shape = RoundedCornerShape(100.dp),
+                        modifier = Modifier
+                            .width(300.dp)
+                            .height(56.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF04A5D4),
+                            unfocusedBorderColor = Color.Gray,
+                        )
+                    )
+
+                }
 
                 when {
                     errorMessage != null -> {
@@ -91,7 +137,7 @@ fun DaftarUserPage(
                         )
                     }
 
-                    customerList.isEmpty() && !isLoading -> {
+                    filteredCustomerList.isEmpty() && !isLoading -> {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
@@ -111,12 +157,11 @@ fun DaftarUserPage(
 
                     else -> {
                         LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            items(customerList) { customer ->
+                            items(filteredCustomerList) { customer ->
                                 DaftarUserCard(
                                     nama = customer.customer_fullname,
                                     email = customer.customer_email,
                                     onClick = {
-                                        // Navigasi hanya jika customer ID tidak kosong
                                         if (customer.customer_id.isNotBlank()) {
                                             onUserSelected(customer.customer_id)
                                         } else {
@@ -149,6 +194,7 @@ fun DaftarUserPage(
         }
     }
 }
+
 
 @Composable
 fun DaftarUserCard(

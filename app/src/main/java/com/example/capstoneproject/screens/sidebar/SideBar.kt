@@ -58,11 +58,11 @@ fun SideBar(
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.logoreservin),
+                    painter = painterResource(id = R.drawable.logo2),
                     contentDescription = "Logo",
                     modifier = Modifier.height(30.dp)
                 )
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(2.dp))
                 Image(
                     painter = painterResource(id = R.drawable.reservin3),
                     contentDescription = "Logo Text",

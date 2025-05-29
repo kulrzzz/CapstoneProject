@@ -34,7 +34,7 @@ fun ManajemenRuanganPage(
     onNavigate: (Screen) -> Unit = {},
     onLogout: () -> Unit = {}
 ) {
-    val spacing = 24.dp
+    val spacing = 20.dp
     val textSize = 14.sp
     val titleSize = 30.sp
     val headerColor = Color(0xFFF0F4FF)
@@ -99,9 +99,9 @@ fun ManajemenRuanganPage(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         TableHeaderCell("No", 75.dp, textSize, headerTextColor)
-                        TableHeaderCell("Nama Ruangan", 240.dp, textSize, headerTextColor)
+                        TableHeaderCell("Nama Ruangan", 200.dp, textSize, headerTextColor)
                         TableHeaderCell("Kategori", 120.dp, textSize, headerTextColor)
-                        TableHeaderCell("Status", 120.dp, textSize, headerTextColor)
+                        TableHeaderCell("Status", 135.dp, textSize, headerTextColor)
                         TableHeaderCell("Actions", 120.dp, textSize, headerTextColor)
                     }
 
@@ -156,7 +156,7 @@ fun RoomRow(
             text = room.room_name,
             fontSize = textSize,
             modifier = Modifier
-                .width(240.dp)
+                .width(200.dp)
                 .padding(start = 48.dp)
         )
 
@@ -164,7 +164,7 @@ fun RoomRow(
             text = room.room_kategori,
             fontSize = textSize,
             modifier = Modifier
-                .width(126.dp)
+                .width(135.dp)
                 .padding(start = 48.dp)
         )
 

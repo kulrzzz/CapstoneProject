@@ -150,7 +150,7 @@ fun BookingHistoryTable(
                 TableHeader("Nama Gedung", 180.dp, textSize, headerTextColor)
                 TableHeader("Tanggal", 180.dp, textSize, headerTextColor)
                 TableHeader("Waktu", 200.dp, textSize, headerTextColor)
-                TableHeader("Nominal", 230.dp, textSize, headerTextColor)
+                TableHeader("Nominal", 150.dp, textSize, headerTextColor)
             }
 
             if (bookingList.isEmpty()) {
@@ -192,7 +192,7 @@ fun BookingRow(
             text = no.toString(),
             fontSize = textSize,
             textAlign = TextAlign.Start,
-            modifier = Modifier.width(60.dp)
+            modifier = Modifier.width(50.dp)
         )
 
         Text(
@@ -205,7 +205,7 @@ fun BookingRow(
         Text(
             text = booking.room_name.orEmpty(),
             fontSize = textSize,
-            modifier = Modifier.width(165.dp)
+            modifier = Modifier.width(180.dp)
         )
 
         Text(
@@ -223,7 +223,7 @@ fun BookingRow(
         Text(
             text = formatCurrency(booking.booking_price),
             fontSize = textSize,
-            modifier = Modifier.width(240.dp)
+            modifier = Modifier.width(160.dp)
         )
     }
 }
