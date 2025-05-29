@@ -78,9 +78,10 @@ fun AppNavGraph(
 
         composable(Screen.RiwayatTransaksi.route) {
             LaunchedEffect(Unit) {
-                bookingViewModel.fetchAllBookings()
+                bookingViewModel.fetchRiwayatTransaksi()
             }
-            val transaksiList = bookingViewModel.allBookings ?: emptyList()
+
+            val transaksiList = bookingViewModel.bookingRiwayatItems
 
             RiwayatTransaksiPage(
                 transaksiList = transaksiList,

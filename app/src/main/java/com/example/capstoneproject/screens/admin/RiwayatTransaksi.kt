@@ -14,7 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.capstoneproject.model.booking.Booking
+import com.example.capstoneproject.model.booking.BookingRiwayatItem
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
 import com.example.capstoneproject.ui.theme.TableHeaderCell
@@ -22,7 +22,7 @@ import com.example.capstoneproject.ui.theme.TableHeaderCell
 @Composable
 fun RiwayatTransaksiPage(
     userRole: String?,
-    transaksiList: List<Booking>,
+    transaksiList: List<BookingRiwayatItem>,
     onNavigate: (Screen) -> Unit = {},
     onLogout: () -> Unit = {}
 ) {
@@ -100,7 +100,7 @@ fun RiwayatTransaksiPage(
 @Composable
 fun TransaksiRow(
     no: Int,
-    booking: Booking,
+    booking: BookingRiwayatItem,
     fontSize: TextUnit,
 ) {
     Row(
@@ -113,24 +113,23 @@ fun TransaksiRow(
         Text(
             text = no.toString(),
             fontSize = fontSize,
-//            textAlign = TextAlign.Center,
             modifier = Modifier.width(36.dp)
         )
 
         Text(
-            text = booking.booking_id,
+            text = booking.booking_code,
             fontSize = fontSize,
             modifier = Modifier.width(100.dp)
         )
 
         Text(
-            text = booking.customer_id,
+            text = booking.customer_fullname,
             fontSize = fontSize,
             modifier = Modifier.width(150.dp)
         )
 
         Text(
-            text = booking.room_id,
+            text = booking.room_name,
             fontSize = fontSize,
             modifier = Modifier.width(150.dp)
         )
@@ -140,18 +139,6 @@ fun TransaksiRow(
             fontSize = fontSize,
             modifier = Modifier.width(120.dp)
         )
-
-//        Text(
-//            text = "Rp${booking.booking_price}",
-//            fontSize = fontSize,
-//            modifier = Modifier.width(120.dp)
-//        )
-//
-//        StatusBadge(
-//            status = if (booking.booking_status == 1) "Lunas" else "Belum lunas",
-//            fontSize = fontSize,
-//            modifier = Modifier.width(120.dp)
-//        )
     }
 }
 

@@ -1,7 +1,7 @@
 package com.example.capstoneproject.model.booking
 
 data class BookingResponse(
-    val status: String,
+    val status: Boolean,
     val message: String,
-    val data: List<Booking>
+    val data: List<BookingRawItem>
 )
