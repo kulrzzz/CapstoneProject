@@ -353,11 +353,11 @@ fun TambahRuanganPage(
                                     room_start = startTime, room_end = endTime, created_at = "", updated_at = ""
                                 )
 
-                                viewModel.addRoomWithImageAndFacilities(
+                                viewModel.addRoomMultipart(
                                     room = room,
-                                    imageUri = imageUri.value,
-                                    context = context,
-                                    fasilitasList = fasilitasList
+                                    imageUris = listOfNotNull(imageUri.value),
+                                    fasilitasList = fasilitasList,
+                                    context = context
                                 ) { success ->
                                     if (success) {
                                         Toast.makeText(context, "Ruangan berhasil ditambahkan", Toast.LENGTH_SHORT).show()

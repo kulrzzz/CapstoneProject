@@ -9,9 +9,6 @@ import com.example.capstoneproject.model.facility.*
 import com.example.capstoneproject.model.room.*
 import com.example.capstoneproject.network.ApiClient
 import kotlinx.coroutines.delay
-import com.example.capstoneproject.network.FacilityService
-import com.example.capstoneproject.network.RoomImageService
-import com.example.capstoneproject.network.RoomService
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -39,7 +36,6 @@ class RoomViewModel(private val token: String) : ViewModel() {
     val successMessage: State<String?> = _successMessage
 
     private val roomService by lazy { ApiClient.roomService }
-    private val roomImageService by lazy { ApiClient.roomImageService }
     private val facilityService by lazy { ApiClient.facilityService }
 
     fun clearMessages() {
@@ -58,17 +54,16 @@ class RoomViewModel(private val token: String) : ViewModel() {
 
             repeat(retryCount) { attempt ->
                 try {
-                    val result = ApiClient.roomService.getAllRooms(token)
+                    val result = roomService.getAllRooms(token)
                     _roomList.clear()
                     _roomList.addAll(result)
                     _isLoading.value = false
                     return@launch
                 } catch (e: Exception) {
-                    e.printStackTrace()
                     if (attempt == retryCount - 1) {
                         _errorMessage.value = "Gagal memuat data ruangan: ${e.localizedMessage}"
                     } else {
-                        delay(500) // Coba lagi setelah jeda
+                        delay(500)
                     }
                 }
             }
@@ -82,68 +77,72 @@ class RoomViewModel(private val token: String) : ViewModel() {
             try {
                 clearMessages()
                 val detail = roomService.getRoomDetail(roomId, token)
-                if (detail != null) {
-                    _roomDetail.value = detail
-                } else {
-                    setError("Data ruangan tidak ditemukan", Exception("Null response"))
-                }
+                _roomDetail.value = detail ?: throw Exception("Null response")
             } catch (e: Exception) {
                 setError("Gagal mengambil detail ruangan", e)
             }
         }
     }
 
-    fun addRoomWithImageAndFacilities(
+    fun addRoomMultipart(
         room: Room,
-        imageUri: Uri?,
-        context: Context,
+        imageUris: List<Uri>,
         fasilitasList: List<String>,
+        context: Context,
         onComplete: (Boolean) -> Unit
     ) {
         launchWithLoading {
             try {
                 clearMessages()
-                val request = createRoomRequest(room, emptyList(), emptyList())
-                val response = roomService.createRoom(request)
 
-                if (response.status == "success") {
-                    val roomId = response.data?.room_id
-                    _successMessage.value = "Ruangan berhasil ditambahkan"
-                    fetchRooms()
+                val payload = FullAddRoomPayload(
+                    token = token,
+                    room_name = room.room_name,
+                    room_desc = room.room_desc,
+                    room_kategori = room.room_kategori,
+                    room_capacity = room.room_capacity,
+                    room_price = room.room_price,
+                    room_available = room.room_available,
+                    room_start = room.room_start,
+                    room_end = room.room_end,
+                    facilities = fasilitasList.map { FacilityCreatePayload(it) },
+                    imageFiles = imageUris.map { uri ->
+                        val inputStream = context.contentResolver.openInputStream(uri)
+                        val file = File.createTempFile("upload", ".jpg", context.cacheDir)
+                        val outputStream = FileOutputStream(file)
 
-                    if (roomId != null && imageUri != null) {
-                        println("🟢 Room ID created: $roomId")
-                        val imagePart = uriToMultipart(imageUri, context)
-                        val roomIdPart = createPartFromString(roomId)
-                        val tokenPart = getTokenPart()
-
-                        uploadRoomImageSafe(imagePart, roomIdPart, tokenPart) { imageSuccess ->
-                            if (!imageSuccess) {
-                                println("❌ Gagal upload gambar")
+                        inputStream?.use { input ->
+                            outputStream.use { output ->
+                                input.copyTo(output)
                             }
                         }
-                    }
 
-                    fasilitasList.forEach { fasilitas ->
-                        val request = FacilityCreateRequest(
-                            access_token = token,
-                            room_id = roomId!!,
-                            facility_name = fasilitas
-                        )
-                        addFacilityToRoom(request) { success ->
-                            if (!success) {
-                                println("❌ Gagal tambah fasilitas: $fasilitas")
-                            }
-                        }
+                        file // ✅ Return the file here
                     }
+                )
 
-                    onComplete(true)
-                } else {
-                    _errorMessage.value = "Gagal tambah ruangan"
-                    onComplete(false)
-                }
+                val (textParts, imageParts) = payload.toMultipartParts()
+
+                val response = roomService.createRoomMultipart(
+                    accessToken = textParts["access_token"]!!,
+                    roomName = textParts["room_name"]!!,
+                    roomDesc = textParts["room_desc"]!!,
+                    roomKategori = textParts["room_kategori"]!!,
+                    roomCapacity = textParts["room_capacity"]!!,
+                    roomPrice = textParts["room_price"]!!,
+                    roomAvailable = textParts["room_available"]!!,
+                    roomStart = textParts["room_start"]!!,
+                    roomEnd = textParts["room_end"]!!,
+                    facilityJson = textParts["facility"]!!,
+                    images = imageParts
+                )
+
+                _successMessage.value = "Ruangan berhasil ditambahkan"
+                fetchRooms()
+                onComplete(true)
+
             } catch (e: Exception) {
-                setError("Kesalahan saat menambahkan ruangan", e)
+                setError("Gagal menambahkan ruangan", e)
                 onComplete(false)
             }
         }
@@ -153,7 +152,18 @@ class RoomViewModel(private val token: String) : ViewModel() {
         launchWithLoading {
             try {
                 clearMessages()
-                val request = room.toUpdateRequest(token)
+                val request = RoomUpdateRequest(
+                    access_token = token,
+                    room_id = room.room_id,
+                    room_name = room.room_name,
+                    room_desc = room.room_desc,
+                    room_kategori = room.room_kategori,
+                    room_capacity = room.room_capacity,
+                    room_price = room.room_price,
+                    room_available = room.room_available,
+                    room_start = room.room_start,
+                    room_end = room.room_end
+                )
                 val result = roomService.updateRoom(request)
 
                 if (result.isSuccessful) {
@@ -236,101 +246,6 @@ class RoomViewModel(private val token: String) : ViewModel() {
             }
         }
     }
-
-    fun uploadRoomImageSafe(
-        imagePart: MultipartBody.Part,
-        roomIdPart: MultipartBody.Part,
-        tokenPart: MultipartBody.Part,
-        onResult: (Boolean) -> Unit
-    ) {
-        launchWithLoading {
-            try {
-                clearMessages()
-                println("🔥 Uploading image to server...")
-                val response = roomImageService.addRoomImageMultipart(imagePart, roomIdPart, tokenPart)
-                if (response.isSuccessful) {
-                    _successMessage.value = "Gambar berhasil diunggah"
-                    onResult(true)
-                } else {
-                    _errorMessage.value = "Gagal unggah gambar: ${response.message()}"
-                    onResult(false)
-                }
-            } catch (e: Exception) {
-                setError("Kesalahan saat unggah gambar", e)
-                onResult(false)
-            }
-        }
-    }
-
-    fun deleteRoomImage(request: RoomImageDeleteRequest, onResult: (Boolean) -> Unit) {
-        launchWithLoading {
-            try {
-                clearMessages()
-                val response = roomImageService.deleteRoomImage(request)
-                if (response.isSuccessful) {
-                    _successMessage.value = "Gambar berhasil dihapus"
-                    onResult(true)
-                } else {
-                    _errorMessage.value = "Gagal hapus gambar: ${response.message()}"
-                    onResult(false)
-                }
-            } catch (e: Exception) {
-                setError("Kesalahan saat hapus gambar", e)
-                onResult(false)
-            }
-        }
-    }
-
-    // 🔧 Helper: Buat multipart dari Uri
-    fun uriToMultipart(uri: Uri, context: Context): MultipartBody.Part {
-        val inputStream = context.contentResolver.openInputStream(uri)
-        val file = File.createTempFile("upload", ".jpg", context.cacheDir)
-        val outputStream = FileOutputStream(file)
-        inputStream?.use { input -> outputStream.use { output -> input.copyTo(output) } }
-        val requestFile = file.asRequestBody("image/*".toMediaTypeOrNull())
-        return MultipartBody.Part.createFormData("ri_image", file.name, requestFile)
-    }
-
-    fun createPartFromString(value: String): MultipartBody.Part {
-        val requestBody = value.toRequestBody("text/plain".toMediaTypeOrNull())
-        return MultipartBody.Part.createFormData("room_id", null, requestBody)
-    }
-
-    fun getTokenPart(): MultipartBody.Part {
-        val tokenBody = token.toRequestBody("text/plain".toMediaTypeOrNull())
-        return MultipartBody.Part.createFormData("access_token", null, tokenBody)
-    }
-
-    private fun Room.toUpdateRequest(token: String) = RoomUpdateRequest(
-        access_token = token,
-        room_id = room_id,
-        room_name = room_name,
-        room_desc = room_desc,
-        room_kategori = room_kategori,
-        room_capacity = room_capacity,
-        room_price = room_price,
-        room_available = room_available,
-        room_start = room_start,
-        room_end = room_end
-    )
-
-    private fun createRoomRequest(
-        room: Room,
-        fasilitas: List<FacilityCreatePayload>,
-        images: List<RoomImageCreatePayload>
-    ) = RoomWithExtrasCreateRequest(
-        access_token = token,
-        room_name = room.room_name,
-        room_desc = room.room_desc,
-        room_kategori = room.room_kategori,
-        room_capacity = room.room_capacity,
-        room_price = room.room_price,
-        room_available = room.room_available,
-        room_start = room.room_start,
-        room_end = room.room_end,
-        facility = fasilitas,
-        images = images
-    )
 
     private fun setError(message: String, e: Exception) {
         _errorMessage.value = "$message: ${e.localizedMessage ?: e.message}"

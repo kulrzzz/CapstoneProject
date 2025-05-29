@@ -1,6 +1,8 @@
 package com.example.capstoneproject.network
 
 import com.example.capstoneproject.model.room.*
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Response
 import retrofit2.http.*
@@ -20,10 +22,21 @@ interface RoomService {
         @Query("access_token") token: String
     ): RoomWithDetails
 
-    // ➕ Tambah Ruangan (Room + images + facilities)
-    @POST("api/room/add")
-    suspend fun createRoom(
-        @Body request: RoomWithExtrasCreateRequest
+    // ✅ ➕ Tambah Ruangan (dengan fasilitas dan gambar) - multipart
+    @Multipart
+    @POST("api/room/full-add")
+    suspend fun createRoomMultipart(
+        @Part("access_token") accessToken: RequestBody,
+        @Part("room_name") roomName: RequestBody,
+        @Part("room_desc") roomDesc: RequestBody,
+        @Part("room_kategori") roomKategori: RequestBody,
+        @Part("room_capacity") roomCapacity: RequestBody,
+        @Part("room_price") roomPrice: RequestBody,
+        @Part("room_available") roomAvailable: RequestBody,
+        @Part("room_start") roomStart: RequestBody,
+        @Part("room_end") roomEnd: RequestBody,
+        @Part("facility") facilityJson: RequestBody,
+        @Part images: List<MultipartBody.Part>
     ): RoomSingleResponse
 
     // ✏️ Update Ruangan
