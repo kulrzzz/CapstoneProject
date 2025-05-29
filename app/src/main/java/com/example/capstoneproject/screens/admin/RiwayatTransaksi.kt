@@ -73,12 +73,11 @@ fun RiwayatTransaksiPage(
                             .padding(vertical = 12.dp, horizontal = 0.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TableHeaderCell("No", 40.dp, textSize, headerTextColor)
-                        TableHeaderCell("Kode", 100.dp, textSize, headerTextColor)
-                        TableHeaderCell("Peminjam", 120.dp, textSize, headerTextColor)
-                        TableHeaderCell("Gedung", 120.dp, textSize, headerTextColor)
-                        TableHeaderCell("Nominal", 100.dp, textSize, headerTextColor)
-                        TableHeaderCell("Status", 100.dp, textSize, headerTextColor)
+                        TableHeaderCell("No", 70.dp, textSize, headerTextColor)
+                        TableHeaderCell("Kode Booking", 170.dp, textSize, headerTextColor)
+                        TableHeaderCell("Peminjam", 170.dp, textSize, headerTextColor)
+                        TableHeaderCell("Ruangan", 150.dp, textSize, headerTextColor)
+                        TableHeaderCell("Tanggal", 100.dp, textSize, headerTextColor)
                     }
 
                     Divider(color = Color.LightGray)
@@ -137,16 +136,22 @@ fun TransaksiRow(
         )
 
         Text(
-            text = "Rp${booking.booking_price}",
+            text = booking.booking_date,
             fontSize = fontSize,
             modifier = Modifier.width(120.dp)
         )
 
-        StatusBadge(
-            status = if (booking.booking_status == 1) "Lunas" else "Belum lunas",
-            fontSize = fontSize,
-            modifier = Modifier.width(120.dp)
-        )
+//        Text(
+//            text = "Rp${booking.booking_price}",
+//            fontSize = fontSize,
+//            modifier = Modifier.width(120.dp)
+//        )
+//
+//        StatusBadge(
+//            status = if (booking.booking_status == 1) "Lunas" else "Belum lunas",
+//            fontSize = fontSize,
+//            modifier = Modifier.width(120.dp)
+//        )
     }
 }
 
