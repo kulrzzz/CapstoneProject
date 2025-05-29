@@ -14,6 +14,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
+import com.example.capstoneproject.R
+
 
 @Composable
 fun DashboardScreen(
@@ -21,68 +30,127 @@ fun DashboardScreen(
     onNavigate: (Screen) -> Unit,
     onLogout: () -> Unit
 ) {
-    // ⏳ Tunda render jika role belum siap
     if (userRole == null) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }
         return
     }
 
-    Row(modifier = Modifier.fillMaxSize()) {
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFFF5F7FF))
+    ) {
+        SideBar(userRole = userRole, onNavigate = onNavigate, onLogout = onLogout)
 
-        // ✅ Sidebar sesuai role dinamis
-        SideBar(
-            userRole = userRole,
-            onNavigate = onNavigate,
-            onLogout = onLogout
-        )
-
-        // 📊 Konten dashboard utama
-        Surface(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .padding(24.dp),
-            color = Color(0xFFF9FBFF)
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Top
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Text(
+                text = "Main Dashboard",
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF04A5D4)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(
-                    text = "Main Dashboard",
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF0D47A1)
+                MetricCard(
+                    title = "Total Peminjam",
+                    value = "45",
+                    iconRes = R.drawable.user
                 )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    MetricCard(title = "Total Peminjam", value = "45")
-                    MetricCard(title = "Total Pembayaran", value = "Rp. 200,000")
-                }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                Text(
-                    text = "Riwayat Peminjaman",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                MetricCard(
+                    title = "Total Pembayaran",
+                    value = "Rp. 200.000",
+                    iconRes = R.drawable.total
                 )
+            }
 
-                LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                    itemsIndexed(sampleRiwayat) { index, item ->
-                        RiwayatItemRow(index + 1, item)
-                    }
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                text = "Riwayat Peminjaman",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            BookingHistoryTable(sampleRiwayat)
+        }
+    }
+}
+
+@Composable
+fun MetricCard(title: String, value: String, iconRes: Int) {
+    Card(
+        modifier = Modifier
+//            .weight(1f)
+            .height(120.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(
+                painter = painterResource(id = iconRes),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(48.dp)
+                    .padding(end = 16.dp)
+            )
+            Column {
+                Text(text = title, fontSize = 14.sp, color = Color.Gray)
+                Text(text = value, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+@Composable
+fun BookingHistoryTable(data: List<RiwayatData>) {
+    val scrollState = rememberScrollState()
+
+    Card(
+        modifier = Modifier
+            .fillMaxSize(),
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(scrollState)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFFE0E0E0))
+                    .padding(vertical = 12.dp, horizontal = 15.dp),
+                horizontalArrangement = Arrangement.Start
+            ) {
+                TableHeader("No", 60.dp)
+                TableHeader("Nama", 200.dp)
+                TableHeader("Ruangan", 200.dp)
+                TableHeader("Agenda", 180.dp)
+                TableHeader("Jam", 180.dp)
+                TableHeader("Kode", 120.dp)
+            }
+
+            LazyColumn {
+                itemsIndexed(data) { index, item ->
+                    BookingRow(index + 1, item)
                 }
             }
         }
@@ -90,34 +158,43 @@ fun DashboardScreen(
 }
 
 @Composable
-fun MetricCard(title: String, value: String) {
-    Column(
+fun TableHeader(text: String, width: Dp) {
+    Text(
+        text = text,
+        fontSize = 14.sp,
+        fontWeight = FontWeight.SemiBold,
+        color = Color(0xFF1A237E),
+        modifier = Modifier.width(width),
+        textAlign = TextAlign.Start
+    )
+}
+
+@Composable
+fun BookingRow(index: Int, data: RiwayatData) {
+    Row(
         modifier = Modifier
-            .width(160.dp)
-            .padding(8.dp)
-            .background(Color.White, shape = MaterialTheme.shapes.medium)
-            .padding(16.dp)
+            .fillMaxWidth()
+            .background(if (index % 2 == 0) Color(0xFFF8FAFF) else Color.White)
+            .padding(horizontal = 15.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = title, fontSize = 14.sp, color = Color.Gray)
-        Text(text = value, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        TableCell(index.toString(), 60.dp)
+        TableCell(data.nama, 200.dp)
+        TableCell(data.ruangan, 200.dp)
+        TableCell(data.agenda, 180.dp)
+        TableCell(data.jam, 180.dp)
+        TableCell(data.kode, 120.dp)
     }
 }
 
 @Composable
-fun RiwayatItemRow(index: Int, data: RiwayatData) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text("$index", Modifier.weight(0.2f))
-        Text(data.nama, Modifier.weight(1f))
-        Text(data.ruangan, Modifier.weight(1f))
-        Text(data.agenda, Modifier.weight(1f))
-        Text(data.jam, Modifier.weight(1f))
-        Text(data.kode, Modifier.weight(1f))
-    }
+fun TableCell(text: String, width: Dp) {
+    Text(
+        text = text,
+        fontSize = 14.sp,
+        modifier = Modifier.width(width),
+        textAlign = TextAlign.Start
+    )
 }
 
 data class RiwayatData(
@@ -127,6 +204,8 @@ data class RiwayatData(
     val jam: String,
     val kode: String
 )
+
+
 
 val sampleRiwayat = listOf(
     RiwayatData("Mithilesh Kumar Singh", "GKM Lantai 1", "Kunjungan Studi", "07.00 - 13.00", "12358G"),
