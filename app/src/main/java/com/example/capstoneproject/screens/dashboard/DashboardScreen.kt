@@ -46,9 +46,9 @@ fun DashboardScreen(
 
         Column(modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp)
+            .padding(20.dp)
         ) {
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(25.dp))
 
             Text(
                 text = "Main Dashboard",

@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -70,7 +71,7 @@ fun RiwayatTransaksiPage(
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(headerColor)
-                            .padding(vertical = 12.dp, horizontal = 0.dp),
+                            .padding(vertical = 12.dp, horizontal = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         TableHeaderCell("No", 70.dp, textSize, headerTextColor)
@@ -113,31 +114,36 @@ fun TransaksiRow(
         Text(
             text = no.toString(),
             fontSize = fontSize,
-            modifier = Modifier.width(36.dp)
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .width(20.dp)
+                .wrapContentWidth(Alignment.CenterHorizontally)
         )
 
         Text(
             text = booking.booking_code,
             fontSize = fontSize,
-            modifier = Modifier.width(100.dp)
+            modifier = Modifier.width(225.dp)
+                .padding(start = 55.dp)
         )
 
         Text(
             text = booking.customer_fullname,
             fontSize = fontSize,
-            modifier = Modifier.width(150.dp)
+            modifier = Modifier.width(170.dp)
         )
 
         Text(
             text = booking.room_name,
             fontSize = fontSize,
-            modifier = Modifier.width(150.dp)
+            modifier = Modifier.width(100.dp)
         )
 
         Text(
             text = booking.booking_date,
             fontSize = fontSize,
-            modifier = Modifier.width(120.dp)
+            modifier = Modifier.width(150.dp)
+                .padding(start = 43.dp)
         )
     }
 }
