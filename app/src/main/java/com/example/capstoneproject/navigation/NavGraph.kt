@@ -77,14 +77,21 @@ fun AppNavGraph(
         }
 
         composable(Screen.RiwayatTransaksi.route) {
-            LaunchedEffect(Unit) {
-                bookingViewModel.fetchRiwayatTransaksi()
-            }
+            val token = loginViewModel.token
+            val transaksiList = bookingViewModel.allBookings
+            val isLoading = bookingViewModel.isLoading
 
-            val transaksiList = bookingViewModel.bookingRiwayatItems
+            LaunchedEffect(token) {
+                if (!token.isNullOrBlank()) {
+                    bookingViewModel.fetchRiwayatTransaksi(token)
+                } else {
+                    bookingViewModel.setError("Token tidak tersedia. Silakan login ulang.")
+                }
+            }
 
             RiwayatTransaksiPage(
                 transaksiList = transaksiList,
+                isLoading = isLoading,
                 userRole = loginViewModel.userRole,
                 onNavigate = { navController.navigate(it.route) },
                 onLogout = {

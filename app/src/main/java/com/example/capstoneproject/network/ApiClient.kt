@@ -42,10 +42,18 @@ object ApiClient {
         response
     }
 
+    // 📏 Optional: Interceptor to log response body size (helps debugging EOF issues)
+    private val contentLengthInterceptor = Interceptor { chain ->
+        val response = chain.proceed(chain.request())
+        val length = response.body?.contentLength() ?: -1
+        println("🔍 Response Content-Length: $length bytes")
+        response
+    }
+
     // 🔧 Gson config with lenient parsing & nulls support
     private val gson: Gson by lazy {
         GsonBuilder()
-            .setLenient()
+            .setLenient() // Allow malformed JSON
             .serializeNulls()
             .create()
     }
@@ -55,9 +63,10 @@ object ApiClient {
         OkHttpClient.Builder()
             .addInterceptor(loggingInterceptor)
             .addInterceptor(retryInterceptor)
+            .addInterceptor(contentLengthInterceptor)
             .connectTimeout(20, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS) // increased read timeout
+            .writeTimeout(60, TimeUnit.SECONDS)
             .build()
     }
 

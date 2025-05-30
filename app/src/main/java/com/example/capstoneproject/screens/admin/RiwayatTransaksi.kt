@@ -15,7 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.capstoneproject.model.booking.BookingRiwayatItem
+import com.example.capstoneproject.model.booking.Booking
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
 import com.example.capstoneproject.ui.theme.TableHeaderCell
@@ -23,7 +23,8 @@ import com.example.capstoneproject.ui.theme.TableHeaderCell
 @Composable
 fun RiwayatTransaksiPage(
     userRole: String?,
-    transaksiList: List<BookingRiwayatItem>,
+    transaksiList: List<Booking>,
+    isLoading: Boolean,
     onNavigate: (Screen) -> Unit = {},
     onLogout: () -> Unit = {}
 ) {
@@ -83,13 +84,28 @@ fun RiwayatTransaksiPage(
 
                     Divider(color = Color.LightGray)
 
-                    LazyColumn {
-                        itemsIndexed(transaksiList) { index, booking ->
-                            TransaksiRow(
-                                no = index + 1,
-                                booking = booking,
-                                fontSize = textSize
+                    if (isLoading) {
+                        // Tampilkan loading spinner di tengah
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(40.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                color = Color(0xFF04A5D4),
+                                strokeWidth = 4.dp
                             )
+                        }
+                    } else {
+                        LazyColumn {
+                            itemsIndexed(transaksiList) { index, booking ->
+                                TransaksiRow(
+                                    no = index + 1,
+                                    booking = booking,
+                                    fontSize = textSize
+                                )
+                            }
                         }
                     }
                 }
@@ -101,7 +117,7 @@ fun RiwayatTransaksiPage(
 @Composable
 fun TransaksiRow(
     no: Int,
-    booking: BookingRiwayatItem,
+    booking: Booking,
     fontSize: TextUnit,
 ) {
     Row(
