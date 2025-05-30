@@ -102,7 +102,7 @@ fun ManajemenAdminPage(
                                 .padding(24.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            CircularProgressIndicator()
+                            CircularProgressIndicator(color = Color(0xFF04A5D4))
                         }
                     }
 

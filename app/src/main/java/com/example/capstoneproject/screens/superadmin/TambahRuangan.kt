@@ -153,7 +153,7 @@ fun TambahRuanganPage(
         true
     )
 
-    val kategoriList = listOf("Meeting", "Auditorium", "Kelas", "Lab")
+    val kategoriList = listOf("Lantai 1", "Lantai 2", "Lantai 3", "Lantai 4", "Lantai 5")
 
     Row(Modifier.fillMaxSize().background(Color(0xFFF5F7FF))) {
         SideBar(userRole = userRole, onNavigate = onNavigate, onLogout = onLogout)

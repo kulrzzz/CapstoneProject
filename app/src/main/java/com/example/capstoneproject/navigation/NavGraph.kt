@@ -286,6 +286,7 @@ fun AppNavGraph(
 
             ManajemenRuanganPage(
                 roomList = roomViewModel.roomList,
+                isLoading = roomViewModel.isLoading.value,
                 onTambahRuanganClick = { navController.navigate(Screen.TambahRuangan.route) },
                 onEditRoom = { room ->
                     Toast.makeText(context, "Fitur edit belum tersedia", Toast.LENGTH_SHORT).show()

@@ -24,7 +24,7 @@ interface AdminService {
     @POST("api/admin/add")
     suspend fun createAdmin(
         @Body request: AdminCreateRequest
-    ): Response<AdminResponse>
+    ): Response<ResponseBody>
 
     // ✏️ Update Admin
     @PUT("api/admin/update")

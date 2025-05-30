@@ -13,7 +13,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,6 +26,7 @@ import com.example.capstoneproject.ui.theme.TableHeaderCell
 fun ManajemenRuanganPage(
     userRole: String?,
     roomList: List<Room>,
+    isLoading: Boolean,
     onTambahRuanganClick: () -> Unit,
     onEditRoom: (Room) -> Unit,
     onDeleteRoom: (Room) -> Unit,
@@ -90,35 +90,76 @@ fun ManajemenRuanganPage(
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
             ) {
-                Column {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(headerColor)
-                            .padding(vertical = 12.dp, horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TableHeaderCell("No", 75.dp, textSize, headerTextColor)
-                        TableHeaderCell("Nama Ruangan", 200.dp, textSize, headerTextColor)
-                        TableHeaderCell("Kategori", 155.dp, textSize, headerTextColor,)
-                        TableHeaderCell("Status", 100.dp, textSize, headerTextColor, textAlign = TextAlign.Center)
-                        TableHeaderCell("Actions", 170.dp, textSize, headerTextColor, textAlign = TextAlign.Center)
+                when {
+                    isLoading -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(24.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = Color(0xFF04A5D4))
+                        }
                     }
 
-                    Divider(color = Color.LightGray)
+                    roomList.isEmpty() -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(24.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("Tidak ada data ruangan ditemukan.")
+                        }
+                    }
 
-                    LazyColumn {
-                        itemsIndexed(roomList) { index, room ->
-                            RoomRow(
-                                no = index + 1,
-                                room = room,
-                                textSize = textSize,
-                                onEdit = { onEditRoom(room) },
-                                onDelete = { onDeleteRoom(room) },
-                                onToggleAvailability = { isAvailable ->
-                                    onToggleAvailability(room, isAvailable)
+                    else -> {
+                        Column {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .background(headerColor)
+                                    .padding(vertical = 12.dp, horizontal = 16.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                TableHeaderCell("No", 75.dp, textSize, headerTextColor)
+                                TableHeaderCell("Nama Ruangan", 200.dp, textSize, headerTextColor)
+                                TableHeaderCell("Kategori", 155.dp, textSize, headerTextColor)
+                                TableHeaderCell(
+                                    "Status",
+                                    100.dp,
+                                    textSize,
+                                    headerTextColor,
+                                    textAlign = TextAlign.Center
+                                )
+                                TableHeaderCell(
+                                    "Actions",
+                                    170.dp,
+                                    textSize,
+                                    headerTextColor,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+
+                            Divider(color = Color.LightGray)
+
+                            LazyColumn {
+                                itemsIndexed(roomList) { index, room ->
+                                    RoomRow(
+                                        no = index + 1,
+                                        room = room,
+                                        textSize = textSize,
+                                        onEdit = { onEditRoom(room) },
+                                        onDelete = { onDeleteRoom(room) },
+                                        onToggleAvailability = { isAvailable ->
+                                            onToggleAvailability(
+                                                room,
+                                                isAvailable
+                                            )
+                                        }
+                                    )
                                 }
-                            )
+                            }
                         }
                     }
                 }
@@ -127,7 +168,7 @@ fun ManajemenRuanganPage(
     }
 }
 
-@Composable
+            @Composable
 fun RoomRow(
     no: Int,
     room: Room,
@@ -213,51 +254,5 @@ fun RoomRow(
                 }
             }
         }
-    }
-}
-
-@Preview(showBackground = true, widthDp = 1000, heightDp = 600)
-@Composable
-fun ManajemenRuanganPagePreview() {
-    val dummyRooms = listOf(
-        Room(
-            room_id = "1",
-            room_name = "A 1.1",
-            room_desc = "Ruangan 5x8 m",
-            room_kategori = "Lantai 1",
-            room_capacity = 12,
-            room_price = 50000,
-            room_available = 0,
-            room_start = "08:00",
-            room_end = "20:00",
-            created_at = "2025-05-28T14:00:00Z",
-            updated_at = "2025-05-28T14:00:00Z"
-        ),
-        Room(
-            room_id = "2",
-            room_name = "F 3.2",
-            room_desc = "Ruang Kelas dengan fasilitas lengkap",
-            room_kategori = "Lantai 3",
-            room_capacity = 30,
-            room_price = 550000,
-            room_available = 1,
-            room_start = "08:00",
-            room_end = "11:30",
-            created_at = "2025-05-28T14:00:00Z",
-            updated_at = "2025-05-28T14:00:00Z"
-        )
-    )
-
-    Surface {
-        ManajemenRuanganPage(
-            userRole = "superadmin",
-            roomList = dummyRooms,
-            onTambahRuanganClick = {},
-            onEditRoom = {},
-            onDeleteRoom = {},
-            onToggleAvailability = { _, _ -> },
-            onNavigate = {},
-            onLogout = {}
-        )
     }
 }

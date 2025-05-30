@@ -28,7 +28,7 @@ fun RiwayatTransaksiPage(
     onNavigate: (Screen) -> Unit = {},
     onLogout: () -> Unit = {}
 ) {
-    val spacing = 24.dp
+    val spacing = 20.dp
     val textSize = 14.sp
     val titleSize = 30.sp
     val headerColor = Color(0xFFF0F4FF)
