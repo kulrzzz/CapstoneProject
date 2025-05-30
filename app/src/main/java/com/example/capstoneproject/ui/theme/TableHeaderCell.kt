@@ -20,7 +20,9 @@ fun TableHeaderCell(
     fontSize: TextUnit,
     textColor: Color = MaterialTheme.colorScheme.onSurface,
     fontWeight: FontWeight = FontWeight.SemiBold,
-    textAlign: TextAlign = TextAlign.Start
+    textAlign: TextAlign = TextAlign.Center,
+    modifier: Modifier = Modifier
+
 ) {
     Text(
         text = text,
@@ -28,7 +30,26 @@ fun TableHeaderCell(
         fontWeight = fontWeight,
         color = textColor,
         textAlign = textAlign,
-        modifier = Modifier
+        modifier = modifier
+            .width(width)
+            .padding(horizontal = 8.dp),
+        maxLines = 1
+    )
+}
+
+@Composable
+fun TableBodyCell(
+    text: String,
+    width: Dp,
+    fontSize: TextUnit,
+    textAlign: TextAlign = TextAlign.Center,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = text,
+        fontSize = fontSize,
+        textAlign = textAlign,
+        modifier = modifier
             .width(width)
             .padding(horizontal = 8.dp),
         maxLines = 1

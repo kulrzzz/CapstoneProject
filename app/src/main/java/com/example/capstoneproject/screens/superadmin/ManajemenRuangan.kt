@@ -20,6 +20,7 @@ import com.example.capstoneproject.R
 import com.example.capstoneproject.model.room.Room
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
+import com.example.capstoneproject.ui.theme.TableBodyCell
 import com.example.capstoneproject.ui.theme.TableHeaderCell
 
 @Composable
@@ -119,26 +120,14 @@ fun ManajemenRuanganPage(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .background(headerColor)
-                                    .padding(vertical = 12.dp, horizontal = 16.dp),
+                                    .padding(vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                TableHeaderCell("No", 75.dp, textSize, headerTextColor)
+                                TableHeaderCell("No", 50.dp, textSize, headerTextColor, modifier = Modifier.padding(horizontal = 10.dp))
                                 TableHeaderCell("Nama Ruangan", 200.dp, textSize, headerTextColor)
                                 TableHeaderCell("Kategori", 155.dp, textSize, headerTextColor)
-                                TableHeaderCell(
-                                    "Status",
-                                    100.dp,
-                                    textSize,
-                                    headerTextColor,
-                                    textAlign = TextAlign.Center
-                                )
-                                TableHeaderCell(
-                                    "Actions",
-                                    170.dp,
-                                    textSize,
-                                    headerTextColor,
-                                    textAlign = TextAlign.Center
-                                )
+                                TableHeaderCell("Status",100.dp,textSize,headerTextColor)
+                                TableHeaderCell("Actions",170.dp,textSize,headerTextColor)
                             }
 
                             Divider(color = Color.LightGray)
@@ -168,7 +157,7 @@ fun ManajemenRuanganPage(
     }
 }
 
-            @Composable
+@Composable
 fun RoomRow(
     no: Int,
     room: Room,
@@ -181,39 +170,17 @@ fun RoomRow(
         modifier = Modifier
             .fillMaxWidth()
             .background(if (no % 2 == 0) Color(0xFFF8FAFF) else Color.White)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = no.toString(),
-            fontSize = textSize,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .width(36.dp)
-                .wrapContentWidth(Alignment.CenterHorizontally)
-        )
-
-        Text(
-            text = room.room_name,
-            fontSize = textSize,
-            modifier = Modifier
-                .width(230.dp)
-                .padding(start = 48.dp)
-        )
-
-        Text(
-            text = room.room_kategori,
-            fontSize = textSize,
-            modifier = Modifier
-                .width(155.dp)
-                .padding(start = 18.dp)
-        )
-
+        TableBodyCell(no.toString(), 50.dp, textSize, modifier = Modifier.padding(horizontal = 10.dp))
+        TableBodyCell(room.room_name, 200.dp,textSize)
+        TableBodyCell(room.room_kategori, 155.dp, textSize)
         Box(
             modifier = Modifier
-                .width(120.dp)
-                .height(48.dp)
-                .wrapContentWidth(Alignment.CenterHorizontally),
+                .width(95.dp)
+                .padding(start = 10.dp)
+                .height(48.dp),
             contentAlignment = Alignment.Center
         ) {
             Box(
@@ -225,10 +192,10 @@ fun RoomRow(
                     )
             )
         }
-
         Box(
             modifier = Modifier
-                .width(140.dp)
+                .width(167.dp)
+                .padding(start = 13.dp)
                 .fillMaxHeight(),
             contentAlignment = Alignment.Center
         ) {

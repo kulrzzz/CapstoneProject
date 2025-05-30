@@ -21,6 +21,7 @@ import com.example.capstoneproject.R
 import com.example.capstoneproject.model.admin.Admin
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
+import com.example.capstoneproject.ui.theme.TableBodyCell
 import com.example.capstoneproject.ui.theme.TableHeaderCell
 
 @Composable
@@ -138,13 +139,13 @@ fun ManajemenAdminPage(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .background(headerColor)
-                                    .padding(vertical = 12.dp, horizontal = 16.dp),
+                                    .padding(vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                TableHeaderCell("No", 75.dp, textSize, headerTextColor)
+                                TableHeaderCell("No", 50.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 10.dp))
                                 TableHeaderCell("Fullname", 220.dp, textSize, headerTextColor)
                                 TableHeaderCell("Email", 240.dp, textSize, headerTextColor)
-                                TableHeaderCell("Actions", 170.dp, textSize, headerTextColor, textAlign = TextAlign.Center)
+                                TableHeaderCell("Actions", 170.dp, textSize, headerTextColor)
                             }
 
                             Divider(color = Color.LightGray)
@@ -180,37 +181,16 @@ fun AdminRow(
         modifier = Modifier
             .fillMaxWidth()
             .background(if (no % 2 == 0) Color(0xFFF8FAFF) else Color.White)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = no.toString(),
-            fontSize = textSize,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .width(36.dp)
-                .wrapContentWidth(Alignment.CenterHorizontally)
-        )
-
-        Text(
-            text = admin.admin_fullname,
-            fontSize = textSize,
-            modifier = Modifier
-                .width(240.dp)
-                .padding(start = 48.dp)
-        )
-
-        Text(
-            text = admin.admin_email,
-            fontSize = textSize,
-            modifier = Modifier
-                .width(260.dp)
-                .padding(start = 28.dp)
-        )
-
+        TableBodyCell(no.toString(), 50.dp, textSize, modifier = Modifier.padding(start = 10.dp))
+        TableBodyCell(admin.admin_fullname, 220.dp, textSize)
+        TableBodyCell(admin.admin_email, 240.dp, textSize)
         Box(
             modifier = Modifier
                 .width(160.dp)
+                .padding(start = 10.dp)
                 .fillMaxHeight(),
             contentAlignment = Alignment.Center
         ) {

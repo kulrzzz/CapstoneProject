@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import com.example.capstoneproject.model.booking.Booking
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
+import com.example.capstoneproject.ui.theme.TableBodyCell
 import com.example.capstoneproject.ui.theme.TableHeaderCell
 
 @Composable
@@ -79,15 +80,15 @@ fun RiwayatTransaksiPage(
                     Row(
                         modifier = Modifier
                             .background(headerColor)
-                            .padding(vertical = 12.dp, horizontal = 10.dp),
+                            .padding(vertical = 12.dp, ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TableHeaderCell("No", 70.dp, textSize, headerTextColor)
+                        TableHeaderCell("No", 40.dp, textSize, headerTextColor, modifier = Modifier.padding(horizontal = 10.dp))
                         TableHeaderCell("Kode Booking", 170.dp, textSize, headerTextColor)
-                        TableHeaderCell("Peminjam", 170.dp, textSize, headerTextColor)
+                        TableHeaderCell("Peminjam", 172.dp, textSize, headerTextColor)
                         TableHeaderCell("Ruangan", 150.dp, textSize, headerTextColor)
                         TableHeaderCell("Tanggal", 120.dp, textSize, headerTextColor)
-                        TableHeaderCell("x", 220.dp, textSize, headerTextColor, textAlign = TextAlign.Center)
+                        TableHeaderCell("Detail", 185.dp, textSize, headerTextColor, modifier = Modifier.padding(horizontal = 5.dp))
                     }
 
                     Divider(color = Color.LightGray)
@@ -131,46 +132,22 @@ fun TransaksiRow(
         modifier = Modifier
             .fillMaxWidth()
             .background(if (no % 2 == 0) Color(0xFFF8FAFF) else Color.White)
-            .padding(horizontal = 10.dp, vertical = 12.dp),
+            .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = no.toString(),
-            fontSize = fontSize,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.width(70.dp)
-        )
-
-        Text(
-            text = booking.booking_code,
-            fontSize = fontSize,
-            modifier = Modifier.width(170.dp)
-        )
-
-        Text(
-            text = booking.customer_fullname,
-            fontSize = fontSize,
-            modifier = Modifier.width(170.dp)
-        )
-
-        Text(
-            text = booking.room_name,
-            fontSize = fontSize,
-            modifier = Modifier.width(150.dp)
-        )
-
-        Text(
-            text = booking.booking_date,
-            fontSize = fontSize,
-            modifier = Modifier.width(100.dp)
-        )
-
+        TableBodyCell(no.toString(), 40.dp, fontSize, modifier = Modifier.padding(start = 10.dp))
+        TableBodyCell(booking.booking_code, 170.dp, fontSize, modifier = Modifier.padding(start = 10.dp))
+        TableBodyCell(text = booking.customer_fullname, 172.dp, fontSize)
+        TableBodyCell(booking.room_name, 150.dp, fontSize)
+        TableBodyCell(booking.booking_date, 120.dp, fontSize)
         Button(
             onClick = { /* TODO */ },
-            modifier = Modifier.width(240.dp)
-                .padding(start = 30.dp)
+            modifier = Modifier
+                .width(195.dp)
+                .padding(horizontal = 10.dp)
         ) {
             Text("Lihat Detail", fontSize = fontSize)
         }
     }
 }
+

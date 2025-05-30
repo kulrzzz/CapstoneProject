@@ -28,6 +28,8 @@ import com.example.capstoneproject.model.booking.BookingDetail
 import com.example.capstoneproject.model.customer.Customer
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
+import com.example.capstoneproject.ui.theme.TableBodyCell
+import com.example.capstoneproject.ui.theme.TableHeaderCell
 import java.text.NumberFormat
 import java.util.*
 
@@ -142,15 +144,15 @@ fun BookingHistoryTable(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color(0xFFE0E0E0))
-                    .padding(vertical = 15.dp, horizontal = 15.dp),
+                    .padding(vertical = 15.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
-                TableHeader("No", 60.dp, textSize, headerTextColor)
-                TableHeader("Kode Booking", 180.dp, textSize, headerTextColor)
-                TableHeader("Nama Gedung", 180.dp, textSize, headerTextColor)
-                TableHeader("Tanggal", 180.dp, textSize, headerTextColor)
-                TableHeader("Waktu", 200.dp, textSize, headerTextColor)
-                TableHeader("Nominal", 150.dp, textSize, headerTextColor)
+                TableHeaderCell("No", 60.dp, textSize, headerTextColor, textAlign = TextAlign.Center)
+                TableHeaderCell("Kode Booking", 180.dp, textSize, headerTextColor)
+                TableHeaderCell("Nama Gedung", 180.dp, textSize, headerTextColor)
+                TableHeaderCell("Tanggal", 180.dp, textSize, headerTextColor)
+                TableHeaderCell("Waktu", 200.dp, textSize, headerTextColor)
+                TableHeaderCell("Nominal", 150.dp, textSize, headerTextColor)
             }
 
             if (bookingList.isEmpty()) {
@@ -185,77 +187,16 @@ fun BookingRow(
         modifier = Modifier
             .fillMaxWidth()
             .background(if (no % 2 == 0) Color(0xFFF8FAFF) else Color.White)
-            .padding(horizontal = 23.dp, vertical = 12.dp),
+            .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = no.toString(),
-            fontSize = textSize,
-            textAlign = TextAlign.Start,
-            modifier = Modifier.width(50.dp)
-        )
-
-        Text(
-            text = booking.booking_code.orEmpty(),
-            fontSize = textSize,
-            textAlign = TextAlign.Start,
-            modifier = Modifier.width(180.dp)
-        )
-
-        Text(
-            text = booking.room_name.orEmpty(),
-            fontSize = textSize,
-            modifier = Modifier.width(180.dp)
-        )
-
-        Text(
-            text = booking.booking_date.orEmpty(),
-            fontSize = textSize,
-            modifier = Modifier.width(160.dp)
-        )
-
-        Text(
-            text = "${booking.booking_start} - ${booking.booking_end}",
-            fontSize = textSize,
-            modifier = Modifier.width(210.dp)
-        )
-
-        Text(
-            text = formatCurrency(booking.booking_price),
-            fontSize = textSize,
-            modifier = Modifier.width(160.dp)
-        )
+        TableBodyCell(no.toString(), 60.dp, textSize)
+        TableBodyCell(booking.booking_code, 180.dp, textSize)
+        TableBodyCell(booking.room_name, 180.dp, textSize)
+        TableBodyCell(booking.booking_date, 180.dp, textSize)
+        TableBodyCell("${booking.booking_start} - ${booking.booking_end}", 200.dp, textSize)
+        TableBodyCell(formatCurrency(booking.booking_price), 150.dp, textSize)
     }
-}
-
-@Composable
-fun TableHeader(text: String, width: Dp, fontSize: androidx.compose.ui.unit.TextUnit, color: Color) {
-    Text(
-        text = text,
-        fontSize = fontSize,
-        fontWeight = FontWeight.SemiBold,
-        modifier = Modifier.width(width),
-        color = color,
-        textAlign = TextAlign.Start
-    )
-}
-
-@Composable
-fun TableCell(
-    text: String,
-    width: Dp,
-    fontSize: androidx.compose.ui.unit.TextUnit,
-    textAlign: TextAlign = TextAlign.Center
-) {
-    Text(
-        text = text,
-        fontSize = fontSize,
-        textAlign = textAlign,
-        modifier = Modifier
-            .width(width)
-            .padding(horizontal = 4.dp),
-        maxLines = 1
-    )
 }
 
 @Composable
