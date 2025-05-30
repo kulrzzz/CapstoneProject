@@ -142,9 +142,9 @@ fun ManajemenAdminPage(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 TableHeaderCell("No", 75.dp, textSize, headerTextColor)
-                                TableHeaderCell("Fullname", 240.dp, textSize, headerTextColor)
+                                TableHeaderCell("Fullname", 220.dp, textSize, headerTextColor)
                                 TableHeaderCell("Email", 240.dp, textSize, headerTextColor)
-                                TableHeaderCell("Actions", 120.dp, textSize, headerTextColor)
+                                TableHeaderCell("Actions", 170.dp, textSize, headerTextColor, textAlign = TextAlign.Center)
                             }
 
                             Divider(color = Color.LightGray)
@@ -204,8 +204,8 @@ fun AdminRow(
             text = admin.admin_email,
             fontSize = textSize,
             modifier = Modifier
-                .width(240.dp)
-                .padding(start = 48.dp)
+                .width(260.dp)
+                .padding(start = 28.dp)
         )
 
         Box(
