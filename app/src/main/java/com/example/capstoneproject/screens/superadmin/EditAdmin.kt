@@ -20,6 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.capstoneproject.model.admin.Admin
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
+import com.example.capstoneproject.ui.theme.LoadingButtonContent
 import com.example.capstoneproject.viewmodel.AdminViewModel
 
 @Composable
@@ -126,6 +127,11 @@ fun EditAdminPage(
                                     return@Button
                                 }
 
+                                if (admin.admin_id.isEmpty() || admin.admin_email.isEmpty() || admin.admin_fullname.isEmpty()) {
+                                    Toast.makeText(context, "Data admin tidak lengkap", Toast.LENGTH_SHORT).show()
+                                    return@Button
+                                }
+
                                 when {
                                     newPassword.isBlank() || confirmPassword.isBlank() -> {
                                         Toast.makeText(context, "Password tidak boleh kosong", Toast.LENGTH_SHORT).show()
@@ -136,8 +142,11 @@ fun EditAdminPage(
                                     else -> {
                                         isLoading = true
                                         adminViewModel.updateAdminPassword(
-                                            adminId = admin.admin_id ?: "",
+                                            adminId = admin.admin_id,
                                             newPassword = newPassword,
+                                            email = admin.admin_email,
+                                            fullname = admin.admin_fullname,
+                                            updatedBy = 1, // Sesuaikan ID updater dari context login
                                             token = token
                                         ) { success ->
                                             isLoading = false
@@ -154,7 +163,10 @@ fun EditAdminPage(
                             enabled = !isLoading,
                             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1570EF))
                         ) {
-                            Text(if (isLoading) "Menyimpan..." else "Simpan", color = Color.White)
+                            LoadingButtonContent(
+                                isLoading = isLoading,
+                                buttonText = if (isLoading) "Menambahkan" else "Tambah Admin"
+                            )
                         }
                     }
                 }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Padding 20dp di setiap sisi agar tidak kena crop oleh mask -->
+    <item
+        android:drawable="@drawable/logo2"
+        android:top="20dp"
+        android:bottom="20dp"
+        android:left="20dp"
+        android:right="20dp" />
+</layer-list>

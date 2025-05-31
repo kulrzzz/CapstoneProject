@@ -63,23 +63,14 @@ class AdminViewModel : ViewModel() {
             try {
                 val response = ApiClient.adminService.createAdmin(request)
 
-                if (response.isSuccessful && response.body() != null) {
-                    val rawJson = response.body()!!.string()
-                    println("📥 RAW JSON: $rawJson")
+                if (response.isSuccessful) {
+                    val responseBody = response.body()
 
-                    // Cek apakah JSON berakhir dengan "}"
-                    if (rawJson.trim().endsWith("}")) {
-                        try {
-                            val parsed = Gson().fromJson(rawJson, AdminResponse::class.java)
-                            println("✅ Admin parsed successfully: ${parsed.data.admin_email}")
-                            onResult(true)
-                        } catch (e: JsonSyntaxException) {
-                            println("❗ Gagal parsing JSON: ${e.localizedMessage}")
-                            e.printStackTrace()
-                            onResult(false)
-                        }
+                    if (responseBody != null && responseBody.status == "success") {
+                        println("✅ Admin created: ${responseBody.data.admin_email}")
+                        onResult(true)
                     } else {
-                        println("❗ Response JSON tidak lengkap: $rawJson")
+                        println("❗ Response status bukan success atau kosong: $responseBody")
                         onResult(false)
                     }
 
@@ -127,26 +118,38 @@ class AdminViewModel : ViewModel() {
     // ============================================
     // ✏️ UPDATE ADMIN PASSWORD (token in body)
     // ============================================
-    fun updateAdminPassword(adminId: String, newPassword: String, token: String, onResult: (Boolean) -> Unit) {
+    fun updateAdminPassword(
+        adminId: String,
+        newPassword: String,
+        email: String,
+        fullname: String,
+        updatedBy: Int,
+        token: String,
+        onResult: (Boolean) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 val request = AdminUpdateRequest(
                     access_token = token,
                     admin_id = adminId,
-                    admin_fullname = null,
-                    admin_email = null,
+                    admin_email = email,
+                    admin_fullname = fullname,
                     admin_pass = newPassword,
-                    admin_who = null
+                    admin_who = updatedBy
                 )
 
                 val response = ApiClient.adminService.updateAdmin(request)
 
-                if (!response.isSuccessful) {
+                if (response.isSuccessful) {
+                    val rawJson = response.body()?.string()
+                    println("✅ Update berhasil: $rawJson")
+                    onResult(true)
+                } else {
                     val errorBody = response.errorBody()?.string()
-                    println("Update failed: ${response.code()} → $errorBody")
+                    println("❌ Update gagal: ${response.code()} → $errorBody")
+                    onResult(false)
                 }
 
-                onResult(response.isSuccessful)
             } catch (e: Exception) {
                 e.printStackTrace()
                 onResult(false)

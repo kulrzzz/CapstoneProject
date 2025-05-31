@@ -13,7 +13,7 @@ interface AdminService {
         @Query("access_token") token: String
     ): List<Admin>
 
-    // 📄 GET Detail Admin
+    // 📄 GET Detail Admin (mengembalikan objek Admin penuh)
     @GET("api/admin/detail/{admin_id}")
     suspend fun getAdminDetail(
         @Path("admin_id") adminId: String,
@@ -24,13 +24,13 @@ interface AdminService {
     @POST("api/admin/add")
     suspend fun createAdmin(
         @Body request: AdminCreateRequest
-    ): Response<ResponseBody>
+    ): Response<AdminCreateResponse> // gunakan model response khusus create
 
-    // ✏️ Update Admin
+    // ✏️ Update Admin (karena responsenya tidak stabil, gunakan ResponseBody)
     @PUT("api/admin/update")
     suspend fun updateAdmin(
         @Body request: AdminUpdateRequest
-    ): Response<AdminResponse>
+    ): Response<ResponseBody>
 
     // ❌ Hapus Admin
     @HTTP(method = "DELETE", path = "api/admin/delete", hasBody = true)

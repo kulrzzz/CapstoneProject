@@ -20,6 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.capstoneproject.model.admin.AdminCreateRequest
 import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
+import com.example.capstoneproject.ui.theme.LoadingButtonContent
 import com.example.capstoneproject.viewmodel.AdminViewModel
 
 @Composable
@@ -134,10 +135,9 @@ fun TambahAdminPage(
                             modifier = Modifier.weight(1f).height(50.dp),
                             enabled = !isLoading
                         ) {
-                            Text(
-                                if (isLoading) "Menambahkan..." else "Tambah Admin",
-                                fontSize = 16.sp,
-                                color = Color.White
+                            LoadingButtonContent(
+                                isLoading = isLoading,
+                                buttonText = if (isLoading) "Menambahkan" else "Tambah Admin"
                             )
                         }
                     }
