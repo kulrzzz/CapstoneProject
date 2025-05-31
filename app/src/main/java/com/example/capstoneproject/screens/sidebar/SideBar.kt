@@ -47,6 +47,7 @@ fun SideBar(
             .fillMaxHeight()
             .background(Color(0xFFF8FAFC))
             .padding(20.dp),
+
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -149,13 +150,3 @@ data class SidebarItemModel(
     val icon: Int,
     val screen: Screen
 )
-
-@Preview(showBackground = true, widthDp = 262, heightDp = 768)
-@Composable
-fun SideBarPreview() {
-    SideBar(
-        userRole = "superadmin", // ✅ Fixed here
-        onNavigate = {},
-        onLogout = {}
-    )
-}

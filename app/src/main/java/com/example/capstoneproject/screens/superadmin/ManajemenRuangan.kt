@@ -123,8 +123,8 @@ fun ManajemenRuanganPage(
                                     .padding(vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                TableHeaderCell("No", 50.dp, textSize, headerTextColor, modifier = Modifier.padding(horizontal = 10.dp))
-                                TableHeaderCell("Nama Ruangan", 200.dp, textSize, headerTextColor)
+                                TableHeaderCell("No", 50.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 10.dp))
+                                TableHeaderCell("Nama Ruangan", 170.dp, textSize, headerTextColor)
                                 TableHeaderCell("Kategori", 155.dp, textSize, headerTextColor)
                                 TableHeaderCell("Status",100.dp,textSize,headerTextColor)
                                 TableHeaderCell("Actions",170.dp,textSize,headerTextColor)
@@ -173,8 +173,8 @@ fun RoomRow(
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TableBodyCell(no.toString(), 50.dp, textSize, modifier = Modifier.padding(horizontal = 10.dp))
-        TableBodyCell(room.room_name, 200.dp,textSize)
+        TableBodyCell(no.toString(), 50.dp, textSize, modifier = Modifier.padding(start = 10.dp))
+        TableBodyCell(room.room_name, 170.dp,textSize)
         TableBodyCell(room.room_kategori, 155.dp, textSize)
         Box(
             modifier = Modifier
@@ -194,8 +194,8 @@ fun RoomRow(
         }
         Box(
             modifier = Modifier
-                .width(167.dp)
-                .padding(start = 13.dp)
+                .width(175.dp)
+                .padding(start = 7.dp)
                 .fillMaxHeight(),
             contentAlignment = Alignment.Center
         ) {

@@ -147,11 +147,11 @@ fun BookingHistoryTable(
                     .padding(vertical = 15.dp),
                 horizontalArrangement = Arrangement.Start
             ) {
-                TableHeaderCell("No", 60.dp, textSize, headerTextColor, textAlign = TextAlign.Center)
-                TableHeaderCell("Kode Booking", 180.dp, textSize, headerTextColor)
-                TableHeaderCell("Nama Gedung", 180.dp, textSize, headerTextColor)
-                TableHeaderCell("Tanggal", 180.dp, textSize, headerTextColor)
-                TableHeaderCell("Waktu", 200.dp, textSize, headerTextColor)
+                TableHeaderCell("No", 50.dp, textSize, headerTextColor)
+                TableHeaderCell("Kode Booking", 170.dp, textSize, headerTextColor)
+                TableHeaderCell("Nama Gedung", 170.dp, textSize, headerTextColor)
+                TableHeaderCell("Tanggal", 130.dp, textSize, headerTextColor)
+                TableHeaderCell("Waktu", 160.dp, textSize, headerTextColor)
                 TableHeaderCell("Nominal", 150.dp, textSize, headerTextColor)
             }
 
@@ -190,11 +190,11 @@ fun BookingRow(
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TableBodyCell(no.toString(), 60.dp, textSize)
-        TableBodyCell(booking.booking_code, 180.dp, textSize)
-        TableBodyCell(booking.room_name, 180.dp, textSize)
-        TableBodyCell(booking.booking_date, 180.dp, textSize)
-        TableBodyCell("${booking.booking_start} - ${booking.booking_end}", 200.dp, textSize)
+        TableBodyCell(no.toString(), 50.dp, textSize)
+        TableBodyCell(booking.booking_code, 170.dp, textSize)
+        TableBodyCell(booking.room_name, 170.dp, textSize)
+        TableBodyCell(booking.booking_date, 130.dp, textSize)
+        TableBodyCell("${booking.booking_start} - ${booking.booking_end}", 160.dp, textSize)
         TableBodyCell(formatCurrency(booking.booking_price), 150.dp, textSize)
     }
 }

@@ -31,8 +31,7 @@ fun TableHeaderCell(
         color = textColor,
         textAlign = textAlign,
         modifier = modifier
-            .width(width)
-            .padding(horizontal = 8.dp),
+            .width(width),
         maxLines = 1
     )
 }
@@ -50,8 +49,7 @@ fun TableBodyCell(
         fontSize = fontSize,
         textAlign = textAlign,
         modifier = modifier
-            .width(width)
-            .padding(horizontal = 8.dp),
+            .width(width),
         maxLines = 1
     )
 }
