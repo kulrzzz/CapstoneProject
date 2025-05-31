@@ -84,11 +84,11 @@ fun RiwayatTransaksiPage(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         TableHeaderCell("No", 40.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 10.dp))
-                        TableHeaderCell("Kode Booking", 150.dp, textSize, headerTextColor)
-                        TableHeaderCell("Peminjam", 172.dp, textSize, headerTextColor)
-                        TableHeaderCell("Ruangan", 150.dp, textSize, headerTextColor)
-                        TableHeaderCell("Tanggal", 120.dp, textSize, headerTextColor)
-                        TableHeaderCell("Detail", 155.dp, textSize, headerTextColor)
+                        TableHeaderCell("Kode Booking", 150.dp, textSize, headerTextColor, textAlign = TextAlign.Start, modifier = Modifier.padding(start = 30.dp))
+                        TableHeaderCell("Peminjam", 172.dp, textSize, headerTextColor, textAlign = TextAlign.Start)
+                        TableHeaderCell("Ruangan", 150.dp, textSize, headerTextColor, textAlign = TextAlign.Start)
+                        TableHeaderCell("Tanggal", 120.dp, textSize, headerTextColor, textAlign = TextAlign.Start)
+                        TableHeaderCell("Detail", 155.dp, textSize, headerTextColor, textAlign = TextAlign.Start)
                     }
 
                     Divider(color = Color.LightGray)
@@ -136,10 +136,10 @@ fun TransaksiRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         TableBodyCell(no.toString(), 40.dp, fontSize, modifier = Modifier.padding(start = 10.dp))
-        TableBodyCell(booking.booking_code, 150.dp, fontSize)
-        TableBodyCell(booking.customer_fullname, 172.dp, fontSize)
-        TableBodyCell(booking.room_name, 150.dp, fontSize)
-        TableBodyCell(booking.booking_date, 120.dp, fontSize)
+        TableBodyCell(booking.booking_code, 150.dp, fontSize, textAlign = TextAlign.Start, modifier = Modifier.padding(start = 30.dp))
+        TableBodyCell(booking.customer_fullname, 172.dp, fontSize, textAlign = TextAlign.Start)
+        TableBodyCell(booking.room_name, 150.dp, fontSize, textAlign = TextAlign.Start)
+        TableBodyCell(booking.booking_date, 120.dp, fontSize, textAlign = TextAlign.Start)
         Button(
             onClick = { /* TODO */ },
             modifier = Modifier

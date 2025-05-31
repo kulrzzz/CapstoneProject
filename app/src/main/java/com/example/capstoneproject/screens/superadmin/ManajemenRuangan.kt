@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,6 +39,12 @@ fun ManajemenRuanganPage(
     val titleSize = 30.sp
     val headerColor = Color(0xFFF0F4FF)
     val headerTextColor = Color(0xFF1A237E)
+
+    var searchQuery by remember { mutableStateOf("") }
+    val filteredRoomList = roomList.filter {
+        it.room_name.contains(searchQuery, ignoreCase = true) ||
+                it.room_kategori.contains(searchQuery, ignoreCase = true)
+    }
 
     Row(
         modifier = Modifier
@@ -69,19 +74,49 @@ fun ManajemenRuanganPage(
 
             Spacer(modifier = Modifier.height(spacing))
 
-            Button(
-                onClick = onTambahRuanganClick,
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1570EF)),
-                shape = RoundedCornerShape(12.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.tambahruangan),
-                    contentDescription = "Tambah Ruangan",
-                    tint = Color.White,
-                    modifier = Modifier.size(20.dp)
+                Button(
+                    onClick = onTambahRuanganClick,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1570EF)),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.tambahruangan),
+                        contentDescription = "Tambah Ruangan",
+                        tint = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Tambah Ruangan", fontSize = textSize, color = Color.White)
+                }
+
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    placeholder = {
+                        Text("Cari nama atau kategori...", color = Color(0xFF94A3B8))
+                    },
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.search),
+                            contentDescription = "Search Icon",
+                            tint = Color(0xFF1E3A8A)
+                        )
+                    },
+                    singleLine = true,
+                    shape = RoundedCornerShape(100.dp),
+                    modifier = Modifier
+                        .width(300.dp)
+                        .height(56.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF04A5D4),
+                        unfocusedBorderColor = Color.Gray,
+                    )
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Tambah Ruangan", fontSize = textSize, color = Color.White)
             }
 
             Spacer(modifier = Modifier.height(spacing))
@@ -126,14 +161,14 @@ fun ManajemenRuanganPage(
                                 TableHeaderCell("No", 50.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 10.dp))
                                 TableHeaderCell("Nama Ruangan", 170.dp, textSize, headerTextColor)
                                 TableHeaderCell("Kategori", 155.dp, textSize, headerTextColor)
-                                TableHeaderCell("Status",100.dp,textSize,headerTextColor)
-                                TableHeaderCell("Actions",170.dp,textSize,headerTextColor)
+                                TableHeaderCell("Status", 100.dp, textSize, headerTextColor)
+                                TableHeaderCell("Actions", 170.dp, textSize, headerTextColor)
                             }
 
                             Divider(color = Color.LightGray)
 
                             LazyColumn {
-                                itemsIndexed(roomList) { index, room ->
+                                itemsIndexed(filteredRoomList) { index, room ->
                                     RoomRow(
                                         no = index + 1,
                                         room = room,
@@ -141,10 +176,7 @@ fun ManajemenRuanganPage(
                                         onEdit = { onEditRoom(room) },
                                         onDelete = { onDeleteRoom(room) },
                                         onToggleAvailability = { isAvailable ->
-                                            onToggleAvailability(
-                                                room,
-                                                isAvailable
-                                            )
+                                            onToggleAvailability(room, isAvailable)
                                         }
                                     )
                                 }
@@ -174,12 +206,13 @@ fun RoomRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         TableBodyCell(no.toString(), 50.dp, textSize, modifier = Modifier.padding(start = 10.dp))
-        TableBodyCell(room.room_name, 170.dp,textSize)
+        TableBodyCell(room.room_name, 170.dp, textSize)
         TableBodyCell(room.room_kategori, 155.dp, textSize)
+
+        // Status Lingkaran (Hijau/Merah)
         Box(
             modifier = Modifier
                 .width(95.dp)
-                .padding(start = 10.dp)
                 .height(48.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -192,10 +225,11 @@ fun RoomRow(
                     )
             )
         }
+
+        // Aksi Edit / Hapus
         Box(
             modifier = Modifier
                 .width(175.dp)
-                .padding(start = 7.dp)
                 .fillMaxHeight(),
             contentAlignment = Alignment.Center
         ) {
