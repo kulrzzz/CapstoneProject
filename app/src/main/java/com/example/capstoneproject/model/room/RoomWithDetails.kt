@@ -1,6 +1,5 @@
 package com.example.capstoneproject.model.room
 
-import com.example.capstoneproject.model.room.RoomImage
 import com.example.capstoneproject.model.facility.Facility
 
 data class RoomWithDetails(

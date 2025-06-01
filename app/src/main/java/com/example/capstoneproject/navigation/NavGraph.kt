@@ -289,7 +289,7 @@ fun AppNavGraph(
                 isLoading = roomViewModel.isLoading.value,
                 onTambahRuanganClick = { navController.navigate(Screen.TambahRuangan.route) },
                 onEditRoom = { room ->
-                    Toast.makeText(context, "Fitur edit belum tersedia", Toast.LENGTH_SHORT).show()
+                    navController.navigate("edit_room/${room.room_id}")
                 },
                 onDeleteRoom = { room ->
                     roomViewModel.deleteRoomById(room.room_id) { success ->
@@ -326,6 +326,26 @@ fun AppNavGraph(
             TambahRuanganPage(
                 userRole = loginViewModel.userRole,
                 viewModel = roomViewModel,
+                onBack = { navController.popBackStack() },
+                onNavigate = { screen -> navController.navigate(screen.route) },
+                onLogout = {
+                    loginViewModel.clearLoginState()
+                    mainViewModel.logout()
+                    navController.navigate(Screen.Login.route) { popUpTo(0) }
+                }
+            )
+        }
+
+        composable("edit_room/{roomId}") { backStackEntry ->
+            val roomId = backStackEntry.arguments?.getString("roomId") ?: return@composable
+            val token = loginViewModel.token ?: ""
+            val roomViewModel: RoomViewModel = viewModel(factory = RoomViewModelFactory(token))
+
+            EditRuanganPage(
+                roomId = roomId,
+                roomViewModel = roomViewModel,
+                navController = navController,
+                userRole = loginViewModel.userRole,
                 onBack = { navController.popBackStack() },
                 onNavigate = { screen -> navController.navigate(screen.route) },
                 onLogout = {

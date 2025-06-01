@@ -247,6 +247,44 @@ class RoomViewModel(private val token: String) : ViewModel() {
         }
     }
 
+    fun addRoomImage(uri: Uri, roomId: String, context: Context, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val imageService = ApiClient.roomImageService
+                val tokenPart = token.toRequestBody("text/plain".toMediaTypeOrNull())
+                val roomIdPart = roomId.toRequestBody("text/plain".toMediaTypeOrNull())
+
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val file = File.createTempFile("upload", ".jpg", context.cacheDir)
+                val outputStream = FileOutputStream(file)
+                inputStream?.use { it.copyTo(outputStream) }
+
+                val imagePart = MultipartBody.Part.createFormData(
+                    "ri_image", file.name, file.asRequestBody("image/*".toMediaTypeOrNull())
+                )
+
+                val response = imageService.addRoomImageMultipart(imagePart, roomIdPart, tokenPart)
+                onResult(response.isSuccessful)
+
+            } catch (e: Exception) {
+                onResult(false)
+            }
+        }
+    }
+
+    fun deleteRoomImage(imageId: String, onResult: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val imageService = ApiClient.roomImageService
+                val request = RoomImageDeleteRequest(token, imageId)
+                val response = imageService.deleteRoomImage(request)
+                onResult(response.isSuccessful)
+            } catch (e: Exception) {
+                onResult(false)
+            }
+        }
+    }
+
     private fun setError(message: String, e: Exception) {
         _errorMessage.value = "$message: ${e.localizedMessage ?: e.message}"
     }
