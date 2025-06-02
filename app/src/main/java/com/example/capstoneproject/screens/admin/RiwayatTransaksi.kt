@@ -22,6 +22,8 @@ import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
 import com.example.capstoneproject.ui.theme.TableBodyCell
 import com.example.capstoneproject.ui.theme.TableHeaderCell
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun RiwayatTransaksiPage(
@@ -88,7 +90,8 @@ fun RiwayatTransaksiPage(
                         TableHeaderCell("Peminjam", 190.dp, textSize, headerTextColor)
                         TableHeaderCell("Ruangan", 160.dp, textSize, headerTextColor)
                         TableHeaderCell("Tanggal", 150.dp, textSize, headerTextColor)
-                        TableHeaderCell("Detail", 200.dp, textSize, headerTextColor)
+                        TableHeaderCell("Waktu", 170.dp, textSize, headerTextColor)
+                        TableHeaderCell("Nominal", 150.dp, textSize, headerTextColor)
                     }
 
                     Divider(color = Color.LightGray)
@@ -140,14 +143,18 @@ fun TransaksiRow(
         TableBodyCell(booking.customer_fullname, 190.dp, fontSize)
         TableBodyCell(booking.room_name, 160.dp, fontSize)
         TableBodyCell(booking.booking_date, 150.dp, fontSize)
-        Button(
-            onClick = { /* TODO */ },
-            modifier = Modifier
-                .width(200.dp)
-                .padding(horizontal = 10.dp)
-        ) {
-            Text("Lihat Detail", fontSize = fontSize)
-        }
+        TableBodyCell("${booking.booking_start} - ${booking.booking_end}", 170.dp, fontSize)
+        TableBodyCell(booking.booking_price.toString(), 150.dp, fontSize)
+//        Button(
+//            onClick = { /* TODO */ },
+//            modifier = Modifier
+//                .width(200.dp)
+//                .padding(horizontal = 10.dp)
+//        ) {
+//            Text("Lihat Detail", fontSize = fontSize)
+//        }
     }
 }
+
+
 
