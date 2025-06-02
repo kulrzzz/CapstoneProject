@@ -84,11 +84,11 @@ fun RiwayatTransaksiPage(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         TableHeaderCell("No", 40.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 10.dp))
-                        TableHeaderCell("Kode Booking", 150.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 30.dp))
-                        TableHeaderCell("Peminjam", 172.dp, textSize, headerTextColor)
-                        TableHeaderCell("Ruangan", 150.dp, textSize, headerTextColor)
-                        TableHeaderCell("Tanggal", 120.dp, textSize, headerTextColor)
-                        TableHeaderCell("Detail", 155.dp, textSize, headerTextColor)
+                        TableHeaderCell("Kode Booking", 160.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 30.dp))
+                        TableHeaderCell("Peminjam", 190.dp, textSize, headerTextColor)
+                        TableHeaderCell("Ruangan", 160.dp, textSize, headerTextColor)
+                        TableHeaderCell("Tanggal", 150.dp, textSize, headerTextColor)
+                        TableHeaderCell("Detail", 200.dp, textSize, headerTextColor)
                     }
 
                     Divider(color = Color.LightGray)
@@ -136,14 +136,14 @@ fun TransaksiRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         TableBodyCell(no.toString(), 40.dp, fontSize, modifier = Modifier.padding(start = 10.dp))
-        TableBodyCell(booking.booking_code, 150.dp, fontSize, modifier = Modifier.padding(start = 30.dp))
-        TableBodyCell(booking.customer_fullname, 172.dp, fontSize, textAlign = TextAlign.Start)
-        TableBodyCell(booking.room_name, 150.dp, fontSize)
-        TableBodyCell(booking.booking_date, 120.dp, fontSize)
+        TableBodyCell(booking.booking_code, 160.dp, fontSize, modifier = Modifier.padding(start = 30.dp))
+        TableBodyCell(booking.customer_fullname, 190.dp, fontSize)
+        TableBodyCell(booking.room_name, 160.dp, fontSize)
+        TableBodyCell(booking.booking_date, 150.dp, fontSize)
         Button(
             onClick = { /* TODO */ },
             modifier = Modifier
-                .width(155.dp)
+                .width(200.dp)
                 .padding(horizontal = 10.dp)
         ) {
             Text("Lihat Detail", fontSize = fontSize)

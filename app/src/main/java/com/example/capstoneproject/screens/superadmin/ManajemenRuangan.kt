@@ -159,10 +159,10 @@ fun ManajemenRuanganPage(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 TableHeaderCell("No", 50.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 10.dp))
-                                TableHeaderCell("Nama Ruangan", 170.dp, textSize, headerTextColor)
-                                TableHeaderCell("Kategori", 155.dp, textSize, headerTextColor)
-                                TableHeaderCell("Status", 100.dp, textSize, headerTextColor)
-                                TableHeaderCell("Actions", 170.dp, textSize, headerTextColor)
+                                TableHeaderCell("Nama Ruangan", 250.dp, textSize, headerTextColor)
+                                TableHeaderCell("Kategori", 200.dp, textSize, headerTextColor)
+                                TableHeaderCell("Status", 150.dp, textSize, headerTextColor)
+                                TableHeaderCell("Actions", 250.dp, textSize, headerTextColor)
                             }
 
                             Divider(color = Color.LightGray)
@@ -206,13 +206,13 @@ fun RoomRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         TableBodyCell(no.toString(), 50.dp, textSize, modifier = Modifier.padding(start = 10.dp))
-        TableBodyCell(room.room_name, 170.dp, textSize)
-        TableBodyCell(room.room_kategori, 155.dp, textSize)
+        TableBodyCell(room.room_name, 250.dp, textSize)
+        TableBodyCell(room.room_kategori, 200.dp, textSize)
 
         // Status Lingkaran (Hijau/Merah)
         Box(
             modifier = Modifier
-                .width(95.dp)
+                .width(145.dp)
                 .height(48.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -229,7 +229,7 @@ fun RoomRow(
         // Aksi Edit / Hapus
         Box(
             modifier = Modifier
-                .width(175.dp)
+                .width(255.dp)
                 .fillMaxHeight(),
             contentAlignment = Alignment.Center
         ) {

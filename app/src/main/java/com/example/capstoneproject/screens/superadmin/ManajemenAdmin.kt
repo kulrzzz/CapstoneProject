@@ -142,9 +142,9 @@ fun ManajemenAdminPage(
                                     .padding(vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                TableHeaderCell("No", 50.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 10.dp))
-                                TableHeaderCell("Fullname", 220.dp, textSize, headerTextColor)
-                                TableHeaderCell("Email", 240.dp, textSize, headerTextColor)
+                                TableHeaderCell("No", 50.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 20.dp))
+                                TableHeaderCell("Fullname", 320.dp, textSize, headerTextColor)
+                                TableHeaderCell("Email", 340.dp, textSize, headerTextColor)
                                 TableHeaderCell("Actions", 170.dp, textSize, headerTextColor)
                             }
 
@@ -184,9 +184,9 @@ fun AdminRow(
             .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        TableBodyCell(no.toString(), 50.dp, textSize, modifier = Modifier.padding(start = 10.dp))
-        TableBodyCell(admin.admin_fullname, 220.dp, textSize)
-        TableBodyCell(admin.admin_email, 240.dp, textSize)
+        TableBodyCell(no.toString(), 50.dp, textSize, modifier = Modifier.padding(start = 20.dp))
+        TableBodyCell(admin.admin_fullname, 320.dp, textSize)
+        TableBodyCell(admin.admin_email, 340.dp, textSize)
         Box(
             modifier = Modifier
                 .width(160.dp)

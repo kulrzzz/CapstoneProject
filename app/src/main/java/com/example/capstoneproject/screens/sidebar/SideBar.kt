@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,6 +30,12 @@ fun SideBar(
 
     val isSuperAdmin = userRole?.lowercase() == "superadmin"
 
+    // Hitung lebar layar dan buat lebar sidebar = 1/5 layar
+    val configuration = LocalConfiguration.current
+    val screenWidthDp = configuration.screenWidthDp
+    val sidebarWidth = (screenWidthDp * 0.255f).dp
+
+
     val menuItems = buildList {
         add(SidebarItemModel("Dashboard", R.drawable.homebefore, Screen.Dashboard))
         add(SidebarItemModel("Riwayat Transaksi", R.drawable.riwayat, Screen.RiwayatTransaksi))
@@ -43,11 +50,11 @@ fun SideBar(
 
     Column(
         modifier = Modifier
-            .width(262.dp)
+            .width(sidebarWidth) // ← responsif 1/5 lebar layar
+            .widthIn(min = 220.dp, max = 320.dp) // opsional: batas aman
             .fillMaxHeight()
             .background(Color(0xFFF8FAFC))
             .padding(20.dp),
-
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
