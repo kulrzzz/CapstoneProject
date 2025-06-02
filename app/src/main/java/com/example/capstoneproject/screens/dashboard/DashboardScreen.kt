@@ -93,8 +93,7 @@ fun DashboardScreen(
 fun MetricCard(title: String, value: String, iconRes: Int) {
     Card(
         modifier = Modifier
-//            .weight(1f)
-            .height(120.dp),
+            .height(90.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(4.dp)
@@ -111,8 +110,8 @@ fun MetricCard(title: String, value: String, iconRes: Int) {
                     .padding(end = 16.dp)
             )
             Column {
-                Text(text = title, fontSize = 14.sp, color = Color.Gray)
-                Text(text = value, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(text = title, fontSize = 14.sp, color = Color.Gray, textAlign = TextAlign.Center)
+                Text(text = value, fontSize = 18.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
             }
         }
     }
@@ -141,11 +140,11 @@ fun BookingHistoryTable(data: List<RiwayatData>) {
                 horizontalArrangement = Arrangement.Start
             ) {
                 TableHeader("No", 60.dp)
-                TableHeader("Nama", 200.dp)
-                TableHeader("Ruangan", 200.dp)
-                TableHeader("Agenda", 180.dp)
-                TableHeader("Jam", 180.dp)
-                TableHeader("Kode", 120.dp)
+                TableHeader("Kode", 180.dp)
+                TableHeader("Peminjam", 190.dp)
+                TableHeader("Ruangan", 160.dp)
+                TableHeader("Tanggal", 150.dp)
+                TableHeader("Waktu", 170.dp)
             }
 
             LazyColumn {
@@ -165,7 +164,7 @@ fun TableHeader(text: String, width: Dp) {
         fontWeight = FontWeight.SemiBold,
         color = Color(0xFF1A237E),
         modifier = Modifier.width(width),
-        textAlign = TextAlign.Start
+        textAlign = TextAlign.Center
     )
 }
 
@@ -179,11 +178,11 @@ fun BookingRow(index: Int, data: RiwayatData) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         TableCell(index.toString(), 60.dp)
-        TableCell(data.nama, 200.dp)
-        TableCell(data.ruangan, 200.dp)
-        TableCell(data.agenda, 180.dp)
-        TableCell(data.jam, 180.dp)
-        TableCell(data.kode, 120.dp)
+        TableCell(data.nama, 180.dp)
+        TableCell(data.ruangan, 190.dp)
+        TableCell(data.agenda, 160.dp)
+        TableCell(data.jam, 150.dp)
+        TableCell(data.kode, 170.dp)
     }
 }
 
@@ -193,7 +192,7 @@ fun TableCell(text: String, width: Dp) {
         text = text,
         fontSize = 14.sp,
         modifier = Modifier.width(width),
-        textAlign = TextAlign.Start
+        textAlign = TextAlign.Center
     )
 }
 
@@ -208,9 +207,8 @@ data class RiwayatData(
 
 
 val sampleRiwayat = listOf(
-    RiwayatData("Mithilesh Kumar Singh", "GKM Lantai 1", "Kunjungan Studi", "07.00 - 13.00", "12358G"),
-    RiwayatData("Suron Maharjan", "GKM Lantai 1", "Gladi Bersih", "08.00 - 15.50", "86523B"),
-    RiwayatData("Sandesh Bajracharya", "GKM Lantai 2", "Kunjungan Studi", "16.00 - 20.00", "78365D"),
-    RiwayatData("Subin Sedhai", "GKM Lantai 4.4", "Gladi Bersih", "12.00 - 20.00", "863265F"),
-    RiwayatData("Vonjola Joshi", "GKM Lantai 3.2", "Upgrading 2", "12.00 - 20.00", "459872E")
+    RiwayatData("6327517145", "RG", "Jepang", "2025-06-05", "07:00:00 - 10:00:00"),
+    RiwayatData("6327517145", "RG", "Lavender", "2025-06-05", "08:00:00 - 16:00:00"),
+    RiwayatData("3325287042", "regga ananda", "Lavender", "2025-06-05", "14:00:00 - 16:00:00"),
+    RiwayatData("8900950976", "aqiljaved", "Indonesia", "2025-06-07", "07:00:00 - 09:00:00"),
 )

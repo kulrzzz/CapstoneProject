@@ -239,8 +239,7 @@ fun DaftarUserCard(
             }
 
             IconButton(
-//                onClick = onDelete
-                onClick = {/*todo*/}
+                onClick = onDelete
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.trash),
