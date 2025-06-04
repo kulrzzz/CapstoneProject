@@ -1,9 +1,11 @@
 package com.example.capstoneproject.screens.superadmin
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -134,31 +136,37 @@ fun ManajemenAdminPage(
                     }
 
                     else -> {
-                        Column {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(headerColor)
-                                    .padding(vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                TableHeaderCell("No", 50.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 20.dp))
-                                TableHeaderCell("Fullname", 320.dp, textSize, headerTextColor)
-                                TableHeaderCell("Email", 340.dp, textSize, headerTextColor)
-                                TableHeaderCell("Actions", 170.dp, textSize, headerTextColor)
-                            }
+                        val scrollState = rememberScrollState()
 
-                            Divider(color = Color.LightGray)
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(scrollState)
+                        ) {
+                            Column {
+                                Row(
+                                    modifier = Modifier
+                                        .background(headerColor)
+                                        .padding(vertical = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    TableHeaderCell("No", 50.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 20.dp))
+                                    TableHeaderCell("Fullname", 320.dp, textSize, headerTextColor)
+                                    TableHeaderCell("Email", 340.dp, textSize, headerTextColor)
+                                    TableHeaderCell("Actions", 170.dp, textSize, headerTextColor)
+                                }
 
-                            LazyColumn {
-                                itemsIndexed(adminRequestList) { index, admin ->
-                                    AdminRow(
-                                        no = index + 1,
-                                        admin = admin,
-                                        textSize = textSize,
-                                        onEdit = { onEditAdmin(admin) },
-                                        onDelete = { onDeleteAdmin(admin) }
-                                    )
+                                Divider(color = Color.LightGray)
+
+                                LazyColumn {
+                                    itemsIndexed(adminRequestList) { index, admin ->
+                                        AdminRow(
+                                            no = index + 1,
+                                            admin = admin,
+                                            textSize = textSize,
+                                            onEdit = { onEditAdmin(admin) },
+                                            onDelete = { onDeleteAdmin(admin) }
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -189,7 +197,7 @@ fun AdminRow(
         TableBodyCell(admin.admin_email, 340.dp, textSize)
         Box(
             modifier = Modifier
-                .width(160.dp)
+                .width(170.dp)
                 .padding(start = 10.dp)
                 .fillMaxHeight(),
             contentAlignment = Alignment.Center

@@ -1,9 +1,11 @@
 package com.example.capstoneproject.screens.superadmin
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -150,35 +152,41 @@ fun ManajemenRuanganPage(
                     }
 
                     else -> {
-                        Column {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(headerColor)
-                                    .padding(vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                TableHeaderCell("No", 50.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 10.dp))
-                                TableHeaderCell("Nama Ruangan", 250.dp, textSize, headerTextColor)
-                                TableHeaderCell("Kategori", 200.dp, textSize, headerTextColor)
-                                TableHeaderCell("Status", 150.dp, textSize, headerTextColor)
-                                TableHeaderCell("Actions", 250.dp, textSize, headerTextColor)
-                            }
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .horizontalScroll(rememberScrollState())
+                        ) {
+                            Column {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(headerColor)
+                                        .padding(vertical = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    TableHeaderCell("No", 50.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 10.dp))
+                                    TableHeaderCell("Nama Ruangan", 250.dp, textSize, headerTextColor)
+                                    TableHeaderCell("Kategori", 200.dp, textSize, headerTextColor)
+                                    TableHeaderCell("Status", 150.dp, textSize, headerTextColor)
+                                    TableHeaderCell("Actions", 250.dp, textSize, headerTextColor)
+                                }
 
-                            Divider(color = Color.LightGray)
+                                Divider(color = Color.LightGray)
 
-                            LazyColumn {
-                                itemsIndexed(filteredRoomList) { index, room ->
-                                    RoomRow(
-                                        no = index + 1,
-                                        room = room,
-                                        textSize = textSize,
-                                        onEdit = { onEditRoom(room) },
-                                        onDelete = { onDeleteRoom(room) },
-                                        onToggleAvailability = { isAvailable ->
-                                            onToggleAvailability(room, isAvailable)
-                                        }
-                                    )
+                                LazyColumn {
+                                    itemsIndexed(filteredRoomList) { index, room ->
+                                        RoomRow(
+                                            no = index + 1,
+                                            room = room,
+                                            textSize = textSize,
+                                            onEdit = { onEditRoom(room) },
+                                            onDelete = { onDeleteRoom(room) },
+                                            onToggleAvailability = { isAvailable ->
+                                                onToggleAvailability(room, isAvailable)
+                                            }
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -209,7 +217,6 @@ fun RoomRow(
         TableBodyCell(room.room_name, 250.dp, textSize)
         TableBodyCell(room.room_kategori, 200.dp, textSize)
 
-        // Status Lingkaran (Hijau/Merah)
         Box(
             modifier = Modifier
                 .width(145.dp)
@@ -226,7 +233,6 @@ fun RoomRow(
             )
         }
 
-        // Aksi Edit / Hapus
         Box(
             modifier = Modifier
                 .width(255.dp)
