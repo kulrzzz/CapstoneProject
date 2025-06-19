@@ -8,12 +8,12 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,8 +22,7 @@ import com.example.capstoneproject.navigation.Screen
 import com.example.capstoneproject.screens.sidebar.SideBar
 import com.example.capstoneproject.ui.theme.TableBodyCell
 import com.example.capstoneproject.ui.theme.TableHeaderCell
-import java.text.NumberFormat
-import java.util.Locale
+import com.example.capstoneproject.R
 
 @Composable
 fun RiwayatTransaksiPage(
@@ -39,6 +38,12 @@ fun RiwayatTransaksiPage(
     val headerColor = Color(0xFFF0F4FF)
     val headerTextColor = Color(0xFF1A237E)
 
+    var searchQuery by remember { mutableStateOf("") }
+    val filteredTransaksiList = transaksiList.filter {
+        it.customer_fullname.contains(searchQuery, ignoreCase = true) ||
+                it.room_name.contains(searchQuery, ignoreCase = true)
+    }
+
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -50,72 +55,106 @@ fun RiwayatTransaksiPage(
             onLogout = onLogout
         )
 
-        Column(
+        Box(
             modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
+                .fillMaxSize()
                 .padding(spacing)
         ) {
-            Spacer(modifier = Modifier.height(25.dp))
+            Column(modifier = Modifier.fillMaxSize()) {
+                Spacer(modifier = Modifier.height(25.dp))
 
-            Text(
-                text = "Lihat Riwayat Transaksi",
-                fontSize = titleSize,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF04A5D4)
-            )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 24.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Lihat Riwayat Transaksi",
+                        fontSize = titleSize,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF04A5D4)
+                    )
 
-            Spacer(modifier = Modifier.height(spacing))
-
-            // Scroll horizontal hanya untuk tabel
-            val horizontalScrollState = rememberScrollState()
-
-            Card(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .horizontalScroll(horizontalScrollState),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
-            ) {
-                Column {
-                    // Header Tabel
-                    Row(
-                        modifier = Modifier
-                            .background(headerColor)
-                            .padding(vertical = 12.dp, ),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TableHeaderCell("No", 40.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 10.dp))
-                        TableHeaderCell("Kode Booking", 160.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 30.dp))
-                        TableHeaderCell("Peminjam", 190.dp, textSize, headerTextColor)
-                        TableHeaderCell("Ruangan", 160.dp, textSize, headerTextColor)
-                        TableHeaderCell("Tanggal", 150.dp, textSize, headerTextColor)
-                        TableHeaderCell("Waktu", 170.dp, textSize, headerTextColor)
-                        TableHeaderCell("Nominal", 150.dp, textSize, headerTextColor)
-                    }
-
-                    Divider(color = Color.LightGray)
-
-                    if (isLoading) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(40.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(
-                                color = Color(0xFF04A5D4),
-                                strokeWidth = 4.dp
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = {
+                            Text(
+                                text = "Cari nama atau email...",
+                                color = Color(0xFF94A3B8)
                             )
+                        },
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.search),
+                                contentDescription = "Search Icon",
+                                tint = Color(0xFF1E3A8A)
+                            )
+                        },
+                        singleLine = true,
+                        shape = RoundedCornerShape(100.dp),
+                        modifier = Modifier
+                            .width(300.dp)
+                            .height(56.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF04A5D4),
+                            unfocusedBorderColor = Color.Gray
+                        )
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(spacing))
+
+                val horizontalScrollState = rememberScrollState()
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .horizontalScroll(horizontalScrollState),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                ) {
+                    Column {
+                        Row(
+                            modifier = Modifier
+                                .background(headerColor)
+                                .padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            TableHeaderCell("No", 40.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 10.dp))
+                            TableHeaderCell("Kode Booking", 160.dp, textSize, headerTextColor, modifier = Modifier.padding(start = 30.dp))
+                            TableHeaderCell("Peminjam", 190.dp, textSize, headerTextColor)
+                            TableHeaderCell("Ruangan", 160.dp, textSize, headerTextColor)
+                            TableHeaderCell("Tanggal", 150.dp, textSize, headerTextColor)
+                            TableHeaderCell("Waktu", 170.dp, textSize, headerTextColor)
+                            TableHeaderCell("Nominal", 150.dp, textSize, headerTextColor)
                         }
-                    } else {
-                        LazyColumn {
-                            itemsIndexed(transaksiList) { index, booking ->
-                                TransaksiRow(
-                                    no = index + 1,
-                                    booking = booking,
-                                    fontSize = textSize
+
+                        Divider(color = Color.LightGray)
+
+                        if (isLoading) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(40.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(
+                                    color = Color(0xFF04A5D4),
+                                    strokeWidth = 4.dp
                                 )
+                            }
+                        } else {
+                            LazyColumn {
+                                itemsIndexed(filteredTransaksiList) { index, booking ->
+                                    TransaksiRow(
+                                        no = index + 1,
+                                        booking = booking,
+                                        fontSize = textSize
+                                    )
+                                }
                             }
                         }
                     }
@@ -145,16 +184,5 @@ fun TransaksiRow(
         TableBodyCell(booking.booking_date, 150.dp, fontSize)
         TableBodyCell("${booking.booking_start} - ${booking.booking_end}", 170.dp, fontSize)
         TableBodyCell(booking.booking_price.toString(), 150.dp, fontSize)
-//        Button(
-//            onClick = { /* TODO */ },
-//            modifier = Modifier
-//                .width(200.dp)
-//                .padding(horizontal = 10.dp)
-//        ) {
-//            Text("Lihat Detail", fontSize = fontSize)
-//        }
     }
 }
-
-
-

@@ -165,7 +165,7 @@ fun EditAdminPage(
                         ) {
                             LoadingButtonContent(
                                 isLoading = isLoading,
-                                buttonText = if (isLoading) "Menambahkan" else "Tambah Admin"
+                                buttonText = if (isLoading) "Menambahkan" else "Edit Admin"
                             )
                         }
                     }
